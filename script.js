@@ -126,6 +126,9 @@ async function init() {
             } else {
                 // Azure manufacturers (keeps the ugly name below)
                 mfg = qpu.provider.charAt(0).toUpperCase() + qpu.provider.slice(1);
+                
+                // THE FIX: Force Azure's "Ionq" to match AWS's "IonQ" so they merge!
+                if (mfg === 'Ionq') mfg = 'IonQ';
             }
             
             const processedItem = { ...qpu, mfg, cleanName, route };
