@@ -49,7 +49,7 @@ function createCard(qpu) {
             <div class="card-header">
                 <div>
                     <p class="qpu-name">${qpu.cleanName}</p>
-                    <p class="qpu-provider">${qpu.mfg} • via ${qpu.route}</p>
+                    <p class="qpu-provider">via ${qpu.route}</p>
                 </div>
                 <div class="status-badge ${badgeClass}">
                     <div class="dot ${dotClass}"></div> ${qpu.status}
@@ -66,62 +66,84 @@ function createCard(qpu) {
     `;
 }
 
+// Function to group items by manufacturer and build sub-grids
+function renderGrouped(containerId, items) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = ''; // Clear container to prevent duplicates
+    
+    const groups = {};
+    items.forEach(item => {
+        if (!groups[item.mfg]) groups[item.mfg] = [];
+        groups[item.mfg].push(item);
+    });
+
+    // Alphabetical sort for manufacturers
+    const sortedMfgs = Object.keys(groups).sort();
+
+    sortedMfgs.forEach(mfg => {
+        // Build the Subheading
+        const header = document.createElement('h3');
+        header.className = 'mfg-title';
+        header.innerText = mfg;
+        container.appendChild(header);
+
+        // Build the specific Grid for this company
+        const grid = document.createElement('div');
+        grid.className = 'grid';
+        grid.style.marginBottom = '1rem'; // tighter spacing between groups
+        
+        groups[mfg].sort((a, b) => a.cleanName.localeCompare(b.cleanName));
+        groups[mfg].forEach(qpu => {
+            grid.innerHTML += createCard(qpu);
+        });
+        
+        container.appendChild(grid);
+    });
+}
+
 async function init() {
     try {
         const res = await fetch('https://api.qpustatus.com/stats');
         let rawData = await res.json();
         
-        // 1. DATA MAPPING (Assigning Manufacturers & Clean Names)
-        let processedData = rawData.map(qpu => {
+        let qpus = [];
+        let sims = [];
+
+        rawData.forEach(qpu => {
             const n = qpu.name.toLowerCase();
             let mfg = qpu.provider.toUpperCase();
             let cleanName = qpu.name.replace(' (Simulator)', '');
             let route = qpu.provider === 'aws' ? 'AWS' : 'Azure';
 
-            // Identify AWS Manufacturers
+            // Tag AWS manufacturers
             if (qpu.provider === 'aws') {
-                if (n.includes('aquila')) mfg = 'QuEra'; //
-                else if (n.includes('aria') || n.includes('forte')) mfg = 'IonQ'; //
-                else if (n.includes('ankaa') || n.includes('aspen')) mfg = 'Rigetti'; //
-                else if (n.includes('garnet') || n.includes('emerald')) mfg = 'IQM'; //
-                else if (n.includes('ibex')) mfg = 'AQT'; //
-                else if (n.includes('sv1') || n.includes('dm1') || n.includes('tn1')) mfg = 'Amazon'; //
-            } 
-            // Identify Azure Manufacturers & Clean their messy names
-            else {
+                if (n.includes('aquila')) mfg = 'QuEra';
+                else if (n.includes('aria') || n.includes('forte')) mfg = 'IonQ';
+                else if (n.includes('ankaa') || n.includes('aspen')) mfg = 'Rigetti';
+                else if (n.includes('garnet') || n.includes('emerald')) mfg = 'IQM';
+                else if (n.includes('ibex')) mfg = 'AQT';
+                else if (n.includes('sv1') || n.includes('dm1') || n.includes('tn1')) mfg = 'Amazon';
+            } else {
+                // Azure manufacturers (keeps the ugly name below)
                 mfg = qpu.provider.charAt(0).toUpperCase() + qpu.provider.slice(1);
-                if (cleanName.includes('.')) cleanName = cleanName.split('.').pop().toUpperCase();
             }
             
-            return { ...qpu, mfg, cleanName, route };
+            const processedItem = { ...qpu, mfg, cleanName, route };
+            
+            if (qpu.name.includes('(Simulator)')) {
+                sims.push(processedItem);
+            } else {
+                qpus.push(processedItem);
+            }
         });
 
-        // 2. SORTING (Alphabetically by Manufacturer, then by Name)
-        processedData.sort((a, b) => {
-            if (a.mfg === b.mfg) return a.cleanName.localeCompare(b.cleanName);
-            return a.mfg.localeCompare(b.mfg);
-        });
-        
         document.getElementById('loader').style.display = 'none';
         document.getElementById('title-qpus').style.display = 'block';
         document.getElementById('title-simulators').style.display = 'block';
 
-        const gridQpus = document.getElementById('grid-qpus');
-        const gridSims = document.getElementById('grid-simulators');
+        renderGrouped('grid-qpus', qpus);
+        renderGrouped('grid-simulators', sims);
 
-        // Clear existing cards to prevent duplication on refresh
-        gridQpus.innerHTML = '';
-        gridSims.innerHTML = '';
-
-        // 3. RENDERING
-        processedData.forEach(qpu => {
-            const cardHTML = createCard(qpu);
-            if (qpu.name.includes('(Simulator)')) {
-                gridSims.innerHTML += cardHTML;
-            } else {
-                gridQpus.innerHTML += cardHTML;
-            }
-        });
     } catch (e) {
         document.getElementById('loader').innerText = "Failed to establish connection to telemetry server.";
     }
