@@ -3,7 +3,6 @@ const themeBtn = document.getElementById('theme-toggle');
 const themeIcon = document.getElementById('theme-icon');
 const htmlTag = document.documentElement;
 
-// Check saved preference on load
 const savedTheme = localStorage.getItem('theme') || 'dark';
 htmlTag.setAttribute('data-theme', savedTheme);
 themeIcon.innerText = savedTheme === 'dark' ? '☀️' : '🌙';
@@ -23,7 +22,7 @@ function formatQueue(depth, provider, status) {
     
     if (provider === 'aws') {
         return `${depth} <span style="font-size: 0.7rem; color: var(--muted); font-family: sans-serif;">Tasks</span>`;
-    } else if (provider === 'azure' || provider === 'ionq' || provider === 'quantinuum' || provider === 'rigetti') {
+    } else {
         if (depth === 0) return '0 <span style="font-size: 0.7rem; color: var(--muted); font-family: sans-serif;">Wait</span>';
         if (depth > 60) {
             const hrs = Math.floor(depth / 60);
@@ -31,7 +30,6 @@ function formatQueue(depth, provider, status) {
         }
         return `${depth}m <span style="font-size: 0.7rem; color: var(--muted); font-family: sans-serif;">Wait</span>`;
     }
-    return depth;
 }
 
 function timeSince(dateString) {
@@ -45,16 +43,13 @@ function createCard(qpu) {
     const isOnline = qpu.status === 'ONLINE';
     const badgeClass = isOnline ? 'status-online' : 'status-offline';
     const dotClass = isOnline ? 'dot-online' : 'dot-offline';
-    
-    let displayProvider = qpu.provider;
-    if(displayProvider.includes('.')) displayProvider = displayProvider.split('.')[0];
 
     return `
         <div class="card">
             <div class="card-header">
                 <div>
-                    <p class="qpu-name">${qpu.name.replace(' (Simulator)', '')}</p>
-                    <p class="qpu-provider">${displayProvider} • ${qpu.region}</p>
+                    <p class="qpu-name">${qpu.cleanName}</p>
+                    <p class="qpu-provider">${qpu.mfg} • via ${qpu.route}</p>
                 </div>
                 <div class="status-badge ${badgeClass}">
                     <div class="dot ${dotClass}"></div> ${qpu.status}
@@ -74,7 +69,38 @@ function createCard(qpu) {
 async function init() {
     try {
         const res = await fetch('https://api.qpustatus.com/stats');
-        const data = await res.json();
+        let rawData = await res.json();
+        
+        // 1. DATA MAPPING (Assigning Manufacturers & Clean Names)
+        let processedData = rawData.map(qpu => {
+            const n = qpu.name.toLowerCase();
+            let mfg = qpu.provider.toUpperCase();
+            let cleanName = qpu.name.replace(' (Simulator)', '');
+            let route = qpu.provider === 'aws' ? 'AWS' : 'Azure';
+
+            // Identify AWS Manufacturers
+            if (qpu.provider === 'aws') {
+                if (n.includes('aquila')) mfg = 'QuEra'; //
+                else if (n.includes('aria') || n.includes('forte')) mfg = 'IonQ'; //
+                else if (n.includes('ankaa') || n.includes('aspen')) mfg = 'Rigetti'; //
+                else if (n.includes('garnet') || n.includes('emerald')) mfg = 'IQM'; //
+                else if (n.includes('ibex')) mfg = 'AQT'; //
+                else if (n.includes('sv1') || n.includes('dm1') || n.includes('tn1')) mfg = 'Amazon'; //
+            } 
+            // Identify Azure Manufacturers & Clean their messy names
+            else {
+                mfg = qpu.provider.charAt(0).toUpperCase() + qpu.provider.slice(1);
+                if (cleanName.includes('.')) cleanName = cleanName.split('.').pop().toUpperCase();
+            }
+            
+            return { ...qpu, mfg, cleanName, route };
+        });
+
+        // 2. SORTING (Alphabetically by Manufacturer, then by Name)
+        processedData.sort((a, b) => {
+            if (a.mfg === b.mfg) return a.cleanName.localeCompare(b.cleanName);
+            return a.mfg.localeCompare(b.mfg);
+        });
         
         document.getElementById('loader').style.display = 'none';
         document.getElementById('title-qpus').style.display = 'block';
@@ -83,11 +109,12 @@ async function init() {
         const gridQpus = document.getElementById('grid-qpus');
         const gridSims = document.getElementById('grid-simulators');
 
-        // THE FIX: Clear the grids before injecting new data so they don't duplicate!
+        // Clear existing cards to prevent duplication on refresh
         gridQpus.innerHTML = '';
         gridSims.innerHTML = '';
 
-        data.forEach(qpu => {
+        // 3. RENDERING
+        processedData.forEach(qpu => {
             const cardHTML = createCard(qpu);
             if (qpu.name.includes('(Simulator)')) {
                 gridSims.innerHTML += cardHTML;
