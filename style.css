@@ -43,6 +43,12 @@ h1 span { color: var(--accent); }
 }
 .section-title { font-size: 1.25rem; margin-bottom: 1rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em;}
 
+.mfg-title {
+    font-size: 1.1rem; color: var(--text); 
+    border-bottom: 1px solid var(--border); 
+    padding-bottom: 0.5rem; margin-top: 2rem; margin-bottom: 1rem;
+}
+
 .card {
     background: var(--panel); border: 1px solid var(--border); border-radius: 0.5rem;
     padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;
