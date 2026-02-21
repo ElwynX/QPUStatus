@@ -1,156 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>QPU Status | Live Quantum Hardware Telemetry</title>
-    <style>
-        :root {
-            --bg: #0f172a; --panel: #1e293b; --text: #f8fafc; --muted: #94a3b8;
-            --online: #10b981; --offline: #ef4444; --border: #334155; --accent: #3b82f6;
-        }
-        body {
-            font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
-            background-color: var(--bg); color: var(--text);
-            margin: 0; padding: 2rem;
-        }
-        header { margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
-        h1 { margin: 0; font-size: 2rem; display: flex; align-items: center; gap: 0.5rem; }
-        h1 span { color: var(--accent); }
-        .subtitle { color: var(--muted); margin-top: 0.5rem; }
-        
-        .grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;
-            margin-bottom: 3rem;
-        }
-        .section-title { font-size: 1.25rem; margin-bottom: 1rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em;}
-        
-        .card {
-            background: var(--panel); border: 1px solid var(--border); border-radius: 0.5rem;
-            padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;
-        }
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
-        .qpu-name { font-weight: 600; font-size: 1.1rem; margin: 0; }
-        .qpu-provider { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-        
-        .status-badge {
-            font-size: 0.75rem; font-weight: bold; padding: 0.25rem 0.5rem; border-radius: 999px;
-            text-transform: uppercase; display: flex; align-items: center; gap: 0.3rem;
-        }
-        .status-online { background: rgba(16, 185, 129, 0.1); color: var(--online); border: 1px solid rgba(16, 185, 129, 0.2); }
-        .status-offline { background: rgba(239, 68, 68, 0.1); color: var(--offline); border: 1px solid rgba(239, 68, 68, 0.2); }
-        .dot { height: 6px; width: 6px; border-radius: 50%; }
-        .dot-online { background-color: var(--online); box-shadow: 0 0 5px var(--online); }
-        .dot-offline { background-color: var(--offline); }
-
-        .metrics { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 1rem; border-top: 1px dashed var(--border); }
-        .metric-label { font-size: 0.75rem; color: var(--muted); }
-        .metric-value { font-size: 1.25rem; font-weight: 700; font-family: monospace; }
-        .time-ago { font-size: 0.7rem; color: var(--muted); text-align: right; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <header>
-        <h1>QPU<span>Status</span></h1>
-        <div class="subtitle">Live Global Quantum Hardware Telemetry</div>
+        <div class="header-left">
+            <svg class="logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <div>
+                <h1>QPU<span>Status</span></h1>
+                <div class="subtitle">Live Global Quantum Hardware Telemetry</div>
+            </div>
+        </div>
+        <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">
+            <span id="theme-icon">☀️</span>
+        </button>
     </header>
 
-    <div id="loader" style="color: var(--muted);">Establishing secure connection to quantum targets...</div>
+    <main>
+        <div id="loader" style="color: var(--muted);">Establishing secure connection to quantum targets...</div>
 
-    <h2 class="section-title" id="title-qpus" style="display: none;">Physical Hardware</h2>
-    <div class="grid" id="grid-qpus"></div>
+        <h2 class="section-title" id="title-qpus" style="display: none;">Physical Hardware</h2>
+        <div class="grid" id="grid-qpus"></div>
 
-    <h2 class="section-title" id="title-simulators" style="display: none;">Simulators & Emulators</h2>
-    <div class="grid" id="grid-simulators"></div>
+        <h2 class="section-title" id="title-simulators" style="display: none;">Simulators & Emulators</h2>
+        <div class="grid" id="grid-simulators"></div>
+    </main>
 
-    <script>
-        // --- NORMALIZATION LOGIC ---
-        function formatQueue(depth, provider, status) {
-            if (status === 'OFFLINE') return '<span style="color: var(--muted)">--</span>';
-            
-            if (provider === 'aws') {
-                return `${depth} <span style="font-size: 0.7rem; color: var(--muted); font-family: sans-serif;">Tasks</span>`;
-            } else if (provider === 'azure' || provider === 'ionq' || provider === 'quantinuum' || provider === 'rigetti') {
-                if (depth === 0) return '0 <span style="font-size: 0.7rem; color: var(--muted); font-family: sans-serif;">Wait</span>';
-                if (depth > 60) {
-                    const hrs = Math.floor(depth / 60);
-                    return `${hrs}h <span style="font-size: 0.7rem; color: var(--muted); font-family: sans-serif;">Wait</span>`;
-                }
-                return `${depth}m <span style="font-size: 0.7rem; color: var(--muted); font-family: sans-serif;">Wait</span>`;
-            }
-            return depth;
-        }
+    <footer class="site-footer">
+        <p>&copy; 2026 QPUStatus. All rights reserved.</p>
+        <p class="disclaimer">Disclaimer: This is an independent telemetry dashboard. QPUStatus is not officially affiliated with, endorsed by, or partnered with AWS, Microsoft Azure, IonQ, Rigetti, Quantinuum, or any other displayed hardware providers.</p>
+    </footer>
 
-        function timeSince(dateString) {
-            // Treat the DB string as UTC
-            const date = new Date(dateString.replace(' ', 'T') + 'Z');
-            const seconds = Math.floor((new Date() - date) / 1000);
-            if (seconds < 60) return `${seconds}s ago`;
-            return `${Math.floor(seconds / 60)}m ago`;
-        }
-
-        function createCard(qpu) {
-            const isOnline = qpu.status === 'ONLINE';
-            const badgeClass = isOnline ? 'status-online' : 'status-offline';
-            const dotClass = isOnline ? 'dot-online' : 'dot-offline';
-            
-            // Clean up Azure's long provider names
-            let displayProvider = qpu.provider;
-            if(displayProvider.includes('.')) displayProvider = displayProvider.split('.')[0];
-
-            return `
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <p class="qpu-name">${qpu.name.replace(' (Simulator)', '')}</p>
-                            <p class="qpu-provider">${displayProvider} • ${qpu.region}</p>
-                        </div>
-                        <div class="status-badge ${badgeClass}">
-                            <div class="dot ${dotClass}"></div> ${qpu.status}
-                        </div>
-                    </div>
-                    <div class="metrics">
-                        <div>
-                            <div class="metric-label">NETWORK LOAD</div>
-                            <div class="metric-value">${formatQueue(qpu.queue_depth, qpu.provider, qpu.status)}</div>
-                        </div>
-                        <div class="time-ago">Updated ${timeSince(qpu.last_updated)}</div>
-                    </div>
-                </div>
-            `;
-        }
-
-        async function init() {
-            try {
-                // REPLACE THIS URL WITH YOUR WORKER's /stats URL!
-                const res = await fetch('https://api.qpustatus.com/stats');
-                const data = await res.json();
-                
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('title-qpus').style.display = 'block';
-                document.getElementById('title-simulators').style.display = 'block';
-
-                const gridQpus = document.getElementById('grid-qpus');
-                const gridSims = document.getElementById('grid-simulators');
-
-                data.forEach(qpu => {
-                    const cardHTML = createCard(qpu);
-                    if (qpu.name.includes('(Simulator)')) {
-                        gridSims.innerHTML += cardHTML;
-                    } else {
-                        gridQpus.innerHTML += cardHTML;
-                    }
-                });
-            } catch (e) {
-                document.getElementById('loader').innerText = "Failed to establish connection to telemetry server.";
-            }
-        }
-
-        init();
-        // Refresh silently every 60 seconds so users don't have to reload
-        setInterval(init, 60000); 
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
