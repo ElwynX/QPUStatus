@@ -1,0 +1,45 @@
+/* The Main Container */
+.device-layout {
+    display: flex;
+    flex-direction: column; /* Stacks on mobile by default */
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 2rem;
+}
+
+/* The Navigation Bar */
+.device-nav {
+    background: var(--panel);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border);
+    position: sticky; 
+    top: 1rem; 
+    z-index: 100;
+}
+
+.device-nav ul li a {
+    transition: color 0.2s;
+}
+
+.device-nav ul li a:hover {
+    color: var(--accent) !important;
+}
+
+/* The Content Area */
+.device-content {
+    flex-grow: 1;
+    min-width: 0; /* Prevents chart from overflowing */
+}
+
+/* DESKTOP OVERRIDES */
+@media (min-width: 768px) {
+    .device-layout {
+        flex-direction: row; /* Side-by-side on PC */
+        align-items: flex-start;
+    }
+    .device-nav {
+        width: 250px;
+        flex-shrink: 0;
+    }
+}
