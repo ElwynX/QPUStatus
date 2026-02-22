@@ -214,3 +214,46 @@ h1 span { color: var(--accent); }
 .uptime-block:hover { opacity: 1; transform: scale(1.1); box-shadow: 0 0 10px rgba(0,0,0,0.5); }
 .uptime-block.down { background: var(--offline); }
 .uptime-block.warn { background: #eab308; }
+
+/* --- UI COMPONENTS: Timeframes & Overlays --- */
+.timeframe-toggle {
+    display: flex;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+.timeframe-toggle button {
+    background: transparent;
+    color: var(--muted);
+    border: none;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.timeframe-toggle button:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+.timeframe-toggle button.active { background: var(--panel); color: var(--accent); }
+
+.disabled-card {
+    position: relative;
+    border-style: dashed !important;
+    opacity: 0.6;
+}
+.coming-soon-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.uptime-labels {
+    display: flex; justify-content: space-between; 
+    margin-top: 0.5rem; color: var(--muted); font-size: 0.7rem;
+}
