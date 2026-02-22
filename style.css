@@ -81,28 +81,40 @@ h1 span { color: var(--accent); }
 }
 .disclaimer { font-size: 0.75rem; max-width: 600px; margin: 0.5rem auto 0; opacity: 0.8; }
 
-/* --- DEVICE PAGE LAYOUT & STEAMDB TABS --- */
-.device-page { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem; }
-.hero-section { background: var(--panel); padding: 2rem; border-radius: 0.5rem; border: 1px solid var(--border); }
-.split-layout { display: flex; flex-direction: column; gap: 2rem; }
-
-@media (min-width: 768px) {
-    .split-layout { flex-direction: row; align-items: flex-start; }
-    .side-nav { width: 250px; position: sticky; top: 2rem; }
+/* --- DEVICE PAGE LAYOUT (ULTIMATE SIDEBAR) --- */
+.device-page { 
+    max-width: 1200px; 
+    margin: 0 auto; 
+    display: flex; 
+    flex-direction: column; /* Mobile: Nav top, content bottom */
+    gap: 2rem; 
+    align-items: flex-start;
 }
 
 .side-nav { width: 100%; flex-shrink: 0; }
+.right-column { display: flex; flex-direction: column; gap: 2rem; width: 100%; min-width: 0; }
+.hero-section { background: var(--panel); padding: 2rem; border-radius: 0.5rem; border: 1px solid var(--border); }
+
+/* DESKTOP PC LAYOUT */
+@media (min-width: 768px) {
+    .device-page { flex-direction: row; }
+    .side-nav { width: 250px; position: sticky; top: 2rem; }
+    /* The Anti-Chart-Squish Math: */
+    .right-column { width: calc(100% - 250px - 2rem); } 
+}
+
+/* Nav Menu Styling */
 .side-nav ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; }
 .side-nav li { padding: 0.8rem 1rem; cursor: pointer; border-radius: 0.5rem; color: var(--muted); transition: all 0.2s; border: 1px solid transparent; font-size: 0.95rem; }
 .side-nav li:hover { color: var(--text); background: rgba(255, 255, 255, 0.05); }
 .side-nav li.active { color: var(--accent); background: var(--panel); border: 1px solid var(--border); font-weight: 600; }
 
-.content-area { flex-grow: 1; min-width: 0; }
+/* Tabs & Uptime Engine */
+.content-area { width: 100%; min-width: 0; }
 .tab-pane { display: none; animation: fadeIn 0.3s ease; }
 .tab-pane.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* Uptime Tracker Blocks */
 .uptime-grid { display: flex; gap: 4px; flex-wrap: wrap; }
 .uptime-block { height: 35px; flex: 1; min-width: 6px; border-radius: 3px; background: var(--online); opacity: 0.8; transition: transform 0.2s, opacity 0.2s; }
 .uptime-block:hover { opacity: 1; transform: scale(1.1); box-shadow: 0 0 10px rgba(0,0,0,0.5); }
