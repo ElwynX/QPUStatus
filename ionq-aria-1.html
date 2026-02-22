@@ -33,7 +33,7 @@
                 <span style="color: var(--muted); font-size: 0.9rem;">Trapped Ion • 25 Qubits</span>
             </div>
             
-            <div class="grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 0;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
                 <div class="card" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border);">
                     <div class="metric-label">AWS ROUTE QUEUE</div>
                     <div class="metric-value" id="aws-queue">Loading...</div>
@@ -80,7 +80,7 @@
 
                 <section id="specs" class="tab-pane">
                     <h3 class="section-title">Hardware Specifications</h3>
-                    <div class="card" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
                         <div><div class="metric-label">TECHNOLOGY</div><div style="font-weight: 500;">Trapped Ion (Yb-171)</div></div>
                         <div><div class="metric-label">ALGORITHMIC QUBITS</div><div style="font-weight: 500;">25 #AQ</div></div>
                         <div><div class="metric-label">CONNECTIVITY</div><div style="font-weight: 500;">All-to-All</div></div>
