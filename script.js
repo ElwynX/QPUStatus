@@ -44,6 +44,12 @@ function createCard(qpu) {
     const badgeClass = isOnline ? 'status-online' : 'status-offline';
     const dotClass = isOnline ? 'dot-online' : 'dot-offline';
 
+    // THE SLUG GENERATOR: Combines 'IonQ' and 'Aria-1' into 'ionq-aria-1'
+    const slug = (qpu.mfg + '-' + qpu.cleanName)
+        .toLowerCase()
+        .replace(/\s+/g, '-')       // Turns spaces into hyphens (e.g., 'Rigetti Ankaa' -> 'rigetti-ankaa')
+        .replace(/[^a-z0-9-]/g, ''); // Removes any weird symbols just in case
+
     return `
         <div class="card">
             <div class="card-header">
@@ -62,6 +68,10 @@ function createCard(qpu) {
                 </div>
                 <div class="time-ago">Updated ${timeSince(qpu.last_updated)}</div>
             </div>
+            
+            <a href="${slug}" class="view-more-btn">
+                View Metrics <i class="fa-solid fa-arrow-right"></i>
+            </a>
         </div>
     `;
 }
