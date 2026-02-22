@@ -279,7 +279,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         var dataLabels = windowData.map(function(h){ return fmtTs(h.timestamp,days); });
         var dataValues = windowData.map(function(h){ return h.queue_depth; });
         var labels = [fmtDate(wStart,days)].concat(dataLabels).concat([fmtDate(wEnd,days)]);
-        var values = [null].concat(dataValues).concat([null]);
+        var lastVal = dataValues.length ? dataValues[dataValues.length - 1] : null;
+        var values = [null].concat(dataValues).concat([lastVal]);
 
         var maxVal = dataValues.length ? Math.max.apply(null,dataValues) : 0;
         var sugMax = maxVal < 5 ? 5 : Math.ceil(maxVal*1.2);
