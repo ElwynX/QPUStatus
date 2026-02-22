@@ -88,6 +88,37 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // --- RESTORED HERO UPDATE LOGIC ---
+    async function updateHeroStats() {
+        try {
+            const statsRes = await fetch('https://api.qpustatus.com/stats');
+            const statsData = await statsRes.json();
+            
+            const awsLive = statsData.find(q => q.id === awsId);
+            const azureLive = statsData.find(q => q.id === azureId);
+
+            // Update Status Badge
+            const primaryStatus = awsLive ? awsLive.status : (azureLive ? azureLive.status : 'OFFLINE');
+            const heroBadge = document.getElementById('hero-status');
+            if (primaryStatus === 'ONLINE') {
+                heroBadge.className = 'status-badge status-online';
+                heroBadge.innerHTML = '<div class="dot dot-online"></div> ONLINE';
+            } else {
+                heroBadge.className = 'status-badge status-offline';
+                heroBadge.innerHTML = '<div class="dot dot-offline"></div> OFFLINE';
+            }
+
+            // Helper to format the queue text
+            const fmt = (val, p) => {
+                if (val === undefined || val === null) return '--';
+                return p === 'aws' ? `${val} <small>Tasks</small>` : `${val}m <small>Wait</small>`;
+            };
+
+            document.getElementById('aws-queue').innerHTML = awsLive ? fmt(awsLive.queue_depth, 'aws') : "N/A";
+            document.getElementById('azure-queue').innerHTML = azureLive ? fmt(azureLive.queue_depth, 'azure') : "N/A";
+        } catch (e) { console.error("Hero update failed", e); }
+    }
+
     // 4. Uptime Grid Logic (Simulated grouping by day)
     function renderUptime(days) {
         document.getElementById('uptime-start-label').innerText = `${days} days ago`;
@@ -122,6 +153,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         buildGrid('aws-uptime-grid', 'aws-uptime-pct', globalAwsHistory);
         buildGrid('azure-uptime-grid', 'azure-uptime-pct', globalAzureHistory);
     }
+
+    function buildGrid(containerId, pctId, data) {
+            const grid = document.getElementById(containerId);
+            grid.innerHTML = '';
+            
+            if (data.length === 0) {
+                grid.innerHTML = '<p style="color: var(--muted); font-size: 0.8rem;">Awaiting first telemetry data...</p>';
+                document.getElementById(pctId).innerText = "0%";
+                return;
+            }
+
+            // Only render blocks for data we HAVE, no grey padding
+            data.forEach(point => {
+                const block = document.createElement('div');
+                block.className = 'uptime-block';
+                const isOnline = point.status === 'ONLINE';
+                block.classList.add(isOnline ? 'online' : 'down');
+                block.title = `${new Date(point.timestamp).toLocaleString()}: ${point.status}`;
+                grid.appendChild(block);
+            });
+
+            // Calculate actual uptime percentage from the data
+            const onlineCount = data.filter(p => p.status === 'ONLINE').length;
+            const uptimePct = ((onlineCount / data.length) * 100).toFixed(2);
+            document.getElementById(pctId).innerText = `${uptimePct}%`;
+        }
 
     // 5. Detailed 1W Step Chart (Using Stepped Line)
     function renderDetailedStatus() {
@@ -175,6 +232,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Initial Render
     renderQueueCharts(1);
+
+
     renderUptime(30);
     renderDetailedStatus();
 });
