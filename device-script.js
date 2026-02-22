@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         htmlTag.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
         themeIcon.innerText = newTheme === 'dark' ? '☀️' : '🌙';
+        Chart.instances.forEach(c => c.update()); // Update chart colors on toggle
     });
 
     const tabs = document.querySelectorAll('#tab-menu li');
@@ -29,6 +30,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     const azureId = mainContent.getAttribute('data-azure-id');
     const API     = 'https://api.qpustatus.com';
 
+    // ── 1. EXACT EVENT FETCHING ──────────────────────────────
+    // Fetches down-to-the-millisecond data for exactly 1 read cost each.
+    let exactEvents = {
+        aws: { firstSeen: null, lastOnline: null, lastOffline: null },
+        azure: { firstSeen: null, lastOnline: null, lastOffline: null }
+    };
+    
+    // Pointers for the chart callout plugins
+    let firstSeenAws = null, firstSeenAzure = null;
+
+    async function fetchExactEvents() {
+        try {
+            const endpoints = [
+                { path: '/first-seen', key: 'firstSeen' },
+                { path: '/last-online', key: 'lastOnline' },
+                { path: '/last-offline', key: 'lastOffline' }
+            ];
+            
+            for (const ep of endpoints) {
+                const [awsRes, azRes] = await Promise.all([
+                    fetch(API + ep.path + '?id=' + awsId),
+                    fetch(API + ep.path + '?id=' + azureId)
+                ]);
+                const awsD = await awsRes.json();
+                const azD = await azRes.json();
+                
+                exactEvents.aws[ep.key] = awsD.length > 0 ? awsD[0] : null;
+                exactEvents.azure[ep.key] = azD.length > 0 ? azD[0] : null;
+            }
+
+            // Bind to the global variables used by the charts
+            firstSeenAws = exactEvents.aws.firstSeen;
+            firstSeenAzure = exactEvents.azure.firstSeen;
+        } catch (e) { console.error('Exact Events fetch failed:', e); }
+    }
+
+    // ── 2. HERO STATS UPDATER (Now with Last Seen!) ──────────
     async function updateHeroStats() {
         try {
             const res  = await fetch(`${API}/stats`);
@@ -37,6 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const azureLive = data.find(q => q.id === azureId);
             const primaryStatus = awsLive?.status ?? azureLive?.status ?? 'OFFLINE';
             const heroBadge = document.getElementById('hero-status');
+            
             if (primaryStatus === 'ONLINE') {
                 heroBadge.className = 'status-badge status-online';
                 heroBadge.innerHTML = '<div class="dot dot-online"></div> ONLINE';
@@ -44,21 +83,39 @@ document.addEventListener('DOMContentLoaded', async () => {
                 heroBadge.className = 'status-badge status-offline';
                 heroBadge.innerHTML = '<div class="dot dot-offline"></div> OFFLINE';
             }
+
+            // NEW: Inject Last Online / Last Offline dynamically below the badge
+            let lastSeenEl = document.getElementById('hero-last-seen');
+            if (!lastSeenEl) {
+                lastSeenEl = document.createElement('div');
+                lastSeenEl.id = 'hero-last-seen';
+                lastSeenEl.style.cssText = 'font-size: 0.75rem; color: var(--muted); margin-top: 0.5rem; font-weight: 500; text-align: center;';
+                heroBadge.parentNode.appendChild(lastSeenEl);
+            }
+
+            const activeProvider = awsLive ? 'aws' : 'azure';
+            const eventData = primaryStatus === 'ONLINE' ? exactEvents[activeProvider].lastOffline : exactEvents[activeProvider].lastOnline;
+            
+            if (eventData && eventData.timestamp) {
+                const ts = new Date(eventData.timestamp.replace(' ', 'T') + 'Z').toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
+                lastSeenEl.innerText = primaryStatus === 'ONLINE' ? `Last offline: ${ts}` : `Last online: ${ts}`;
+            } else {
+                lastSeenEl.innerText = 'Awaiting telemetry...';
+            }
+
             const fmtAws   = v => (v != null) ? v + ' <small>Tasks</small>'  : '--';
             const fmtAzure = v => (v != null) ? v + 'm <small>Wait</small>'  : '--';
             document.getElementById('aws-queue').innerHTML   = awsLive   ? fmtAws(awsLive.queue_depth)     : 'N/A';
             document.getElementById('azure-queue').innerHTML = azureLive ? fmtAzure(azureLive.queue_depth) : 'N/A';
         } catch (e) { console.error('Hero stats fetch failed:', e); }
     }
+
+    // Initialize exact events FIRST, so the Hero Updater can use them
+    await fetchExactEvents();
     await updateHeroStats();
     setInterval(updateHeroStats, 60000);
 
-    // ── History cache & fetching ──────────────────────────────
-    // Server returns pre-bucketed data per ?days= value:
-    //   days=1   → raw 2-min    → max ~720 rows
-    //   days=7   → hourly       → max ~168 rows
-    //   days=30  → 4-hourly     → max ~180 rows
-    //   days=365 → daily        → max ~365 rows
+    // ── 3. HISTORY CACHE & FETCHING ──────────────────────────
     const historyCache = {};
 
     async function fetchHistory(days) {
@@ -77,28 +134,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // First Seen = absolute oldest record in DB (1Y query index[0])
-    // Fetched once, never changes when user switches timeframe.
-    let firstSeenAws = null, firstSeenAzure = null;
-
-    async function fetchFirstSeen() {
-        try {
-            const [awsRes, azureRes] = await Promise.all([
-                fetch(API + '/history?id=' + awsId   + '&days=365'),
-                fetch(API + '/history?id=' + azureId + '&days=365')
-            ]);
-            const awsData   = await awsRes.json();
-            const azureData = await azureRes.json();
-            historyCache[365] = { aws: awsData, azure: azureData };
-            firstSeenAws   = awsData.length   > 0 ? awsData[0]   : null;
-            firstSeenAzure = azureData.length > 0 ? azureData[0] : null;
-        } catch (e) { console.error('First Seen fetch failed:', e); }
-    }
-
-    await fetchFirstSeen();
     await fetchHistory(1);
 
-    // ── Label formatters ─────────────────────────────────────
+    // ── 4. LABEL FORMATTERS & OVERLAYS ───────────────────────
     function fmtDate(d, days) {
         if (days <= 1)  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         if (days <= 30) return d.toLocaleString([],   { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -106,7 +144,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     function fmtTs(ts, days) { return fmtDate(new Date(ts.replace(' ','T')+'Z'), days); }
 
-    // ── No-data overlay ──────────────────────────────────────
     function showNoData(canvasId, msg) {
         msg = msg || 'Data not collected';
         const canvas = document.getElementById(canvasId);
@@ -129,9 +166,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const CHART_INSTANCES = {};
 
-    // ── Event detection ──────────────────────────────────────
-    // First Seen index is always 1 (right after the start-anchor null).
-    // Transition events get index i+1 (offset for prepended null).
+    // ── 5. EVENT DETECTION & CALLOUT PLUGINS ─────────────────
     function detectStatusEvents(windowData, firstSeenRecord, days) {
         var events = [];
         var windowStartMs = Date.now() - days * 86400000;
@@ -155,7 +190,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return events;
     }
 
-    // ── Canvas drawing helpers ───────────────────────────────
     function drawRoundRect(ctx, x, y, w, h, r) {
         ctx.beginPath();
         ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
@@ -177,7 +211,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         ctx.font='bold 10px sans-serif'; ctx.fillText(label,bx+PAD+iw,by+bh/2);
     }
 
-    // ── Chart.js plugin ──────────────────────────────────────
     var statusEventPlugin = {
         id: 'statusEvents',
         afterDraw: function(chart) {
@@ -208,7 +241,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
     Chart.register(statusEventPlugin);
 
-    // ── Event bar ────────────────────────────────────────────
     function renderEventBar(barId, events, days) {
         var bar = document.getElementById(barId); if (!bar) return;
         bar.innerHTML = '';
@@ -234,10 +266,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // ── Render queue chart with STRONG x-axis anchor ─────────
-    // Always injects null at exact window start (now-days) and
-    // exact window end (now), forcing the axis to span the full
-    // selected period even when data only covers part of it.
+    // ── 6. CHART DRAWING LOGIC ───────────────────────────────
     function renderQueueChart(canvasId, eventBarId, windowData, firstSeenRecord, days, color, label) {
         if (CHART_INSTANCES[canvasId]) { CHART_INSTANCES[canvasId].destroy(); delete CHART_INSTANCES[canvasId]; }
         var events = detectStatusEvents(windowData, firstSeenRecord, days);
@@ -277,7 +306,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         CHART_INSTANCES[canvasId].config._statusEvents = events;
     }
 
-    // ── Queue chart rendering ─────────────────────────────────
     async function renderAllQueueCharts(days) {
         showNoData('awsChart','Loading...'); showNoData('azureChart','Loading...');
         var h = await fetchHistory(days);
@@ -294,16 +322,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     await renderAllQueueCharts(1);
 
-    // ── Uptime grids ─────────────────────────────────────────
+    // ── 7. UPTIME GRIDS ──────────────────────────────────────
     function buildUptimeGrid(gridId, pctId, history, days) {
         var grid = document.getElementById(gridId); if (!grid) return;
         grid.innerHTML = '';
         var dayMap = {};
+        
+        // This naturally scales with 1W (hourly) and 1Y (daily) data accurately!
         history.forEach(function(h) {
             var key = new Date(h.timestamp.replace(' ','T')+'Z').toISOString().slice(0,10);
             if (!dayMap[key]) dayMap[key]=[];
             dayMap[key].push(h.status);
         });
+        
         var onlineDays=0, dataDays=0;
         for (var i=days-1; i>=0; i--) {
             var d=new Date(); d.setUTCDate(d.getUTCDate()-i);
@@ -340,7 +371,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     await renderUptime(30);
 
-    // ── Detailed 7-day stepped status chart ─────────────────
+    // ── 8. DETAILED 7-DAY STATUS CHART ───────────────────────
     async function renderDetailedStatus() {
         var canvasId='detailedStatusChart';
         if (CHART_INSTANCES[canvasId]) { CHART_INSTANCES[canvasId].destroy(); delete CHART_INSTANCES[canvasId]; }
