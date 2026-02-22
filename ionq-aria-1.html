@@ -25,35 +25,36 @@
 
     <main class="device-page" data-aws-id="aws_Aria-1" data-azure-id="azure_ionq.qpu.aria-1">
         
-        <div class="hero-section card">
-            <h2 style="font-size: 2.5rem; margin: 0 0 0.5rem 0;">IonQ Aria-1</h2>
-            <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 2rem;">
-                <div class="status-badge status-online" id="hero-status"><div class="dot dot-online"></div> ONLINE</div>
-                <span style="color: var(--muted); font-size: 0.9rem;">Trapped Ion • 25 Qubits</span>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                <div class="card" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border);">
-                    <div class="metric-label">AWS ROUTE QUEUE</div>
-                    <div class="metric-value" id="aws-queue">Loading...</div>
-                </div>
-                <div class="card" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border);">
-                    <div class="metric-label">AZURE ROUTE WAIT</div>
-                    <div class="metric-value" id="azure-queue">Loading...</div>
-                </div>
-            </div>
-        </div>
+        <nav class="side-nav">
+            <h3 style="margin-top: 0; margin-bottom: 1rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase;">Aria-1 Menu</h3>
+            <ul id="tab-menu">
+                <li class="active" data-target="history">Queue & Latency History</li>
+                <li data-target="uptime">Status History (Uptime)</li>
+                <li data-target="specs">Hardware Specifications</li>
+                <li data-target="links">Official Resources</li>
+            </ul>
+        </nav>
 
-        <div class="split-layout">
+        <div class="right-column">
             
-            <nav class="side-nav">
-                <ul id="tab-menu">
-                    <li class="active" data-target="history">Queue & Latency History</li>
-                    <li data-target="uptime">Status History (Uptime)</li>
-                    <li data-target="specs">Hardware Specifications</li>
-                    <li data-target="links">Official Resources</li>
-                </ul>
-            </nav>
+            <div class="hero-section card">
+                <h2 style="font-size: 2.5rem; margin: 0 0 0.5rem 0;">IonQ Aria-1</h2>
+                <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 2rem;">
+                    <div class="status-badge status-online" id="hero-status"><div class="dot dot-online"></div> ONLINE</div>
+                    <span style="color: var(--muted); font-size: 0.9rem;">Trapped Ion • 25 Qubits</span>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div class="card" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border);">
+                        <div class="metric-label">AWS ROUTE QUEUE</div>
+                        <div class="metric-value" id="aws-queue">Loading...</div>
+                    </div>
+                    <div class="card" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border);">
+                        <div class="metric-label">AZURE ROUTE WAIT</div>
+                        <div class="metric-value" id="azure-queue">Loading...</div>
+                    </div>
+                </div>
+            </div>
 
             <div class="content-area">
                 
@@ -84,7 +85,7 @@
                         <div><div class="metric-label">ALGORITHMIC QUBITS</div><div style="font-weight: 500;">25 #AQ</div></div>
                         <div><div class="metric-label">CONNECTIVITY</div><div style="font-weight: 500;">All-to-All</div></div>
                         <div><div class="metric-label">NATIVE GATES</div><div style="font-weight: 500;">GPI, GPI2, MS</div></div>
-                        <div style="grid-column: span 2;">
+                        <div style="grid-column: 1 / -1;">
                             <div class="metric-label">SYSTEM DESCRIPTION</div>
                             <p style="margin: 0.5rem 0 0 0; color: var(--muted); font-size: 0.9rem; line-height: 1.5;">
                                 Aria-1 represents IonQ's commercial-grade trapped ion quantum computer. It utilizes a vacuum chamber where Ytterbium ions are trapped in a linear chain using electromagnetic fields. Computations are performed by directing precisely tuned laser beams at individual ions to manipulate their quantum states.
