@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IonQ Aria-1 Status & Queue | QPUStatus</title>
     <meta name="description" content="Live queue depth, wait times, and hardware specifications for the IonQ Aria-1 trapped-ion quantum computer.">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -26,12 +26,24 @@
     <main class="device-page" data-aws-id="aws_Aria-1" data-azure-id="azure_ionq.qpu.aria-1">
         
         <nav class="side-nav">
-            <h3 style="margin-top: 0; margin-bottom: 1rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase;">Aria-1 Menu</h3>
+            <h3 class="nav-title">Aria-1 Menu</h3>
             <ul id="tab-menu">
-                <li class="active" data-target="history">Queue & Latency History</li>
-                <li data-target="uptime">Status History (Uptime)</li>
-                <li data-target="specs">Hardware Specifications</li>
-                <li data-target="links">Official Resources</li>
+                <li class="active" data-target="history">
+                    <i class="fa-solid fa-chart-line nav-icon"></i>
+                    <span class="nav-text">Latency</span>
+                </li>
+                <li data-target="uptime">
+                    <i class="fa-solid fa-server nav-icon"></i>
+                    <span class="nav-text">Uptime</span>
+                </li>
+                <li data-target="specs">
+                    <i class="fa-solid fa-microchip nav-icon"></i>
+                    <span class="nav-text">Specs</span>
+                </li>
+                <li data-target="links">
+                    <i class="fa-solid fa-link nav-icon"></i>
+                    <span class="nav-text">Links</span>
+                </li>
             </ul>
         </nav>
 
