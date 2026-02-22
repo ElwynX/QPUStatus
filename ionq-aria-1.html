@@ -81,16 +81,23 @@
                         </div>
                     </div>
 
+                    <!-- AWS CHART + EVENT BAR -->
                     <h4 style="margin: 1rem 0 0.5rem 0; color: var(--text);">AWS Route (Queued Tasks)</h4>
-                    <div class="card" style="height: 250px; padding: 1rem; margin-bottom: 1.5rem;">
+                    <div class="card" style="height: 250px; padding: 1rem; margin-bottom: 0.5rem;">
                         <canvas id="awsChart"></canvas>
                     </div>
+                    <!-- Event notifier bar: populated by device-script.js -->
+                    <div id="aws-event-bar" style="display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 4px; margin-bottom: 1.5rem; min-height: 30px;"></div>
 
+                    <!-- AZURE CHART + EVENT BAR -->
                     <h4 style="margin: 1rem 0 0.5rem 0; color: var(--text);">Azure Route (Wait Minutes)</h4>
-                    <div class="card" style="height: 250px; padding: 1rem; margin-bottom: 1.5rem;">
+                    <div class="card" style="height: 250px; padding: 1rem; margin-bottom: 0.5rem;">
                         <canvas id="azureChart"></canvas>
                     </div>
+                    <!-- Event notifier bar: populated by device-script.js -->
+                    <div id="azure-event-bar" style="display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 4px; margin-bottom: 1.5rem; min-height: 30px;"></div>
 
+                    <!-- DIRECT CLOUD (COMING SOON) -->
                     <h4 style="margin: 1rem 0 0.5rem 0; color: var(--muted);">Direct API Route</h4>
                     <div class="card disabled-card" style="height: 150px; padding: 1rem;">
                         <div class="coming-soon-overlay">Direct API Integration Coming Soon</div>
