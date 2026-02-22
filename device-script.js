@@ -218,12 +218,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 var pt = meta.data[ev.index]; if (!pt) return;
                 var xPos = pt.x;
                 if (xPos < ca.left || xPos > ca.right) return;
+                
                 var isOnline = ev.status === 'ONLINE';
-                var lc = isOnline ? '#10b981' : '#ef4444';
-                var bg = isOnline ? '#059669' : '#dc2626';
-                var gw = isOnline ? '#10b981' : '#ef4444';
+                
+                // FIXED: If it's the First Seen marker, make it a clean Slate Grey instead of red/green
+                var lc = ev.isFirst ? '#94a3b8' : (isOnline ? '#10b981' : '#ef4444');
+                var bg = ev.isFirst ? '#475569' : (isOnline ? '#059669' : '#dc2626');
+                var gw = ev.isFirst ? '#94a3b8' : (isOnline ? '#10b981' : '#ef4444');
                 var icon  = ev.isFirst ? '\uf0e7' : (isOnline ? '\uf062' : '\uf063');
-                var label = ev.isFirst ? 'First Seen: '+ev.status : (isOnline ? 'ONLINE' : 'OFFLINE');
+                var label = ev.isFirst ? 'First Tracked' : (isOnline ? 'ONLINE' : 'OFFLINE');
+                
                 ctx.save();
                 ctx.shadowColor=gw; ctx.shadowBlur=8; ctx.setLineDash([4,4]);
                 ctx.strokeStyle=lc; ctx.lineWidth=1.5; ctx.globalAlpha=0.85;
