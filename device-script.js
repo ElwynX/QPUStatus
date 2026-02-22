@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const azureId = mainContent.getAttribute('data-azure-id');
 
     // =========================================================
-    // 4. LIVE HERO STATS (status badge + queue depths)
+    // 4. LIVE HERO STATS
     // =========================================================
     async function updateHeroStats() {
         try {
@@ -51,7 +51,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const awsLive   = data.find(q => q.id === awsId);
             const azureLive = data.find(q => q.id === azureId);
 
-            // --- Status badge (driven by AWS, fallback Azure) ---
             const primaryStatus = awsLive?.status ?? azureLive?.status ?? 'OFFLINE';
             const heroBadge = document.getElementById('hero-status');
             if (primaryStatus === 'ONLINE') {
@@ -62,12 +61,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 heroBadge.innerHTML = '<div class="dot dot-offline"></div> OFFLINE';
             }
 
-            // --- Queue depth display ---
-            const fmtAws   = v => (v != null) ? `${v} <small>Tasks</small>`   : '--';
-            const fmtAzure = v => (v != null) ? `${v}m <small>Wait</small>`   : '--';
+            const fmtAws   = v => (v != null) ? `${v} <small>Tasks</small>`  : '--';
+            const fmtAzure = v => (v != null) ? `${v}m <small>Wait</small>`  : '--';
 
             document.getElementById('aws-queue').innerHTML   = awsLive   ? fmtAws(awsLive.queue_depth)     : 'N/A';
-            document.getElementById('azure-queue').innerHTML = azureLive  ? fmtAzure(azureLive.queue_depth) : 'N/A';
+            document.getElementById('azure-queue').innerHTML = azureLive ? fmtAzure(azureLive.queue_depth) : 'N/A';
 
         } catch (e) {
             console.error('Hero stats fetch failed:', e);
@@ -75,7 +73,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     await updateHeroStats();
-    // Refresh live stats every 60 seconds
     setInterval(updateHeroStats, 60_000);
 
     // =========================================================
@@ -99,19 +96,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 6. CHART HELPERS
     // =========================================================
 
-    /**
-     * Filter history array to only entries within the last `days` days.
-     * Returns the filtered array (may be empty if no data in that window).
-     */
+    /** Filter to entries within last `days` days */
     function filterByDays(history, days) {
         const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
-        return history.filter(h => new Date(h.timestamp.replace(' ', 'T') + 'Z').getTime() >= cutoff);
+        return history.filter(h =>
+            new Date(h.timestamp.replace(' ', 'T') + 'Z').getTime() >= cutoff
+        );
     }
 
-    /**
-     * Format a timestamp string for chart x-axis labels.
-     * For ranges > 7 days, show date only; otherwise show date + time.
-     */
+    /** Format a timestamp for the x-axis label based on timeframe */
     function fmtLabel(tsStr, days) {
         const d = new Date(tsStr.replace(' ', 'T') + 'Z');
         if (days <= 1)
@@ -121,9 +114,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
     }
 
-    /**
-     * Show a "no data" overlay on a canvas and hide the chart.
-     */
+    /** Format a raw Date object to the same label format */
+    function fmtDateLabel(d, days) {
+        if (days <= 1)
+            return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        if (days <= 7)
+            return d.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
+
+    /** Show a "no data" overlay, hide the canvas */
     function showNoData(canvasId, message = 'Data not collected') {
         const canvas = document.getElementById(canvasId);
         if (!canvas) return;
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             overlay.style.cssText = `
                 display:flex; align-items:center; justify-content:center;
                 height:140px; border-radius:8px;
-                background:var(--card-bg, #1e293b);
+                background:var(--panel, #1e293b);
                 color:var(--muted, #64748b); font-size:0.85rem;
                 border: 1px solid var(--border, #334155);
             `;
@@ -156,31 +156,73 @@ document.addEventListener('DOMContentLoaded', async () => {
     const CHART_INSTANCES = {};
 
     // =========================================================
-    // EVENT DETECTION  — "first seen" transition system
-    // Returns array of { index, status, timestamp } for each
-    // ONLINE↔OFFLINE transition in the given filtered array.
-    // The very first data point is always included as a "First Seen" event.
+    // EVENT DETECTION — FIXED "First Seen" System
+    //
+    // Key fix: "First Seen" always references globalHistory[0],
+    // the absolute first record ever — never the first record of
+    // the currently selected timeframe window.
+    //
+    // - If globalHistory[0] falls WITHIN the current window:
+    //     → draw vertical line on chart + show in event bar
+    // - If globalHistory[0] falls BEFORE the current window:
+    //     → do NOT draw on chart, but still show in event bar
+    //       with "(before window)" indicator so it's clear
+    //
+    // Transitions (ONLINE↔OFFLINE) within the filtered window
+    // are detected and displayed normally.
     // =========================================================
-    function detectStatusEvents(filtered) {
+    function detectStatusEvents(filtered, globalHistory) {
         const events = [];
         if (filtered.length === 0) return events;
 
-        // Always mark the first data point
-        events.push({ index: 0, status: filtered[0].status, timestamp: filtered[0].timestamp, isFirst: true });
+        // ── First Seen (anchored to global history, not filtered) ──
+        const globalFirst = globalHistory.length > 0 ? globalHistory[0] : null;
+        if (globalFirst) {
+            const windowStart = Date.now() - /* will be overridden by caller */ 0;
+            const globalFirstMs = new Date(globalFirst.timestamp.replace(' ', 'T') + 'Z').getTime();
+            const filteredStartMs = new Date(filtered[0].timestamp.replace(' ', 'T') + 'Z').getTime();
 
-        for (let i = 1; i < filtered.length; i++) {
-            if (filtered[i].status !== filtered[i - 1].status) {
-                events.push({ index: i, status: filtered[i].status, timestamp: filtered[i].timestamp, isFirst: false });
+            if (globalFirstMs >= filteredStartMs) {
+                // First seen IS within this window — draw at index 1 (accounting for start anchor)
+                events.push({
+                    index: 1,          // +1 because we prepend a null anchor
+                    status: globalFirst.status,
+                    timestamp: globalFirst.timestamp,
+                    isFirst: true,
+                    inWindow: true
+                });
+            } else {
+                // First seen happened BEFORE this window — only show in event bar, no chart line
+                events.push({
+                    index: -1,
+                    status: globalFirst.status,
+                    timestamp: globalFirst.timestamp,
+                    isFirst: true,
+                    inWindow: false    // plugin will skip this; event bar still shows it
+                });
             }
         }
+
+        // ── Status transitions within the filtered window ──
+        for (let i = 1; i < filtered.length; i++) {
+            if (filtered[i].status !== filtered[i - 1].status) {
+                events.push({
+                    index: i + 1,  // +1 for the prepended start-anchor null
+                    status: filtered[i].status,
+                    timestamp: filtered[i].timestamp,
+                    isFirst: false,
+                    inWindow: true
+                });
+            }
+        }
+
         return events;
     }
 
     // =========================================================
-    // INLINE Chart.js PLUGIN — TradingView-style event markers
+    // CHART.JS PLUGIN — TradingView-style event markers
     // =========================================================
 
-    // Cross-browser rounded rectangle (ctx.roundRect not supported everywhere)
     function drawRoundRect(ctx, x, y, w, h, r) {
         ctx.beginPath();
         ctx.moveTo(x + r, y);
@@ -195,30 +237,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         ctx.closePath();
     }
 
-    // Draw a callout label: rounded rect + downward pointer triangle
     function drawCallout(ctx, cx, tipY, label, icon, bgColor, glowColor) {
-        const PAD_X = 7, PAD_Y = 4, R = 4, PTR = 6;
+        const PAD_X = 7, R = 4, PTR = 6;
         ctx.font = 'bold 10px sans-serif';
         const labelW = ctx.measureText(label).width;
-
-        // Icon width using Font Awesome font
         ctx.font = '900 11px "Font Awesome 6 Free"';
-        const iconW = ctx.measureText(icon).width + 4; // 4px gap
+        const iconW = ctx.measureText(icon).width + 4;
         const totalW = iconW + labelW + PAD_X * 2;
         const boxH   = 18;
         const boxX   = cx - totalW / 2;
         const boxY   = tipY - boxH - PTR;
 
-        // Glow effect
         ctx.shadowColor = glowColor;
         ctx.shadowBlur  = 10;
-
-        // Background pill + pointer
         ctx.fillStyle = bgColor;
         drawRoundRect(ctx, boxX, boxY, totalW, boxH, R);
         ctx.fill();
 
-        // Pointer triangle (downward)
+        // Pointer triangle
         ctx.beginPath();
         ctx.moveTo(cx - PTR * 0.7, boxY + boxH);
         ctx.lineTo(cx + PTR * 0.7, boxY + boxH);
@@ -227,15 +263,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         ctx.fill();
 
         ctx.shadowBlur = 0;
-
-        // Icon (Font Awesome unicode)
         ctx.fillStyle = '#ffffff';
-        ctx.textAlign  = 'left';
+        ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
         ctx.font = '900 11px "Font Awesome 6 Free"';
         ctx.fillText(icon, boxX + PAD_X, boxY + boxH / 2);
-
-        // Label text
         ctx.font = 'bold 10px sans-serif';
         ctx.fillText(label, boxX + PAD_X + iconW, boxY + boxH / 2);
     }
@@ -247,11 +279,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!events || events.length === 0) return;
 
             const { ctx, chartArea: { top, bottom, left, right } } = chart;
-
-            // ✅ FIXED: use getDatasetMeta pixel positions, not getPixelForIndex
             const meta = chart.getDatasetMeta(0);
 
             events.forEach(ev => {
+                // Skip events outside the current window (e.g. First Seen before window)
+                if (!ev.inWindow || ev.index < 0) return;
+
                 const point = meta.data[ev.index];
                 if (!point) return;
                 const xPos = point.x;
@@ -262,7 +295,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const bgColor   = isOnline ? '#059669' : '#dc2626';
                 const glowColor = isOnline ? '#10b981' : '#ef4444';
 
-                // FA unicode: \uf0e7 = bolt (first seen), \uf062 = arrow-up, \uf063 = arrow-down
+                // \uf0e7 = bolt, \uf062 = arrow-up, \uf063 = arrow-down
                 const icon  = ev.isFirst ? '\uf0e7' : (isOnline ? '\uf062' : '\uf063');
                 const label = ev.isFirst
                     ? `First Seen: ${ev.status}`
@@ -271,121 +304,146 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ctx.save();
 
                 // Glowing dashed vertical line
-                ctx.shadowColor  = glowColor;
-                ctx.shadowBlur   = 8;
+                ctx.shadowColor = glowColor;
+                ctx.shadowBlur  = 8;
                 ctx.setLineDash([4, 4]);
-                ctx.strokeStyle  = lineColor;
-                ctx.lineWidth    = 1.5;
-                ctx.globalAlpha  = 0.85;
+                ctx.strokeStyle = lineColor;
+                ctx.lineWidth   = 1.5;
+                ctx.globalAlpha = 0.85;
                 ctx.beginPath();
-                ctx.moveTo(xPos, top + 30); // start below the callout
+                ctx.moveTo(xPos, top + 30);
                 ctx.lineTo(xPos, bottom);
                 ctx.stroke();
 
-                // Reset for callout
                 ctx.globalAlpha = 1;
                 ctx.setLineDash([]);
-
-                // Draw callout marker at top of line
                 drawCallout(ctx, xPos, top + 30, label, icon, bgColor, glowColor);
-
                 ctx.restore();
             });
         }
     };
 
-    // Register the plugin globally once
     Chart.register(statusEventPlugin);
 
     // =========================================================
-    // RENDER EVENT NOTIFIER BAR below the chart
-    // A horizontal scrollable row of event chips.
+    // EVENT NOTIFIER BAR (chips below chart)
+    // Always shows the true First Seen — even if outside window
     // =========================================================
     function renderEventBar(barId, events, days) {
         const bar = document.getElementById(barId);
         if (!bar) return;
         bar.innerHTML = '';
 
-        if (events.length === 0) {
+        // Show all events including out-of-window First Seen
+        const displayEvents = events.filter(ev => ev.isFirst || ev.inWindow);
+
+        if (displayEvents.length === 0) {
             bar.innerHTML = '<span style="color:var(--muted,#64748b);font-size:0.78rem;">No events in this timeframe</span>';
             return;
         }
 
-        events.forEach(ev => {
-            const isOnline = ev.status === 'ONLINE';
+        displayEvents.forEach(ev => {
+            const isOnline  = ev.status === 'ONLINE';
+            const outOfWin  = !ev.inWindow; // First Seen from before window
             const chip = document.createElement('div');
             chip.style.cssText = `
                 display:inline-flex; align-items:center; gap:5px;
-                padding:3px 9px; border-radius:20px; font-size:0.75rem;
+                padding:3px 10px; border-radius:20px; font-size:0.75rem;
                 font-weight:600; white-space:nowrap; cursor:default;
                 background:${isOnline ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'};
                 border:1px solid ${isOnline ? '#10b981' : '#ef4444'};
                 color:${isOnline ? '#10b981' : '#ef4444'};
+                ${outOfWin ? 'opacity:0.65;' : ''}
             `;
-            const dot = `<span style="width:6px;height:6px;border-radius:50%;background:${isOnline ? '#10b981' : '#ef4444'};display:inline-block;"></span>`;
+            const dot = `<span style="width:6px;height:6px;border-radius:50%;background:${isOnline ? '#10b981' : '#ef4444'};display:inline-block;flex-shrink:0;"></span>`;
             const d = new Date(ev.timestamp.replace(' ', 'T') + 'Z');
-            const timeStr = days <= 1
-                ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                : d.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            // First Seen chip always shows full date+time regardless of current timeframe
+            const timeStr = ev.isFirst
+                ? d.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                : (days <= 1
+                    ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    : d.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }));
 
-            const eventLabel = ev.isFirst ? `First Seen · ${ev.status}` : ev.status;
+            let eventLabel = ev.isFirst
+                ? `First Seen · ${ev.status}`
+                : (isOnline ? '▲ ONLINE' : '▼ OFFLINE');
+
+            // If First Seen is before the current window, note it
+            if (ev.isFirst && outOfWin) {
+                eventLabel = `First Seen · ${ev.status}`;
+                chip.title = `First telemetry recorded at ${ev.timestamp} UTC (before current window)`;
+            } else {
+                chip.title = `${ev.timestamp} UTC`;
+            }
+
             chip.innerHTML = `${dot} ${eventLabel} <span style="opacity:0.6;font-weight:400;">${timeStr}</span>`;
-            chip.title = `${ev.timestamp} UTC — ${ev.status}`;
             bar.appendChild(chip);
         });
     }
 
-    /**
-     * Render (or re-render) a single queue depth line chart.
-     * @param {string} canvasId  - target <canvas> id
-     * @param {string} eventBarId - target event bar div id (or null)
-     * @param {Array}  history   - full history array
-     * @param {number} days      - timeframe in days
-     * @param {string} color     - hex border colour
-     * @param {string} label     - dataset label
-     */
-    function renderQueueChart(canvasId, eventBarId, history, days, color, label) {
+    // =========================================================
+    // RENDER QUEUE CHART — with FIXED timeframe x-axis
+    //
+    // Key fix: We always inject a null data point at the EXACT
+    // start of the timeframe window (now - days) and one at NOW.
+    // This forces Chart.js to always show the full selected period
+    // even when data only covers part of it. Gaps appear as breaks
+    // in the line rather than the axis shrinking to fit data.
+    // =========================================================
+    function renderQueueChart(canvasId, eventBarId, history, globalHistory, days, color, label) {
         if (CHART_INSTANCES[canvasId]) {
             CHART_INSTANCES[canvasId].destroy();
             delete CHART_INSTANCES[canvasId];
         }
 
         const filtered = filterByDays(history, days);
+        const events   = detectStatusEvents(filtered, globalHistory);
+
+        if (eventBarId) renderEventBar(eventBarId, events, days);
 
         if (filtered.length === 0) {
-            showNoData(canvasId);
-            if (eventBarId) renderEventBar(eventBarId, [], days);
+            showNoData(canvasId, 'Data not collected for this timeframe');
             return;
         }
 
         hideNoData(canvasId);
 
-        const events = detectStatusEvents(filtered);
-        if (eventBarId) renderEventBar(eventBarId, events, days);
+        // ── Build anchored labels/values ──────────────────────────
+        // Start anchor: exact beginning of selected timeframe window
+        // End anchor:   right now
+        // Both use null so no line draws there, but the x-axis is forced to span the full period.
+        const windowStart = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+        const windowEnd   = new Date();
 
-        const bg     = color + '1a'; // 10% opacity fill
-        const labels = filtered.map(h => fmtLabel(h.timestamp, days));
-        const values = filtered.map(h => h.queue_depth);
+        const startLabel = fmtDateLabel(windowStart, days);
+        const endLabel   = fmtDateLabel(windowEnd, days);
 
-        // Compute a sensible y-axis max: at least 5, or 20% above actual max
-        const maxVal = Math.max(...values);
+        const dataLabels = filtered.map(h => fmtLabel(h.timestamp, days));
+        const dataValues = filtered.map(h => h.queue_depth);
+
+        const labels = [startLabel, ...dataLabels, endLabel];
+        const values = [null,        ...dataValues,  null];
+        // Note: event indices already have +1 applied in detectStatusEvents
+        // to account for this prepended start anchor.
+
+        const maxVal       = Math.max(...dataValues);
         const suggestedMax = maxVal < 5 ? 5 : Math.ceil(maxVal * 1.2);
 
         const chartConfig = {
             type: 'line',
-            _statusEvents: events,   // picked up by our plugin
+            _statusEvents: events,
             data: {
                 labels,
                 datasets: [{
                     label,
                     data: values,
                     borderColor: color,
-                    backgroundColor: bg,
+                    backgroundColor: color + '1a',
                     borderWidth: 2,
                     fill: true,
                     tension: 0.35,
                     pointRadius: 0,
-                    spanGaps: false
+                    spanGaps: false   // gaps in data stay as visible breaks
                 }]
             },
             options: {
@@ -404,8 +462,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         grid: { color: '#334155' },
                         ticks: {
                             color: '#94a3b8',
-                            precision: 0,    // no decimals
-                            stepSize: 1      // min increment = 1
+                            precision: 0,
+                            stepSize: 1
                         }
                     }
                 }
@@ -417,53 +475,36 @@ document.addEventListener('DOMContentLoaded', async () => {
             chartConfig
         );
 
-        // Attach event data to instance so the plugin can reach it
+        // Attach events so the plugin can read them
         CHART_INSTANCES[canvasId].config._statusEvents = events;
     }
 
     // =========================================================
-    // 7. QUEUE CHARTS (AWS | Azure | Direct Cloud [coming soon])
+    // 7. QUEUE CHARTS (AWS | Azure | Direct Cloud coming soon)
     // =========================================================
-    let currentQueueTf = 1; // default: 24H
-
     function renderAllQueueCharts(days) {
-        renderQueueChart('awsChart',   'aws-event-bar',   globalAwsHistory,   days, '#f97316', 'AWS Queue (Tasks)');
-        renderQueueChart('azureChart', 'azure-event-bar', globalAzureHistory, days, '#3b82f6', 'Azure Queue (Wait Mins)');
-        // Direct Cloud chart stays greyed-out / "Coming Soon" – no render needed
+        renderQueueChart('awsChart',   'aws-event-bar',   globalAwsHistory,   globalAwsHistory,   days, '#f97316', 'AWS Queue (Tasks)');
+        renderQueueChart('azureChart', 'azure-event-bar', globalAzureHistory, globalAzureHistory, days, '#3b82f6', 'Azure Queue (Wait Mins)');
     }
 
-    // Timeframe buttons
     document.querySelectorAll('#queue-tf button').forEach(btn => {
         btn.addEventListener('click', e => {
             document.querySelectorAll('#queue-tf button').forEach(b => b.classList.remove('active'));
             e.target.classList.add('active');
-            currentQueueTf = parseInt(e.target.getAttribute('data-tf'));
-            renderAllQueueCharts(currentQueueTf);
+            renderAllQueueCharts(parseInt(e.target.getAttribute('data-tf')));
         });
     });
 
-    // Initial render
     renderAllQueueCharts(1);
 
     // =========================================================
     // 8. UPTIME GRIDS  (30d | 90d | 180d | 1Y)
     // =========================================================
-
-    /**
-     * Build a per-day uptime grid.
-     * Each block = 1 day.  Green = online, Red = offline, Grey = no data.
-     *
-     * @param {string} gridId   - container element id
-     * @param {string} pctId    - uptime % span id
-     * @param {Array}  history  - full status history for this provider
-     * @param {number} days     - how many day-blocks to render
-     */
     function buildUptimeGrid(gridId, pctId, history, days) {
         const grid = document.getElementById(gridId);
         if (!grid) return;
         grid.innerHTML = '';
 
-        // Bucket history into per-day maps  { "YYYY-MM-DD": [status, ...] }
         const dayMap = {};
         history.forEach(h => {
             const key = new Date(h.timestamp.replace(' ', 'T') + 'Z').toISOString().slice(0, 10);
@@ -495,7 +536,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     block.title = `${key}: Degraded / Offline`;
                 }
             } else {
-                // No data for this day
                 block.style.background = 'var(--border, #334155)';
                 block.title = `${key}: Data not collected`;
             }
@@ -517,7 +557,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         buildUptimeGrid('aws-uptime-grid',   'aws-uptime-pct',   globalAwsHistory,   days);
         buildUptimeGrid('azure-uptime-grid', 'azure-uptime-pct', globalAzureHistory, days);
-        // Direct cloud grid: Coming Soon — leave empty / handled by HTML placeholder
     }
 
     document.querySelectorAll('#uptime-tf button').forEach(btn => {
@@ -528,11 +567,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // Default: 30 days
     renderUptime(30);
 
     // =========================================================
-    // 9. DETAILED 1-WEEK STATUS CHART  (stepped, daily ticks)
+    // 9. DETAILED 1-WEEK STATUS CHART (stepped)
     // =========================================================
     function renderDetailedStatus() {
         const canvasId = 'detailedStatusChart';
@@ -542,36 +580,39 @@ document.addEventListener('DOMContentLoaded', async () => {
             delete CHART_INSTANCES[canvasId];
         }
 
-        // Use 7 days of AWS data for the detail view
-        const data = filterByDays(globalAwsHistory, 7);
+        const awsData   = filterByDays(globalAwsHistory,   7);
+        const azureData = filterByDays(globalAzureHistory, 7);
 
-        if (data.length === 0) {
+        if (awsData.length === 0 && azureData.length === 0) {
             showNoData(canvasId, 'No status data in the last 7 days');
             return;
         }
 
         hideNoData(canvasId);
 
+        // Use whichever dataset has more points for labels
+        const baseData = awsData.length >= azureData.length ? awsData : azureData;
+
         CHART_INSTANCES[canvasId] = new Chart(
             document.getElementById(canvasId).getContext('2d'),
             {
                 type: 'line',
                 data: {
-                    labels: data.map(h => fmtLabel(h.timestamp, 7)),
+                    labels: baseData.map(h => fmtLabel(h.timestamp, 7)),
                     datasets: [
                         {
-                            label: 'AWS Status',
-                            data: data.map(h => h.status === 'ONLINE' ? 1 : 0),
-                            borderColor: '#10b981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                            label: 'AWS',
+                            data: awsData.map(h => h.status === 'ONLINE' ? 1 : 0),
+                            borderColor: '#f97316',
+                            backgroundColor: 'rgba(249, 115, 22, 0.08)',
                             fill: true,
-                            stepped: 'before',   // sharp, blocky transitions
+                            stepped: 'before',
                             borderWidth: 2,
                             pointRadius: 0
                         },
                         {
-                            label: 'Azure Status',
-                            data: filterByDays(globalAzureHistory, 7).map(h => h.status === 'ONLINE' ? 1 : 0),
+                            label: 'Azure',
+                            data: azureData.map(h => h.status === 'ONLINE' ? 1 : 0),
                             borderColor: '#3b82f6',
                             backgroundColor: 'rgba(59, 130, 246, 0.08)',
                             fill: true,
