@@ -71,52 +71,75 @@
             <div class="content-area">
                 
                 <section id="history" class="tab-pane active">
-                    <h3 class="section-title">24-Hour Network Load</h3>
-                    <div class="card" style="height: 350px; padding: 1rem; position: relative;">
-                        <canvas id="queueChart"></canvas>
-                        <div id="chart-fallback" style="display: none; position: absolute; top: 45%; left: 0; width: 100%; text-align: center; color: var(--muted);">Gathering telemetry data... check back in a few minutes.</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 class="section-title" style="margin: 0;">Network Load</h3>
+                        <div class="timeframe-toggle" id="queue-tf">
+                            <button class="active" data-tf="1">24H</button>
+                            <button data-tf="7">1W</button>
+                            <button data-tf="30">1M</button>
+                            <button data-tf="365">1Y</button>
+                        </div>
+                    </div>
+
+                    <h4 style="margin: 1rem 0 0.5rem 0; color: var(--text);">AWS Route (Queued Tasks)</h4>
+                    <div class="card" style="height: 250px; padding: 1rem; margin-bottom: 1.5rem;">
+                        <canvas id="awsChart"></canvas>
+                    </div>
+
+                    <h4 style="margin: 1rem 0 0.5rem 0; color: var(--text);">Azure Route (Wait Minutes)</h4>
+                    <div class="card" style="height: 250px; padding: 1rem; margin-bottom: 1.5rem;">
+                        <canvas id="azureChart"></canvas>
+                    </div>
+
+                    <h4 style="margin: 1rem 0 0.5rem 0; color: var(--muted);">Direct API Route</h4>
+                    <div class="card disabled-card" style="height: 150px; padding: 1rem;">
+                        <div class="coming-soon-overlay">Direct API Integration Coming Soon</div>
                     </div>
                 </section>
 
                 <section id="uptime" class="tab-pane">
-                    <h3 class="section-title">90-Day Uptime History</h3>
-                    <div class="card">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; color: var(--muted); font-size: 0.8rem;">
-                            <span>90 days ago</span>
-                            <span style="color: var(--online);">99.8% Uptime</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 class="section-title" style="margin: 0;">Status History</h3>
+                        <div class="timeframe-toggle" id="uptime-tf">
+                            <button class="active" data-tf="30">30D</button>
+                            <button data-tf="90">90D</button>
+                            <button data-tf="180">180D</button>
+                            <button data-tf="365">1Y</button>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 600;">AWS Route Availability</span>
+                            <span style="color: var(--online);" id="aws-uptime-pct">100%</span>
+                        </div>
+                        <div class="uptime-grid" id="aws-uptime-grid"></div>
+                        <div class="uptime-labels">
+                            <span id="uptime-start-label">30 days ago</span>
                             <span>Today</span>
                         </div>
-                        <div class="uptime-grid" id="uptime-grid"></div>
                     </div>
-                </section>
 
-                <section id="specs" class="tab-pane">
-                    <h3 class="section-title">Hardware Specifications</h3>
-                    <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
-                        <div><div class="metric-label">TECHNOLOGY</div><div style="font-weight: 500;">Trapped Ion (Yb-171)</div></div>
-                        <div><div class="metric-label">ALGORITHMIC QUBITS</div><div style="font-weight: 500;">25 #AQ</div></div>
-                        <div><div class="metric-label">CONNECTIVITY</div><div style="font-weight: 500;">All-to-All</div></div>
-                        <div><div class="metric-label">NATIVE GATES</div><div style="font-weight: 500;">GPI, GPI2, MS</div></div>
-                        <div style="grid-column: 1 / -1;">
-                            <div class="metric-label">SYSTEM DESCRIPTION</div>
-                            <p style="margin: 0.5rem 0 0 0; color: var(--muted); font-size: 0.9rem; line-height: 1.5;">
-                                Aria-1 represents IonQ's commercial-grade trapped ion quantum computer. It utilizes a vacuum chamber where Ytterbium ions are trapped in a linear chain using electromagnetic fields. Computations are performed by directing precisely tuned laser beams at individual ions to manipulate their quantum states.
-                            </p>
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 600;">Azure Route Availability</span>
+                            <span style="color: var(--online);" id="azure-uptime-pct">100%</span>
+                        </div>
+                        <div class="uptime-grid" id="azure-uptime-grid"></div>
+                        <div class="uptime-labels">
+                            <span>30 days ago</span>
+                            <span>Today</span>
                         </div>
                     </div>
-                </section>
 
-                <section id="links" class="tab-pane">
-                    <h3 class="section-title">Official Resources</h3>
-                    <div class="card">
-                        <ul style="line-height: 2; padding-left: 1.2rem; margin:0; color: var(--muted);">
-                            <li><a href="https://ionq.com/quantum-systems/aria" target="_blank" style="color: var(--accent);">IonQ Aria Official System Page</a></li>
-                            <li><a href="https://aws.amazon.com/braket/quantum-computers/ionq/" target="_blank" style="color: var(--accent);">AWS Braket: Provider Guide</a></li>
-                            <li><a href="https://learn.microsoft.com/en-us/azure/quantum/provider-ionq" target="_blank" style="color: var(--accent);">Azure Quantum: Provider Documentation</a></li>
-                        </ul>
+                    <h4 style="margin: 2rem 0 0.5rem 0; color: var(--text);">Detailed Connectivity (Last 7 Days)</h4>
+                    <div class="card" style="height: 200px; padding: 1rem;">
+                        <canvas id="detailedStatusChart"></canvas>
                     </div>
                 </section>
 
+                <section id="specs" class="tab-pane">...</section>
+                <section id="links" class="tab-pane">...</section>
             </div>
         </div>
     </main>
