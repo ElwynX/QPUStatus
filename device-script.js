@@ -177,58 +177,118 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // =========================================================
-    // INLINE Chart.js PLUGIN — draws TradingView-style event lines
+    // INLINE Chart.js PLUGIN — TradingView-style event markers
     // =========================================================
+
+    // Cross-browser rounded rectangle (ctx.roundRect not supported everywhere)
+    function drawRoundRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+    }
+
+    // Draw a callout label: rounded rect + downward pointer triangle
+    function drawCallout(ctx, cx, tipY, label, icon, bgColor, glowColor) {
+        const PAD_X = 7, PAD_Y = 4, R = 4, PTR = 6;
+        ctx.font = 'bold 10px sans-serif';
+        const labelW = ctx.measureText(label).width;
+
+        // Icon width using Font Awesome font
+        ctx.font = '900 11px "Font Awesome 6 Free"';
+        const iconW = ctx.measureText(icon).width + 4; // 4px gap
+        const totalW = iconW + labelW + PAD_X * 2;
+        const boxH   = 18;
+        const boxX   = cx - totalW / 2;
+        const boxY   = tipY - boxH - PTR;
+
+        // Glow effect
+        ctx.shadowColor = glowColor;
+        ctx.shadowBlur  = 10;
+
+        // Background pill + pointer
+        ctx.fillStyle = bgColor;
+        drawRoundRect(ctx, boxX, boxY, totalW, boxH, R);
+        ctx.fill();
+
+        // Pointer triangle (downward)
+        ctx.beginPath();
+        ctx.moveTo(cx - PTR * 0.7, boxY + boxH);
+        ctx.lineTo(cx + PTR * 0.7, boxY + boxH);
+        ctx.lineTo(cx, boxY + boxH + PTR);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.shadowBlur = 0;
+
+        // Icon (Font Awesome unicode)
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign  = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.font = '900 11px "Font Awesome 6 Free"';
+        ctx.fillText(icon, boxX + PAD_X, boxY + boxH / 2);
+
+        // Label text
+        ctx.font = 'bold 10px sans-serif';
+        ctx.fillText(label, boxX + PAD_X + iconW, boxY + boxH / 2);
+    }
+
     const statusEventPlugin = {
         id: 'statusEvents',
         afterDraw(chart) {
             const events = chart.config._statusEvents;
             if (!events || events.length === 0) return;
 
-            const { ctx, chartArea: { top, bottom }, scales: { x } } = chart;
+            const { ctx, chartArea: { top, bottom, left, right } } = chart;
+
+            // ✅ FIXED: use getDatasetMeta pixel positions, not getPixelForIndex
+            const meta = chart.getDatasetMeta(0);
 
             events.forEach(ev => {
-                const xPos = x.getPixelForIndex(ev.index);
-                if (xPos < x.left || xPos > x.right) return;
+                const point = meta.data[ev.index];
+                if (!point) return;
+                const xPos = point.x;
+                if (xPos < left || xPos > right) return;
 
-                const isOnline = ev.status === 'ONLINE';
-                const lineColor  = isOnline ? '#10b981' : '#ef4444';
-                const labelBg    = isOnline ? '#10b981' : '#ef4444';
-                const labelText  = ev.isFirst
+                const isOnline  = ev.status === 'ONLINE';
+                const lineColor = isOnline ? '#10b981' : '#ef4444';
+                const bgColor   = isOnline ? '#059669' : '#dc2626';
+                const glowColor = isOnline ? '#10b981' : '#ef4444';
+
+                // FA unicode: \uf0e7 = bolt (first seen), \uf062 = arrow-up, \uf063 = arrow-down
+                const icon  = ev.isFirst ? '\uf0e7' : (isOnline ? '\uf062' : '\uf063');
+                const label = ev.isFirst
                     ? `First Seen: ${ev.status}`
-                    : isOnline ? '▲ ONLINE' : '▼ OFFLINE';
+                    : (isOnline ? 'ONLINE' : 'OFFLINE');
 
-                // Dashed vertical line
                 ctx.save();
+
+                // Glowing dashed vertical line
+                ctx.shadowColor  = glowColor;
+                ctx.shadowBlur   = 8;
                 ctx.setLineDash([4, 4]);
-                ctx.strokeStyle = lineColor;
-                ctx.lineWidth = 1.5;
-                ctx.globalAlpha = 0.75;
+                ctx.strokeStyle  = lineColor;
+                ctx.lineWidth    = 1.5;
+                ctx.globalAlpha  = 0.85;
                 ctx.beginPath();
-                ctx.moveTo(xPos, top);
+                ctx.moveTo(xPos, top + 30); // start below the callout
                 ctx.lineTo(xPos, bottom);
                 ctx.stroke();
 
-                // Pill label at the top of the line
-                ctx.setLineDash([]);
+                // Reset for callout
                 ctx.globalAlpha = 1;
-                ctx.font = 'bold 10px sans-serif';
-                const textW = ctx.measureText(labelText).width;
-                const padX = 5, padY = 3;
-                const boxW = textW + padX * 2;
-                const boxH = 16;
-                const boxX = xPos - boxW / 2;
-                const boxY = top + 4;
+                ctx.setLineDash([]);
 
-                ctx.fillStyle = labelBg;
-                ctx.beginPath();
-                ctx.roundRect(boxX, boxY, boxW, boxH, 4);
-                ctx.fill();
+                // Draw callout marker at top of line
+                drawCallout(ctx, xPos, top + 30, label, icon, bgColor, glowColor);
 
-                ctx.fillStyle = '#ffffff';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(labelText, xPos, boxY + boxH / 2);
                 ctx.restore();
             });
         }
