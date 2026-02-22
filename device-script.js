@@ -33,12 +33,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ── 1. EXACT EVENT FETCHING ──────────────────────────────
     // Fetches down-to-the-millisecond data for exactly 1 read cost each.
     // ── 1. EXACT EVENT FETCHING ──────────────────────────────
+    // ── 1. EXACT EVENT FETCHING ──────────────────────────────
     let exactEvents = { aws: {}, azure: {} };
     let firstSeenAws = null, firstSeenAzure = null;
 
     async function fetchExactEvents() {
         try {
-            // One single optimized fetch per QPU!
             const [awsRes, azRes] = await Promise.all([
                 fetch(API + '/events?id=' + awsId),
                 fetch(API + '/events?id=' + azureId)
@@ -49,9 +49,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (awsD.length > 0) exactEvents.aws = awsD[0];
             if (azD.length > 0) exactEvents.azure = azD[0];
 
-            // Re-bind for the chart's anchor point (ensuring we don't pass nulls)
-            if (exactEvents.aws.first_seen) firstSeenAws = { timestamp: exactEvents.aws.first_seen, status: 'UNKNOWN' };
-            if (exactEvents.azure.first_seen) firstSeenAzure = { timestamp: exactEvents.azure.first_seen, status: 'UNKNOWN' };
+            // Safely pass the timestamp to the chart marker
+            if (exactEvents.aws && exactEvents.aws.first_seen) firstSeenAws = { timestamp: exactEvents.aws.first_seen };
+            if (exactEvents.azure && exactEvents.azure.first_seen) firstSeenAzure = { timestamp: exactEvents.azure.first_seen };
 
         } catch (e) { console.error('Exact Events fetch failed:', e); }
     }
@@ -74,32 +74,26 @@ document.addEventListener('DOMContentLoaded', async () => {
                 heroBadge.innerHTML = '<div class="dot dot-offline"></div> OFFLINE';
             }
 
-            // Inject Last & First Seen dynamically
             let lastSeenEl = document.getElementById('hero-last-seen');
             if (!lastSeenEl) {
                 lastSeenEl = document.createElement('div');
                 lastSeenEl.id = 'hero-last-seen';
-                lastSeenEl.style.cssText = 'font-size: 0.75rem; color: var(--muted); margin-top: 0.5rem; font-weight: 500; text-align: center; line-height: 1.4;';
+                lastSeenEl.style.cssText = 'font-size: 0.8rem; color: var(--muted); margin-top: 0.5rem; font-weight: 500; text-align: center;';
                 heroBadge.parentNode.appendChild(lastSeenEl);
             }
 
             const activeProvider = awsLive ? 'aws' : 'azure';
             const events = exactEvents[activeProvider];
             
-            const fmtExactDate = (ts) => ts ? new Date(ts.replace(' ', 'T') + 'Z').toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : 'N/A';
+            const fmtExactDate = (ts) => ts ? new Date(ts.replace(' ', 'T') + 'Z').toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : 'Never';
 
             if (events) {
-                // If it's ONLINE, show when it was last offline. If OFFLINE, show when it was last online.
+                // Keep it simple and strictly useful
                 const lastImportantDate = primaryStatus === 'ONLINE' 
                     ? `Last offline: ${fmtExactDate(events.last_offline)}` 
                     : `Last online: ${fmtExactDate(events.last_online)}`;
                 
-                // Show the absolute first time it ever achieved the opposite state
-                const firstImportantDate = primaryStatus === 'ONLINE'
-                    ? `First ever online: ${fmtExactDate(events.first_online)}`
-                    : `First ever offline: ${fmtExactDate(events.first_offline)}`;
-
-                lastSeenEl.innerHTML = `${lastImportantDate}<br><span style="opacity:0.6; font-size: 0.65rem;">${firstImportantDate}</span>`;
+                lastSeenEl.innerHTML = `${lastImportantDate}`;
             } else {
                 lastSeenEl.innerText = 'Awaiting telemetry...';
             }
