@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IonQ Aria-1 Status & Queue | QPUStatus</title>
+    <meta name="description" content="Live queue depth, wait times, and hardware specifications for the IonQ Aria-1 trapped-ion quantum computer via AWS and Azure.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="device-style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
+                <svg class="logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                <h1>QPU<span>Status</span></h1>
+            </a>
+        </div>
+    </header>
+
+    <div class="device-layout">
+        
+        <nav class="device-nav">
+            <h3 style="margin-top: 0; color: var(--muted); font-size: 0.85rem; text-transform: uppercase;">On this page</h3>
+            <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.8rem;">
+                <li><a href="#overview" style="color: var(--text); text-decoration: none;">Live Overview</a></li>
+                <li><a href="#charts" style="color: var(--text); text-decoration: none;">Queue & Latency History</a></li>
+                <li><a href="#info" style="color: var(--text); text-decoration: none;">Hardware Specifications</a></li>
+                <li><a href="#links" style="color: var(--text); text-decoration: none;">Official Resources</a></li>
+            </ul>
+        </nav>
+
+        <main class="device-content" id="overview" data-aws-id="aws_Aria-1" data-azure-id="azure_ionq.qpu.aria-1">
+            
+            <div style="margin-bottom: 3rem;">
+                <h2 style="font-size: 2.5rem; margin: 0 0 0.5rem 0;">IonQ Aria-1</h2>
+                <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 2rem;">
+                    <div class="status-badge status-online" id="hero-status"><div class="dot dot-online"></div> ONLINE</div>
+                    <span style="color: var(--muted); font-size: 0.9rem;">Trapped Ion • 25 Qubits</span>
+                </div>
+                
+                <div class="grid" style="grid-template-columns: 1fr 1fr;">
+                    <div class="card">
+                        <div class="metric-label">AWS ROUTE QUEUE</div>
+                        <div class="metric-value" id="aws-queue">Loading...</div>
+                    </div>
+                    <div class="card">
+                        <div class="metric-label">AZURE ROUTE WAIT</div>
+                        <div class="metric-value" id="azure-queue">Loading...</div>
+                    </div>
+                </div>
+            </div>
+
+            <section id="charts" style="margin-bottom: 4rem;">
+                <h3 class="section-title">24-Hour Network Load</h3>
+                <div class="card" style="height: 300px; padding: 1rem;">
+                    <canvas id="queueChart"></canvas>
+                </div>
+                <p class="disclaimer" style="text-align: left; margin-top: 0.5rem;">Note: Azure reports in expected wait minutes. AWS reports in total queued tasks.</p>
+            </section>
+
+            <section id="info" style="margin-bottom: 4rem;">
+                <h3 class="section-title">Hardware Specifications</h3>
+                <div class="card" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div>
+                        <div class="metric-label">TECHNOLOGY</div>
+                        <div style="font-weight: 500;">Trapped Ion (Ytterbium-171)</div>
+                    </div>
+                    <div>
+                        <div class="metric-label">ALGORITHMIC QUBITS</div>
+                        <div style="font-weight: 500;">25 #AQ</div>
+                    </div>
+                    <div>
+                        <div class="metric-label">CONNECTIVITY</div>
+                        <div style="font-weight: 500;">All-to-All</div>
+                    </div>
+                    <div>
+                        <div class="metric-label">NATIVE GATES</div>
+                        <div style="font-weight: 500;">GPI, GPI2, MS</div>
+                    </div>
+                    <div style="grid-column: span 2;">
+                        <div class="metric-label">SYSTEM DESCRIPTION</div>
+                        <p style="margin: 0.5rem 0 0 0; color: var(--muted); font-size: 0.9rem; line-height: 1.5;">
+                            Aria-1 represents IonQ's commercial-grade trapped ion quantum computer. It utilizes a vacuum chamber where Ytterbium ions are trapped in a linear chain using electromagnetic fields. Computations are performed by directing precisely tuned laser beams at individual ions to manipulate their quantum states.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="links" style="margin-bottom: 2rem;">
+                <h3 class="section-title">Official Resources</h3>
+                <ul style="line-height: 1.8; padding-left: 1.2rem; color: var(--muted);">
+                    <li><a href="https://ionq.com/quantum-systems/aria" target="_blank" style="color: var(--accent);">IonQ Aria Official System Page</a></li>
+                    <li><a href="https://aws.amazon.com/braket/quantum-computers/ionq/" target="_blank" style="color: var(--accent);">AWS Braket: IonQ Provider Guide</a></li>
+                    <li><a href="https://learn.microsoft.com/en-us/azure/quantum/provider-ionq" target="_blank" style="color: var(--accent);">Azure Quantum: IonQ Provider Documentation</a></li>
+                </ul>
+            </section>
+
+        </main>
+    </div>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 QPUStatus. All rights reserved.</p>
+        <p class="disclaimer">Disclaimer: This is an independent telemetry dashboard. QPUStatus is not an official project and is not affiliated with, endorsed by, or partnered with AWS, Microsoft Azure, IonQ, Rigetti, Quantinuum, or any other displayed hardware providers.</p>
+    </footer>
+
+    <script src="device-script.js"></script>
+</body>
+</html>
