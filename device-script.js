@@ -155,15 +155,136 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const CHART_INSTANCES = {};
 
+    // =========================================================
+    // EVENT DETECTION  — "first seen" transition system
+    // Returns array of { index, status, timestamp } for each
+    // ONLINE↔OFFLINE transition in the given filtered array.
+    // The very first data point is always included as a "First Seen" event.
+    // =========================================================
+    function detectStatusEvents(filtered) {
+        const events = [];
+        if (filtered.length === 0) return events;
+
+        // Always mark the first data point
+        events.push({ index: 0, status: filtered[0].status, timestamp: filtered[0].timestamp, isFirst: true });
+
+        for (let i = 1; i < filtered.length; i++) {
+            if (filtered[i].status !== filtered[i - 1].status) {
+                events.push({ index: i, status: filtered[i].status, timestamp: filtered[i].timestamp, isFirst: false });
+            }
+        }
+        return events;
+    }
+
+    // =========================================================
+    // INLINE Chart.js PLUGIN — draws TradingView-style event lines
+    // =========================================================
+    const statusEventPlugin = {
+        id: 'statusEvents',
+        afterDraw(chart) {
+            const events = chart.config._statusEvents;
+            if (!events || events.length === 0) return;
+
+            const { ctx, chartArea: { top, bottom }, scales: { x } } = chart;
+
+            events.forEach(ev => {
+                const xPos = x.getPixelForIndex(ev.index);
+                if (xPos < x.left || xPos > x.right) return;
+
+                const isOnline = ev.status === 'ONLINE';
+                const lineColor  = isOnline ? '#10b981' : '#ef4444';
+                const labelBg    = isOnline ? '#10b981' : '#ef4444';
+                const labelText  = ev.isFirst
+                    ? `First Seen: ${ev.status}`
+                    : isOnline ? '▲ ONLINE' : '▼ OFFLINE';
+
+                // Dashed vertical line
+                ctx.save();
+                ctx.setLineDash([4, 4]);
+                ctx.strokeStyle = lineColor;
+                ctx.lineWidth = 1.5;
+                ctx.globalAlpha = 0.75;
+                ctx.beginPath();
+                ctx.moveTo(xPos, top);
+                ctx.lineTo(xPos, bottom);
+                ctx.stroke();
+
+                // Pill label at the top of the line
+                ctx.setLineDash([]);
+                ctx.globalAlpha = 1;
+                ctx.font = 'bold 10px sans-serif';
+                const textW = ctx.measureText(labelText).width;
+                const padX = 5, padY = 3;
+                const boxW = textW + padX * 2;
+                const boxH = 16;
+                const boxX = xPos - boxW / 2;
+                const boxY = top + 4;
+
+                ctx.fillStyle = labelBg;
+                ctx.beginPath();
+                ctx.roundRect(boxX, boxY, boxW, boxH, 4);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(labelText, xPos, boxY + boxH / 2);
+                ctx.restore();
+            });
+        }
+    };
+
+    // Register the plugin globally once
+    Chart.register(statusEventPlugin);
+
+    // =========================================================
+    // RENDER EVENT NOTIFIER BAR below the chart
+    // A horizontal scrollable row of event chips.
+    // =========================================================
+    function renderEventBar(barId, events, days) {
+        const bar = document.getElementById(barId);
+        if (!bar) return;
+        bar.innerHTML = '';
+
+        if (events.length === 0) {
+            bar.innerHTML = '<span style="color:var(--muted,#64748b);font-size:0.78rem;">No events in this timeframe</span>';
+            return;
+        }
+
+        events.forEach(ev => {
+            const isOnline = ev.status === 'ONLINE';
+            const chip = document.createElement('div');
+            chip.style.cssText = `
+                display:inline-flex; align-items:center; gap:5px;
+                padding:3px 9px; border-radius:20px; font-size:0.75rem;
+                font-weight:600; white-space:nowrap; cursor:default;
+                background:${isOnline ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'};
+                border:1px solid ${isOnline ? '#10b981' : '#ef4444'};
+                color:${isOnline ? '#10b981' : '#ef4444'};
+            `;
+            const dot = `<span style="width:6px;height:6px;border-radius:50%;background:${isOnline ? '#10b981' : '#ef4444'};display:inline-block;"></span>`;
+            const d = new Date(ev.timestamp.replace(' ', 'T') + 'Z');
+            const timeStr = days <= 1
+                ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                : d.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+            const eventLabel = ev.isFirst ? `First Seen · ${ev.status}` : ev.status;
+            chip.innerHTML = `${dot} ${eventLabel} <span style="opacity:0.6;font-weight:400;">${timeStr}</span>`;
+            chip.title = `${ev.timestamp} UTC — ${ev.status}`;
+            bar.appendChild(chip);
+        });
+    }
+
     /**
      * Render (or re-render) a single queue depth line chart.
      * @param {string} canvasId  - target <canvas> id
+     * @param {string} eventBarId - target event bar div id (or null)
      * @param {Array}  history   - full history array
      * @param {number} days      - timeframe in days
      * @param {string} color     - hex border colour
      * @param {string} label     - dataset label
      */
-    function renderQueueChart(canvasId, history, days, color, label) {
+    function renderQueueChart(canvasId, eventBarId, history, days, color, label) {
         if (CHART_INSTANCES[canvasId]) {
             CHART_INSTANCES[canvasId].destroy();
             delete CHART_INSTANCES[canvasId];
@@ -173,52 +294,71 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (filtered.length === 0) {
             showNoData(canvasId);
+            if (eventBarId) renderEventBar(eventBarId, [], days);
             return;
         }
 
         hideNoData(canvasId);
 
-        const bg = color + '1a'; // 10% opacity fill
+        const events = detectStatusEvents(filtered);
+        if (eventBarId) renderEventBar(eventBarId, events, days);
+
+        const bg     = color + '1a'; // 10% opacity fill
         const labels = filtered.map(h => fmtLabel(h.timestamp, days));
         const values = filtered.map(h => h.queue_depth);
 
-        CHART_INSTANCES[canvasId] = new Chart(
-            document.getElementById(canvasId).getContext('2d'),
-            {
-                type: 'line',
-                data: {
-                    labels,
-                    datasets: [{
-                        label,
-                        data: values,
-                        borderColor: color,
-                        backgroundColor: bg,
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.35,
-                        pointRadius: 0,
-                        spanGaps: false   // gaps in data stay as gaps, not connected
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: {
-                            grid: { color: '#334155' },
-                            ticks: { maxTicksLimit: 8, color: '#94a3b8' }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: '#334155' },
-                            ticks: { color: '#94a3b8' }
+        // Compute a sensible y-axis max: at least 5, or 20% above actual max
+        const maxVal = Math.max(...values);
+        const suggestedMax = maxVal < 5 ? 5 : Math.ceil(maxVal * 1.2);
+
+        const chartConfig = {
+            type: 'line',
+            _statusEvents: events,   // picked up by our plugin
+            data: {
+                labels,
+                datasets: [{
+                    label,
+                    data: values,
+                    borderColor: color,
+                    backgroundColor: bg,
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: 0,
+                    spanGaps: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: {
+                        grid: { color: '#334155' },
+                        ticks: { maxTicksLimit: 8, color: '#94a3b8' }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        suggestedMax,
+                        grid: { color: '#334155' },
+                        ticks: {
+                            color: '#94a3b8',
+                            precision: 0,    // no decimals
+                            stepSize: 1      // min increment = 1
                         }
                     }
                 }
             }
+        };
+
+        CHART_INSTANCES[canvasId] = new Chart(
+            document.getElementById(canvasId).getContext('2d'),
+            chartConfig
         );
+
+        // Attach event data to instance so the plugin can reach it
+        CHART_INSTANCES[canvasId].config._statusEvents = events;
     }
 
     // =========================================================
@@ -227,8 +367,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentQueueTf = 1; // default: 24H
 
     function renderAllQueueCharts(days) {
-        renderQueueChart('awsChart',   globalAwsHistory,   days, '#f97316', 'AWS Queue (Tasks)');
-        renderQueueChart('azureChart', globalAzureHistory, days, '#3b82f6', 'Azure Queue (Wait Mins)');
+        renderQueueChart('awsChart',   'aws-event-bar',   globalAwsHistory,   days, '#f97316', 'AWS Queue (Tasks)');
+        renderQueueChart('azureChart', 'azure-event-bar', globalAzureHistory, days, '#3b82f6', 'Azure Queue (Wait Mins)');
         // Direct Cloud chart stays greyed-out / "Coming Soon" – no render needed
     }
 
