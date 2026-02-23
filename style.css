@@ -58,6 +58,14 @@ h1 span { color: var(--accent); }
 .qpu-name { font-weight: 600; font-size: 1.1rem; margin: 0; }
 .qpu-provider { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
+/* Provider Card Last Seen Text */
+.provider-last-seen {
+    font-size: 0.75rem; 
+    color: var(--muted); 
+    padding-top: 1rem; 
+    border-top: 1px dashed var(--border);
+    font-weight: 500;
+}
 /* Badges */
 .status-badge {
     font-size: 0.75rem; font-weight: bold; padding: 0.25rem 0.5rem; border-radius: 999px;
