@@ -17,7 +17,9 @@ themeBtn.addEventListener('click', () => {
 
 // --- TELEMETRY LOGIC ---
 function formatQueue(depth, provider, status) {
-    if (status === 'OFFLINE') return '<span style="color: var(--muted)">--</span>';
+    // FIX: We now show the queue depth even if OFFLINE
+    if (depth === undefined || depth === null) return '--';
+    
     if (provider === 'aws') return `${depth} Tasks`;
     if (depth === 0) return '0 Wait';
     if (depth > 60) return `${Math.floor(depth / 60)}h Wait`;
@@ -46,14 +48,21 @@ function createCard(machine) {
     const routeHtml = ['Direct', 'AWS', 'Azure'].map(r => {
         const rData = machine.routes[r];
         if (!rData) return '';
+        
+        // If offline, text is muted (grey). If online, text is bright green.
         const rColor = rData.status === 'ONLINE' ? 'var(--online)' : 'var(--muted)';
         const rIcon = r === 'AWS' ? 'fa-cloud' : r === 'Azure' ? 'fa-network-wired' : 'fa-server';
         const iColor = r === 'AWS' ? '#f97316' : r === 'Azure' ? '#3b82f6' : '#a855f7';
         
+        // CSS FIX: Added 'gap: 12px' to prevent clashing between Logo and Queue
         return `
-        <div style="display:flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
-            <span style="font-size: 0.8rem; color: var(--muted);"><i class="fa-solid ${rIcon}" style="color: ${iColor}; margin-right: 6px;"></i>${r}</span>
-            <span style="font-size: 0.85rem; font-weight: 500; color: ${rColor}">${formatQueue(rData.queue_depth, rData.provider, rData.status)}</span>
+        <div style="display:flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); gap: 12px;">
+            <span style="font-size: 0.8rem; color: var(--muted); white-space: nowrap;">
+                <i class="fa-solid ${rIcon}" style="color: ${iColor}; margin-right: 6px;"></i>${r}
+            </span>
+            <span style="font-size: 0.85rem; font-weight: 500; color: ${rColor}; text-align: right;">
+                ${formatQueue(rData.queue_depth, rData.provider, rData.status)}
+            </span>
         </div>`;
     }).join('');
 
