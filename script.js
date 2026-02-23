@@ -41,7 +41,7 @@ function createCard(machine) {
     const dotClass = isOnline ? 'dot-online' : 'dot-offline';
     const statusText = isOnline ? 'ONLINE' : 'OFFLINE';
 
-    // Build the slug (e.g., 'IonQ Forte-1' -> 'ionq-forte-1')
+    // Build the slug
     const slug = (machine.mfg + '-' + machine.name).toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 
     // Render the mini-rows for available routes
@@ -49,18 +49,20 @@ function createCard(machine) {
         const rData = machine.routes[r];
         if (!rData) return '';
         
-        // If offline, text is muted (grey). If online, text is bright green.
         const rColor = rData.status === 'ONLINE' ? 'var(--online)' : 'var(--muted)';
         const rIcon = r === 'AWS' ? 'fa-cloud' : r === 'Azure' ? 'fa-network-wired' : 'fa-server';
         const iColor = r === 'AWS' ? '#f97316' : r === 'Azure' ? '#3b82f6' : '#a855f7';
         
-        // CSS FIX: Added 'gap: 12px' to prevent clashing between Logo and Queue
         return `
         <div style="display:flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); gap: 12px;">
-            <span style="font-size: 0.8rem; color: var(--muted); white-space: nowrap;">
-                <i class="fa-solid ${rIcon}" style="color: ${iColor}; margin-right: 6px;"></i>${r}
-            </span>
-            <span style="font-size: 0.85rem; font-weight: 500; color: ${rColor}; text-align: right;">
+            <div style="display: flex; align-items: center;">
+                <span style="display: inline-block; width: 20px; text-align: center; margin-right: 8px;">
+                    <i class="fa-solid ${rIcon}" style="color: ${iColor}; font-size: 0.9rem;"></i>
+                </span>
+                <span style="font-size: 0.85rem; color: var(--muted); font-weight: 500;">${r}</span>
+            </div>
+            
+            <span style="font-size: 0.85rem; font-weight: 600; color: ${rColor}; white-space: nowrap;">
                 ${formatQueue(rData.queue_depth, rData.provider, rData.status)}
             </span>
         </div>`;
@@ -68,22 +70,20 @@ function createCard(machine) {
 
     return `
         <div class="card">
-            <div class="card-header">
-                <div>
-                    <p class="qpu-name">${machine.name}</p>
-                    <p class="qpu-provider">${machine.mfg}</p>
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+                <div style="min-width: 0; flex: 1;"> <p class="qpu-name" style="margin: 0; font-weight: 700; font-size: 1.1rem; line-height: 1.2;">${machine.name}</p>
+                    <p class="qpu-provider" style="margin: 2px 0 0 0; font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;">${machine.mfg}</p>
                 </div>
-                <div class="status-badge ${badgeClass}">
-                    <div class="dot ${dotClass}"></div> ${statusText}
+                <div class="status-badge ${badgeClass}" style="flex-shrink: 0;"> <div class="dot ${dotClass}"></div> ${statusText}
                 </div>
             </div>
             
-            <div class="metrics" style="background: rgba(0,0,0,0.15); padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem;">
-                <div style="font-size: 0.7rem; font-weight: bold; color: var(--muted); margin-bottom: 0.5rem; letter-spacing: 0.5px;">ROUTING OPTIONS</div>
+            <div class="metrics" style="background: rgba(0,0,0,0.15); padding: 0.8rem 1rem; border-radius: 8px; margin: 1rem 0;">
+                <div style="font-size: 0.7rem; font-weight: 800; color: var(--muted); margin-bottom: 0.6rem; letter-spacing: 0.5px; text-transform: uppercase; opacity: 0.7;">Routing Options</div>
                 ${routeHtml}
             </div>
             
-            <div class="time-ago" style="margin-bottom: 1rem; text-align: right;">Updated ${timeSince(machine.last_updated)}</div>
+            <div class="time-ago" style="margin-bottom: 1rem; text-align: right; font-size: 0.8rem; color: var(--muted);">Updated ${timeSince(machine.last_updated)}</div>
             
             <a href="${slug}.html" class="view-more-btn">
                 View Hardware Metrics <i class="fa-solid fa-arrow-right"></i>
