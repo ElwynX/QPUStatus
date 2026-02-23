@@ -3,8 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IonQ Aria-1 Status & Queue | QPUStatus</title>
-    <meta name="description" content="Live queue depth, wait times, and hardware specifications for the IonQ Aria-1 trapped-ion quantum computer.">
+    <title>IonQ Aria-1 Live Status, Queue Time & Wait Monitor | QPUStatus</title>
+    <meta name="description" content="Check the live status, real-time queue depth, and AWS/Azure wait times for the IonQ Aria-1 quantum computer. Track uptime, hardware specs, and network availability.">
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": "IonQ Aria-1",
+      "description": "Live status, real-time queue depth, and AWS/Azure wait times for the IonQ Aria-1 trapped-ion quantum computer.",
+      "brand": {
+        "@type": "Brand",
+        "name": "IonQ"
+      },
+      "category": "Quantum Processor"
+    }
+    </script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -52,14 +67,14 @@
             <div class="hero-section card">
                 <h2 style="font-size: 2.5rem; margin: 0 0 0.5rem 0;">IonQ Aria-1</h2>
                 <div style="margin-bottom: 2rem;">
-                    <span style="color: var(--muted); font-size: 0.9rem;">Trapped Ion • 25 Algorithmic Qubits</span>
+                    <span style="color: var(--muted); font-size: 0.9rem;">Trapped Ion • 25 Algorithmic Qubits • Real-Time Hardware Tracker</span>
                 </div>
                 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
                     
                     <div class="card" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 1.5rem;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-                            <i class="fa-solid fa-cloud" style="color:#f97316; margin-right:5px; font-size: 1rem;"></i> AWS ROUTE
+                            <div class="metric-label" style="font-size: 0.85rem;"><i class="fa-solid fa-cloud" style="color:#f97316; margin-right:5px; font-size: 1rem;"></i> AWS ROUTE</div>
                             <div class="status-badge status-offline" id="aws-status"><div class="dot dot-offline"></div> LOAD</div>
                         </div>
                         <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1rem;">
@@ -71,7 +86,7 @@
 
                     <div class="card" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 1.5rem;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-                            <i class="fa-solid fa-network-wired" style="color:#3b82f6; margin-right:5px; font-size: 1rem;"></i> AZURE ROUTE
+                            <div class="metric-label" style="font-size: 0.85rem;"><i class="fa-solid fa-network-wired" style="color:#3b82f6; margin-right:5px; font-size: 1rem;"></i> AZURE ROUTE</div>
                             <div class="status-badge status-offline" id="azure-status"><div class="dot dot-offline"></div> LOAD</div>
                         </div>
                         <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1rem;">
@@ -88,7 +103,7 @@
                 
                 <section id="history" class="tab-pane active">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h3 class="section-title" style="margin: 0;">Network Load</h3>
+                        <h3 class="section-title" style="margin: 0;">Real-Time Queue Depth</h3>
                         <div class="timeframe-toggle" id="queue-tf">
                             <button class="active" data-tf="1">24H</button>
                             <button data-tf="7">1W</button>
@@ -117,7 +132,7 @@
 
                 <section id="uptime" class="tab-pane">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h3 class="section-title" style="margin: 0;">Status History</h3>
+                        <h3 class="section-title" style="margin: 0;">Hardware Uptime Dashboard</h3>
                         <div class="timeframe-toggle" id="uptime-tf">
                             <button class="active" data-tf="30">30D</button>
                             <button data-tf="90">90D</button>
@@ -203,6 +218,10 @@
 
                     <h3 class="section-title">Frequently Asked Questions</h3>
                     <div class="card faq-item">
+                        <h4><i class="fa-regular fa-circle-xmark" style="color: #ef4444; margin-right: 8px;"></i> Why is the IonQ Aria-1 offline or unavailable?</h4>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">If the Aria-1 status shows as OFFLINE, it is usually due to a scheduled daily calibration window or laser tuning sequence rather than a hardware failure. Quantum processors require frequent environmental recalibration to maintain gate fidelity. Check our uptime charts above to see if this is a routine outage.</p>
+                    </div>
+                    <div class="card faq-item" style="margin-top: 1rem;">
                         <h4><i class="fa-solid fa-microchip" style="color: #3b82f6; margin-right: 8px;"></i> What does #AQ 25 mean?</h4>
                         <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">AQ (Algorithmic Qubits) is a system-level metric introduced by IonQ to measure the real-world utility of a quantum computer, factoring in error rates and gate fidelities. An #AQ of 25 means the Aria-1 can successfully execute quantum circuits up to 25 qubits wide and over 600 entangling gate operations deep, a benchmark that far exceeds most competing systems available today.</p>
                     </div>
