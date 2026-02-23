@@ -314,23 +314,26 @@ table tr:last-child {
 }
 
 /* --- LINKS TAB: Interactive Cards --- */
-.link-card {
+/* Add high specificity (.card.link-card) to override the default column layout */
+.card.link-card {
     text-decoration: none;
     color: inherit;
     display: flex;
+    flex-direction: row;      /* Forces icon and text side-by-side */
     align-items: center;
+    text-align: left;         /* Forces text to align left */
     gap: 1.2rem;
     padding: 1.2rem;
     transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.link-card h4 {
+.card.link-card h4 {
     margin: 0 0 0.3rem 0;
     color: var(--text);
     transition: color 0.2s ease;
 }
 
-.link-card p {
+.card.link-card p {
     margin: 0;
     font-size: 0.85rem;
     color: var(--muted);
@@ -347,21 +350,73 @@ table tr:last-child {
     flex-shrink: 0;
 }
 
-/* Specific icon colors mapped to the HTML classes */
 .icon-ionq { background: rgba(255,255,255,0.05); border: 1px solid var(--border); }
 .icon-aws { background: rgba(249,115,22,0.1); color: #f97316; border: 1px solid rgba(249,115,22,0.3); }
 .icon-azure { background: rgba(59,130,246,0.1); color: #3b82f6; border: 1px solid rgba(59,130,246,0.3); }
 
-/* The Hover Animation */
-.link-card:hover {
+.card.link-card:hover {
     transform: translateY(-2px);
     border-color: var(--muted);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.link-card:hover h4 {
-    color: var(--accent); /* Turn title blue on hover */
+.card.link-card:hover h4 {
+    color: var(--accent); 
 }
+
+/* Override back to column specifically for the internal nav grid */
+.internal-nav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.card.link-card.internal-card {
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    gap: 0.8rem;
+    padding: 1.5rem 1rem;
+}
+
+.card.link-card.internal-card i {
+    font-size: 1.8rem;
+    transition: transform 0.2s ease;
+}
+
+.card.link-card.internal-card:hover i {
+    transform: scale(1.1); 
+}
+
+/* --- OFFICIAL STATUS CARD (UPTIME TAB) --- */
+.official-status-card {
+    background: color-mix(in srgb, var(--accent) 5%, var(--panel));
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .official-status-card {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+.official-status-text h4 { margin: 0 0 0.5rem 0; color: var(--accent); }
+.official-status-text p { margin: 0 0 0.5rem 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+.official-warning { font-size: 0.75rem !important; color: var(--offline) !important; opacity: 0.9; font-weight: 600; margin-bottom: 0 !important; }
+
+.official-status-btn {
+    text-decoration: none; padding: 0.6rem 1.2rem; border-radius: 6px;
+    background: var(--accent); color: #fff; font-weight: bold; font-size: 0.85rem;
+    white-space: nowrap; text-align: center; transition: opacity 0.2s;
+}
+.official-status-btn:hover { opacity: 0.9; }
 
 /* Internal Navigation Grid Alignment */
 .internal-nav-grid {
