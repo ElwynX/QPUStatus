@@ -1,17 +1,20 @@
 document.addEventListener('DOMContentLoaded', async () => {
 
+    // ── 0. THEME & TABS LOGIC ────────────────────────────────
     const htmlTag = document.documentElement;
     const themeBtn = document.getElementById('theme-toggle');
     const themeIcon = document.getElementById('theme-icon');
     const savedTheme = localStorage.getItem('theme') || 'dark';
     htmlTag.setAttribute('data-theme', savedTheme);
     themeIcon.innerText = savedTheme === 'dark' ? '☀️' : '🌙';
+    
     themeBtn.addEventListener('click', () => {
         const newTheme = htmlTag.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
         htmlTag.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
         themeIcon.innerText = newTheme === 'dark' ? '☀️' : '🌙';
-        Chart.instances.forEach(c => c.update()); // Update chart colors on toggle
+        // Update all charts to reflect new theme colors
+        Object.values(CHART_INSTANCES).forEach(c => c.update()); 
     });
 
     const tabs = document.querySelectorAll('#tab-menu li');
@@ -25,45 +28,54 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
+    // ── 1. SETUP & DATA FETCHING ─────────────────────────────
     const mainContent = document.querySelector('.device-page');
-    const awsId   = mainContent.getAttribute('data-aws-id');
-    const azureId = mainContent.getAttribute('data-azure-id');
-    const API     = 'https://api.qpustatus.com';
+    const awsId    = mainContent.getAttribute('data-aws-id');
+    const azureId  = mainContent.getAttribute('data-azure-id');
+    const directId = mainContent.getAttribute('data-direct-id'); // NEW: Direct ID
+    const API      = 'https://api.qpustatus.com';
+    let CHART_INSTANCES = {};
 
-    // ── 1. EXACT EVENT FETCHING ──────────────────────────────
-    // Fetches down-to-the-millisecond data for exactly 1 read cost each.
-    // ── 1. EXACT EVENT FETCHING ──────────────────────────────
-    // ── 1. EXACT EVENT FETCHING ──────────────────────────────
-    let exactEvents = { aws: {}, azure: {} };
-    let firstSeenAws = null, firstSeenAzure = null;
+    // ── 2. EXACT EVENT FETCHING (First Seen Logic) ───────────
+    let exactEvents = { aws: {}, azure: {}, direct: {} };
+    let firstSeenAws = null, firstSeenAzure = null, firstSeenDirect = null;
 
     async function fetchExactEvents() {
         try {
-            const [awsRes, azRes] = await Promise.all([
-                fetch(API + '/events?id=' + awsId),
-                fetch(API + '/events?id=' + azureId)
+            // Helper to safely fetch only if ID exists
+            const safeFetch = (id) => id ? fetch(`${API}/events?id=${id}`) : Promise.resolve({ json: () => [] });
+
+            const [awsRes, azRes, dirRes] = await Promise.all([
+                safeFetch(awsId),
+                safeFetch(azureId),
+                safeFetch(directId)
             ]);
+
             const awsD = await awsRes.json();
-            const azD = await azRes.json();
+            const azD  = await azRes.json();
+            const dirD = await dirRes.json();
             
             if (awsD.length > 0) exactEvents.aws = awsD[0];
             if (azD.length > 0) exactEvents.azure = azD[0];
+            if (dirD.length > 0) exactEvents.direct = dirD[0];
 
-            // Safely pass the timestamp to the chart marker
-            if (exactEvents.aws && exactEvents.aws.first_seen) firstSeenAws = { timestamp: exactEvents.aws.first_seen };
-            if (exactEvents.azure && exactEvents.azure.first_seen) firstSeenAzure = { timestamp: exactEvents.azure.first_seen };
+            // Store timestamps for the Chart Markers
+            if (exactEvents.aws?.first_seen) firstSeenAws = { timestamp: exactEvents.aws.first_seen };
+            if (exactEvents.azure?.first_seen) firstSeenAzure = { timestamp: exactEvents.azure.first_seen };
+            if (exactEvents.direct?.first_seen) firstSeenDirect = { timestamp: exactEvents.direct.first_seen };
 
         } catch (e) { console.error('Exact Events fetch failed:', e); }
     }
 
-    // ── 2. HERO STATS UPDATER ──────────────────────────
-    // ── 2. HERO STATS UPDATER (INDEPENDENT PROVIDERS) ──────────
+    // ── 3. HERO STATS UPDATER (With Flex Ordering) ───────────
     async function updateHeroStats() {
         try {
             const res  = await fetch(`${API}/stats`);
             const data = await res.json();
-            const awsLive   = data.find(q => q.id === awsId);
-            const azureLive = data.find(q => q.id === azureId);
+            
+            const awsLive    = awsId ? data.find(q => q.id === awsId) : null;
+            const azureLive  = azureId ? data.find(q => q.id === azureId) : null;
+            const directLive = directId ? data.find(q => q.id === directId) : null;
 
             const fmtExactDate = (ts) => ts ? new Date(ts.replace(' ', 'T') + 'Z').toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : 'Never';
 
@@ -71,32 +83,48 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const statBadge = document.getElementById(`${prefix}-status`);
                 const queueEl   = document.getElementById(`${prefix}-queue`);
                 const lastSeenEl = document.getElementById(`${prefix}-last-seen`);
+                const cardEl    = document.getElementById(`card-${prefix}`);
+                const groupEl   = document.getElementById(`group-${prefix}`);
 
-                if (!statBadge || !queueEl || !lastSeenEl) return; // Safety check in case elements are missing
+                if (!statBadge) return; 
 
+                // --- MISSING ROUTE HANDLER ---
                 if (!liveData) {
-                    queueEl.innerHTML = 'N/A';
+                    // Set visual state to N/A
+                    queueEl.innerHTML = '--';
                     statBadge.className = 'status-badge status-offline';
-                    statBadge.innerHTML = '<div class="dot dot-offline"></div> OFFLINE';
-                    lastSeenEl.innerHTML = 'Provider not found';
+                    statBadge.innerHTML = '<div class="dot dot-offline"></div> N/A';
+                    if(lastSeenEl) lastSeenEl.innerHTML = 'Route not available';
+                    
+                    // FLEX ORDERING: Dim it and drop it to the bottom
+                    if(cardEl) { 
+                        cardEl.style.opacity = '0.4'; 
+                        cardEl.style.order = '99'; 
+                    }
+                    // Hide the chart container completely
+                    if(groupEl) { 
+                        groupEl.style.display = 'none'; 
+                    }
                     return;
                 }
 
-                // 1. Independent Status Badge (This fixes the sync issue!)
-                if (liveData.status === 'ONLINE') {
-                    statBadge.className = 'status-badge status-online';
-                    statBadge.innerHTML = '<div class="dot dot-online"></div> ONLINE';
-                } else {
-                    statBadge.className = 'status-badge status-offline';
-                    statBadge.innerHTML = '<div class="dot dot-offline"></div> OFFLINE';
-                }
+                // --- NORMAL UPDATE ---
+                // Reset order/opacity in case it came back online
+                if(cardEl) { cardEl.style.opacity = '1'; cardEl.style.order = (prefix === 'direct' ? '1' : prefix === 'aws' ? '2' : '3'); }
+                if(groupEl) { groupEl.style.display = 'block'; groupEl.style.order = (prefix === 'direct' ? '1' : prefix === 'aws' ? '2' : '3'); }
 
-                // 2. Queue Depth
+                const isOnline = liveData.status === 'ONLINE';
+                
+                // Status Badge
+                statBadge.className = `status-badge ${isOnline ? 'status-online' : 'status-offline'}`;
+                statBadge.innerHTML = `<div class="dot ${isOnline ? 'dot-online' : 'dot-offline'}"></div> ${liveData.status}`;
+
+                // Queue Depth
                 queueEl.innerHTML = (liveData.queue_depth != null) ? liveData.queue_depth : '--';
 
-                // 3. Independent Last Seen
+                // Last Seen / First Seen
                 if (exactData) {
-                    const lastImportantDate = liveData.status === 'ONLINE' 
+                    const lastImportantDate = isOnline 
                         ? `Last offline: ${fmtExactDate(exactData.last_offline)}` 
                         : `Last online: ${fmtExactDate(exactData.last_online)}`;
                     lastSeenEl.innerHTML = lastImportantDate;
@@ -105,43 +133,62 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
 
-            // Run the independent updates
+            updateProviderCard(directLive, exactEvents.direct, 'direct');
             updateProviderCard(awsLive, exactEvents.aws, 'aws');
             updateProviderCard(azureLive, exactEvents.azure, 'azure');
+
+            // --- SEO GOLD INJECTOR ---
+            const seoEl = document.getElementById('seo-dynamic-summary');
+            if (seoEl && (awsLive || azureLive || directLive)) {
+                const machineName = document.querySelector('h2') ? document.querySelector('h2').innerText : 'Quantum Machine';
+                let routesText = [];
+                if (directLive) routesText.push(`Direct API (${directLive.status}, ${directLive.queue_depth}m wait)`);
+                if (awsLive) routesText.push(`AWS (${awsLive.status}, ${awsLive.queue_depth} tasks)`);
+                if (azureLive) routesText.push(`Azure (${azureLive.status}, ${azureLive.queue_depth}m wait)`);
+                
+                seoEl.innerHTML = `<strong>Live Status Update:</strong> As of right now, the ${machineName} is accessible via ${routesText.join(', ')}. Track historical uptime and network latency below.`;
+            }
 
         } catch (e) { console.error('Hero stats fetch failed:', e); }
     }
 
-    // Initialize exact events FIRST, so the Hero Updater can use them
     await fetchExactEvents();
     await updateHeroStats();
     setInterval(updateHeroStats, 60000);
 
-    // ── 3. HISTORY CACHE & FETCHING ──────────────────────────
+    // ── 4. HISTORY CACHE & FETCHING ──────────────────────────
     const historyCache = {};
 
     async function fetchHistory(days) {
         if (historyCache[days]) return historyCache[days];
         try {
-            const [awsRes, azureRes] = await Promise.all([
-                fetch(API + '/history?id=' + awsId   + '&days=' + days),
-                fetch(API + '/history?id=' + azureId + '&days=' + days)
+            const safeHistFetch = (id) => id ? fetch(`${API}/history?id=${id}&days=${days}`) : Promise.resolve({ json: () => [] });
+
+            const [awsRes, azRes, dirRes] = await Promise.all([
+                safeHistFetch(awsId),
+                safeHistFetch(azureId),
+                safeHistFetch(directId)
             ]);
-            const result = { aws: await awsRes.json(), azure: await azureRes.json() };
+            
+            const result = { 
+                aws: await awsRes.json(), 
+                azure: await azRes.json(),
+                direct: await dirRes.json() 
+            };
             historyCache[days] = result;
             return result;
         } catch (e) {
             console.error('History fetch failed days=' + days, e);
-            return { aws: [], azure: [] };
+            return { aws: [], azure: [], direct: [] };
         }
     }
 
     await fetchHistory(1);
 
-    // ── 4. LABEL FORMATTERS & OVERLAYS ───────────────────────
+    // ── 5. UTILS & HELPERS ───────────────────────────────────
     function fmtDate(d, days) {
         if (days <= 1)  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        if (days <= 30) return d.toLocaleString([],   { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        if (days <= 30) return d.toLocaleString([],    { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         return d.toLocaleDateString([], { month: 'short', day: 'numeric', year: '2-digit' });
     }
     function fmtTs(ts, days) { return fmtDate(new Date(ts.replace(' ','T')+'Z'), days); }
@@ -166,9 +213,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         var o = document.getElementById(canvasId+'-overlay'); if (o) o.style.display = 'none';
     }
 
-    const CHART_INSTANCES = {};
-
-    // ── 5. EVENT DETECTION & CALLOUT PLUGINS ─────────────────
+    // ── 6. EVENT DETECTION & PLUGINS ─────────────────────────
     function detectStatusEvents(windowData, firstSeenRecord, days) {
         var events = [];
         var windowStartMs = Date.now() - days * 86400000;
@@ -227,8 +272,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (xPos < ca.left || xPos > ca.right) return;
                 
                 var isOnline = ev.status === 'ONLINE';
-                
-                // FIXED: If it's the First Seen marker, make it a clean Slate Grey instead of red/green
                 var lc = ev.isFirst ? '#94a3b8' : (isOnline ? '#10b981' : '#ef4444');
                 var bg = ev.isFirst ? '#475569' : (isOnline ? '#059669' : '#dc2626');
                 var gw = ev.isFirst ? '#94a3b8' : (isOnline ? '#10b981' : '#ef4444');
@@ -272,9 +315,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // ── 6. CHART DRAWING LOGIC ───────────────────────────────
+    // ── 7. CHART DRAWING ─────────────────────────────────────
     function renderQueueChart(canvasId, eventBarId, windowData, firstSeenRecord, days, color, label) {
         if (CHART_INSTANCES[canvasId]) { CHART_INSTANCES[canvasId].destroy(); delete CHART_INSTANCES[canvasId]; }
+        
+        // Use generic event detector
         var events = detectStatusEvents(windowData, firstSeenRecord, days);
         if (eventBarId) renderEventBar(eventBarId, events, days);
 
@@ -294,7 +339,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         var cfg = {
             type: 'line',
-            _statusEvents: events,
+            _statusEvents: events, // Pass events to the plugin
             data: { labels: labels, datasets: [{ label:label, data:values,
                 borderColor:color, backgroundColor:color+'1a',
                 borderWidth:2, fill:true, tension:0.35, pointRadius:0, spanGaps:false }] },
@@ -314,10 +359,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function renderAllQueueCharts(days) {
-        showNoData('awsChart','Loading...'); showNoData('azureChart','Loading...');
+        // Show loading state for all potential charts
+        showNoData('directChart', 'Loading...');
+        showNoData('awsChart',    'Loading...');
+        showNoData('azureChart',  'Loading...');
+        
         var h = await fetchHistory(days);
-        renderQueueChart('awsChart',  'aws-event-bar',   h.aws,   firstSeenAws,   days, '#f97316','AWS Queue (Tasks)');
-        renderQueueChart('azureChart','azure-event-bar', h.azure, firstSeenAzure, days, '#3b82f6','Azure Queue (Wait Mins)');
+        
+        // Render Direct, AWS, and Azure (if data exists)
+        renderQueueChart('directChart', 'direct-event-bar', h.direct, firstSeenDirect, days, '#a855f7', 'Direct Queue (Wait Mins)');
+        renderQueueChart('awsChart',    'aws-event-bar',    h.aws,    firstSeenAws,    days, '#f97316', 'AWS Queue (Tasks)');
+        renderQueueChart('azureChart',  'azure-event-bar',  h.azure,  firstSeenAzure,  days, '#3b82f6', 'Azure Queue (Wait Mins)');
     }
 
     document.querySelectorAll('#queue-tf button').forEach(function(btn) {
@@ -329,13 +381,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     await renderAllQueueCharts(1);
 
-    // ── 7. UPTIME GRIDS ──────────────────────────────────────
+    // ── 8. UPTIME GRIDS ──────────────────────────────────────
     function buildUptimeGrid(gridId, pctId, history, days) {
         var grid = document.getElementById(gridId); if (!grid) return;
         grid.innerHTML = '';
         var dayMap = {};
         
-        // This naturally scales with 1W (hourly) and 1Y (daily) data accurately!
         history.forEach(function(h) {
             var key = new Date(h.timestamp.replace(' ','T')+'Z').toISOString().slice(0,10);
             if (!dayMap[key]) dayMap[key]=[];
@@ -343,17 +394,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         
         var onlineDays=0, dataDays=0;
+        var todayKey = new Date().toISOString().slice(0,10);
+
         for (var i=days-1; i>=0; i--) {
             var d=new Date(); d.setUTCDate(d.getUTCDate()-i);
             var key=d.toISOString().slice(0,10);
-            var todayKey = new Date().toISOString().slice(0,10); // ADD THIS
             var block=document.createElement('div'); block.className='uptime-block';
+            
             if (dayMap[key]) {
                 dataDays++;
                 var pct=dayMap[key].filter(function(s){return s==='ONLINE';}).length/dayMap[key].length;
                 if (pct>=0.9) { block.classList.add('online'); block.title=key+': Online'; onlineDays++; }
                 else          { block.classList.add('down');   block.title=key+': Degraded / Offline'; }
-            } else if (key === todayKey) {  // ADD THIS BRANCH
+            } else if (key === todayKey) {
+                // Animated block for 'Today - collecting data'
                 block.style.background='repeating-linear-gradient(45deg,#1e3a5f,#1e3a5f 4px,#1e293b 4px,#1e293b 8px)';
                 block.title=key+': Collecting data...';
             } else {
@@ -368,9 +422,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function renderUptime(days) {
         var sl=document.getElementById('uptime-start-label');
         if (sl) sl.innerText = days>=365?'1 year ago':days+' days ago';
+        
         var h = await fetchHistory(days);
-        buildUptimeGrid('aws-uptime-grid',  'aws-uptime-pct',  h.aws,  days);
-        buildUptimeGrid('azure-uptime-grid','azure-uptime-pct',h.azure,days);
+        buildUptimeGrid('direct-uptime-grid', 'direct-uptime-pct', h.direct, days);
+        buildUptimeGrid('aws-uptime-grid',    'aws-uptime-pct',    h.aws,    days);
+        buildUptimeGrid('azure-uptime-grid',  'azure-uptime-pct',  h.azure,  days);
     }
 
     document.querySelectorAll('#uptime-tf button').forEach(function(btn) {
@@ -382,22 +438,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     await renderUptime(30);
 
-    // ── 8. DETAILED 7-DAY STATUS CHART ───────────────────────
+    // ── 9. DETAILED 7-DAY STATUS CHART ───────────────────────
     async function renderDetailedStatus() {
         var canvasId='detailedStatusChart';
         if (CHART_INSTANCES[canvasId]) { CHART_INSTANCES[canvasId].destroy(); delete CHART_INSTANCES[canvasId]; }
+        
         var h = await fetchHistory(7);
-        var awsData=h.aws, azureData=h.azure;
-        if (!awsData.length && !azureData.length) { showNoData(canvasId,'No status data in the last 7 days'); return; }
+        var awsData=h.aws, azureData=h.azure, directData=h.direct;
+        
+        if (!awsData.length && !azureData.length && !directData.length) { 
+            showNoData(canvasId,'No status data in the last 7 days'); return; 
+        }
         hideNoData(canvasId);
-        var base = awsData.length>=azureData.length ? awsData : azureData;
+
+        // Determine which dataset is longest to use as the base X-axis
+        var base = awsData;
+        if (azureData.length > base.length) base = azureData;
+        if (directData.length > base.length) base = directData;
+
         CHART_INSTANCES[canvasId] = new Chart(document.getElementById(canvasId).getContext('2d'), {
             type:'line',
             data:{ labels:base.map(function(h){return fmtTs(h.timestamp,7);}),
                 datasets:[
-                    { label:'AWS',   data:awsData.map(function(h){return h.status==='ONLINE'?1:0;}),
+                    { label:'Direct', data:directData.map(function(h){return h.status==='ONLINE'?1:0;}),
+                      borderColor:'#a855f7',backgroundColor:'rgba(168,85,247,0.08)',fill:true,stepped:'before',borderWidth:2,pointRadius:0 },
+                    { label:'AWS',    data:awsData.map(function(h){return h.status==='ONLINE'?1:0;}),
                       borderColor:'#f97316',backgroundColor:'rgba(249,115,22,0.08)',fill:true,stepped:'before',borderWidth:2,pointRadius:0 },
-                    { label:'Azure', data:azureData.map(function(h){return h.status==='ONLINE'?1:0;}),
+                    { label:'Azure',  data:azureData.map(function(h){return h.status==='ONLINE'?1:0;}),
                       borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.08)',fill:true,stepped:'before',borderWidth:2,pointRadius:0 }
                 ]},
             options:{ responsive:true,maintainAspectRatio:false,
@@ -414,4 +481,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     await renderDetailedStatus();
 
-}); // end DOMContentLoaded
+});
