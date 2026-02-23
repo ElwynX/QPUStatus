@@ -139,12 +139,13 @@
                         <canvas id="detailedStatusChart"></canvas>
                     </div>
 
-                    <div class="card" style="background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.3); display: flex; justify-content: space-between; align-items: center; padding: 1.5rem;">
-                        <div>
-                            <h4 style="margin: 0 0 0.5rem 0; color: #3b82f6;">Official Provider Status</h4>
-                            <p style="margin: 0; font-size: 0.85rem; color: var(--muted);">Compare our telemetry with IonQ's official incident reports and maintenance windows.</p>
+                    <div class="official-status-card">
+                        <div class="official-status-text">
+                            <h4><i class="fa-solid fa-tower-broadcast" style="margin-right: 5px;"></i> Official Provider Status</h4>
+                            <p>Because we're still gathering historical data, our telemetry might not show the full picture yet. For official incident reports, past outages, and scheduled maintenance windows, please check the manufacturer's official page.</p>
+                            <p class="official-warning"><i class="fa-solid fa-triangle-exclamation"></i> Note: QPUStatus is an unofficial project and is not affiliated with IonQ.</p>
                         </div>
-                        <a href="https://status.ionq.co" target="_blank" rel="noopener" style="text-decoration: none; padding: 0.6rem 1.2rem; border-radius: 6px; background: #3b82f6; color: #fff; font-weight: bold; font-size: 0.85rem; white-space: nowrap;">
+                        <a href="https://status.ionq.co" target="_blank" rel="noopener" class="official-status-btn">
                             status.ionq.co <i class="fa-solid fa-arrow-up-right-from-square" style="margin-left: 5px;"></i>
                         </a>
                     </div>
