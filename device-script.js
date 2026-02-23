@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ── 2. HERO STATS UPDATER ──────────────────────────
-    // ── 2. HERO STATS UPDATER ──────────────────────────
+    // ── 2. HERO STATS UPDATER (INDEPENDENT PROVIDERS) ──────────
     async function updateHeroStats() {
         try {
             const res  = await fetch(`${API}/stats`);
@@ -72,12 +72,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const queueEl   = document.getElementById(`${prefix}-queue`);
                 const lastSeenEl = document.getElementById(`${prefix}-last-seen`);
 
+                if (!statBadge || !queueEl || !lastSeenEl) return; // Safety check in case elements are missing
+
                 if (!liveData) {
                     queueEl.innerHTML = 'N/A';
+                    statBadge.className = 'status-badge status-offline';
+                    statBadge.innerHTML = '<div class="dot dot-offline"></div> OFFLINE';
+                    lastSeenEl.innerHTML = 'Provider not found';
                     return;
                 }
 
-                // 1. Independent Status Badge
+                // 1. Independent Status Badge (This fixes the sync issue!)
                 if (liveData.status === 'ONLINE') {
                     statBadge.className = 'status-badge status-online';
                     statBadge.innerHTML = '<div class="dot dot-online"></div> ONLINE';
@@ -95,6 +100,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         ? `Last offline: ${fmtExactDate(exactData.last_offline)}` 
                         : `Last online: ${fmtExactDate(exactData.last_online)}`;
                     lastSeenEl.innerHTML = lastImportantDate;
+                } else {
+                    lastSeenEl.innerHTML = 'Awaiting telemetry...';
                 }
             }
 
