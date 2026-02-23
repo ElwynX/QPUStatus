@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IonQ Forte-1 Queue Time, Live Status & Wait Monitor | QPUStatus</title>
+    <meta name="description" content="Track the live status, AWS/Azure wait times, and real-time queue depth for the IonQ Forte-1. Explore uptime history and #AQ 36 hardware specifications.">
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": "IonQ Forte-1",
+      "description": "Live status, real-time queue depth, and AWS/Azure wait times for the IonQ Forte-1 trapped-ion quantum computer.",
+      "brand": {
+        "@type": "Brand",
+        "name": "IonQ"
+      },
+      "category": "Quantum Processor",
+      "additionalProperty": [{
+        "@type": "PropertyValue",
+        "name": "Algorithmic Qubits",
+        "value": "36"
+      }]
+    }
+    </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
+                <svg class="logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                <h1>QPU<span>Status</span></h1>
+            </a>
+        </div>
+        <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">
+            <span id="theme-icon">☀️</span>
+        </button>
+    </header>
+
+    <main class="device-page" data-aws-id="aws_Forte-1" data-azure-id="azure_ionq.qpu.forte-1">
+        
+        <nav class="side-nav">
+            <h3 class="nav-title">Forte-1 Menu</h3>
+            <ul id="tab-menu">
+                <li class="active" data-target="history">
+                    <i class="fa-solid fa-chart-line nav-icon"></i>
+                    <span class="nav-text">Latency</span>
+                </li>
+                <li data-target="uptime">
+                    <i class="fa-solid fa-server nav-icon"></i>
+                    <span class="nav-text">Uptime</span>
+                </li>
+                <li data-target="info">
+                    <i class="fa-solid fa-circle-info nav-icon"></i>
+                    <span class="nav-text">Info</span>
+                </li>
+                <li data-target="links">
+                    <i class="fa-solid fa-link nav-icon"></i>
+                    <span class="nav-text">Links</span>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="right-column">
+            
+            <div class="hero-section card" style="border-top: 4px solid #8b5cf6;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <h2 style="font-size: 2.5rem; margin: 0 0 0.5rem 0;">IonQ Forte-1</h2>
+                    <span style="background: rgba(139, 92, 246, 0.15); color: #a78bfa; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: bold; border: 1px solid rgba(139, 92, 246, 0.3);"><i class="fa-solid fa-bolt" style="margin-right: 4px;"></i> Enterprise Performance</span>
+                </div>
+                <div style="margin-bottom: 2rem;">
+                    <span style="color: var(--muted); font-size: 0.9rem;">Trapped Ion • 36 Algorithmic Qubits • Dynamic Optical Routing</span>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                    
+                    <div class="card" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                            <div class="metric-label" style="font-size: 0.85rem;"><i class="fa-solid fa-cloud" style="color:#f97316; margin-right:5px; font-size: 1rem;"></i> AWS ROUTE</div>
+                            <div class="status-badge status-offline" id="aws-status"><div class="dot dot-offline"></div> LOAD</div>
+                        </div>
+                        <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1rem;">
+                            <div class="metric-value" id="aws-queue" style="font-size: 2rem;">--</div>
+                            <span style="color: var(--muted); font-size: 0.8rem;">Tasks</span>
+                        </div>
+                        <div id="aws-last-seen" class="provider-last-seen">Awaiting telemetry...</div>
+                    </div>
+
+                    <div class="card" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                            <div class="metric-label" style="font-size: 0.85rem;"><i class="fa-solid fa-network-wired" style="color:#3b82f6; margin-right:5px; font-size: 1rem;"></i> AZURE ROUTE</div>
+                            <div class="status-badge status-offline" id="azure-status"><div class="dot dot-offline"></div> LOAD</div>
+                        </div>
+                        <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1rem;">
+                            <div class="metric-value" id="azure-queue" style="font-size: 2rem;">--</div>
+                            <span style="color: var(--muted); font-size: 0.8rem;">Min Wait</span>
+                        </div>
+                        <div id="azure-last-seen" class="provider-last-seen">Awaiting telemetry...</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="content-area">
+                
+                <section id="history" class="tab-pane active">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 class="section-title" style="margin: 0;">Live Network Load</h3>
+                        <div class="timeframe-toggle" id="queue-tf">
+                            <button class="active" data-tf="1">24H</button>
+                            <button data-tf="7">1W</button>
+                            <button data-tf="30">1M</button>
+                            <button data-tf="365">1Y</button>
+                        </div>
+                    </div>
+
+                    <h4 style="margin: 1rem 0 0.5rem 0; color: var(--text);">AWS Route (Queued Tasks)</h4>
+                    <div class="card" style="height: 250px; padding: 1rem; margin-bottom: 0.5rem;">
+                        <canvas id="awsChart"></canvas>
+                    </div>
+                    <div id="aws-event-bar" style="display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 4px; margin-bottom: 1.5rem; min-height: 30px;"></div>
+
+                    <h4 style="margin: 1rem 0 0.5rem 0; color: var(--text);">Azure Route (Wait Minutes)</h4>
+                    <div class="card" style="height: 250px; padding: 1rem; margin-bottom: 0.5rem;">
+                        <canvas id="azureChart"></canvas>
+                    </div>
+                    <div id="azure-event-bar" style="display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 4px; margin-bottom: 1.5rem; min-height: 30px;"></div>
+
+                    <h4 style="margin: 1rem 0 0.5rem 0; color: var(--muted);">Direct API Route</h4>
+                    <div class="card disabled-card" style="height: 150px; padding: 1rem;">
+                        <div class="coming-soon-overlay">Direct API Integration Coming Soon</div>
+                    </div>
+                </section>
+
+                <section id="uptime" class="tab-pane">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 class="section-title" style="margin: 0;">System Availability Trends</h3>
+                        <div class="timeframe-toggle" id="uptime-tf">
+                            <button class="active" data-tf="30">30D</button>
+                            <button data-tf="90">90D</button>
+                            <button data-tf="180">180D</button>
+                            <button data-tf="365">1Y</button>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 600;">AWS Route Availability</span>
+                            <span style="color: var(--online);" id="aws-uptime-pct">100%</span>
+                        </div>
+                        <div class="uptime-grid" id="aws-uptime-grid"></div>
+                        <div class="uptime-labels">
+                            <span id="uptime-start-label">30 days ago</span>
+                            <span>Today</span>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 600;">Azure Route Availability</span>
+                            <span style="color: var(--online);" id="azure-uptime-pct">100%</span>
+                        </div>
+                        <div class="uptime-grid" id="azure-uptime-grid"></div>
+                        <div class="uptime-labels">
+                            <span>30 days ago</span>
+                            <span>Today</span>
+                        </div>
+                    </div>
+
+                    <h4 style="margin: 2rem 0 0.5rem 0; color: var(--text);">Detailed Connectivity (Last 7 Days)</h4>
+                    <div class="card" style="height: 200px; padding: 1rem; margin-bottom: 1.5rem;">
+                        <canvas id="detailedStatusChart"></canvas>
+                    </div>
+
+                    <div class="official-status-card">
+                        <div class="official-status-text">
+                            <h4><i class="fa-solid fa-tower-broadcast" style="margin-right: 5px;"></i> Official Provider Status</h4>
+                            <p>Because we're still gathering historical data, our telemetry might not show the full picture yet. For official incident reports, past outages, and scheduled maintenance windows, please check the manufacturer's official page.</p>
+                            <p class="official-warning"><i class="fa-solid fa-triangle-exclamation"></i> Note: QPUStatus is an unofficial project and is not affiliated with IonQ.</p>
+                        </div>
+                        <a href="https://status.ionq.co" target="_blank" rel="noopener" class="official-status-btn">
+                            status.ionq.co <i class="fa-solid fa-arrow-up-right-from-square" style="margin-left: 5px;"></i>
+                        </a>
+                    </div>
+                </section>
+
+                <section id="info" class="tab-pane">
+                    
+                    <div class="card" style="margin-bottom: 2rem; border-left: 4px solid #ef4444; background: rgba(239, 68, 68, 0.05);">
+                        <h4 style="margin: 0 0 0.5rem 0; color: #ef4444;"><i class="fa-solid fa-triangle-exclamation" style="margin-right: 8px;"></i> Unofficial Telemetry Dashboard</h4>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">This is an independent tracking project. QPUStatus is <strong>not</strong> affiliated with, endorsed by, or partnered with IonQ, AWS, or Microsoft Azure. Our data is gathered automatically via public API routing endpoints and may not perfectly reflect internal hardware states.</p>
+                    </div>
+
+                    <h3 class="section-title">Hardware Deep Dive</h3>
+                    <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 2rem;">The IonQ Forte represents a significant paradigm shift in trapped-ion quantum computing. It abandons traditional fixed-beam multi-channel acousto-optic modulators (AOMs) in favor of a software-configurable laser routing system. This dynamic approach to qubit entanglement pushes its computational capacity to an industry-leading <strong>#AQ 36</strong>.</p>
+
+                    <h3 class="section-title">Technical Specifications</h3>
+                    <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 2.5rem;">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <th>Architecture</th>
+                                    <td>Trapped Ion (Ytterbium ions)</td>
+                                </tr>
+                                <tr>
+                                    <th>Algorithmic Qubits</th>
+                                    <td>36 (#AQ 36)</td>
+                                </tr>
+                                <tr>
+                                    <th>Optical System</th>
+                                    <td>Acousto-Optic Deflectors (AODs)</td>
+                                </tr>
+                                <tr>
+                                    <th>Topology</th>
+                                    <td>All-to-All (Fully connected)</td>
+                                </tr>
+                                <tr>
+                                    <th>Native Gates</th>
+                                    <td>GPI, GPI2, MS</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 class="section-title">Common Provider Questions</h3>
+                    <div class="card faq-item">
+                        <h4><i class="fa-solid fa-microchip" style="color: #a78bfa; margin-right: 8px;"></i> What makes Forte-1's laser routing different?</h4>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5; margin-bottom: 1rem;">Previous generations of trapped-ion QPUs relied on a rigid optical grid. Forte uses specialized Acousto-Optic Deflectors (AODs), decoupling the qubit arrangement from fixed hardware. This allows the control system to dynamically "steer" control lasers to any individual ion in the trap with extreme precision, significantly reducing acoustic cross-talk and residual noise.</p>
+                        
+                    </div>
+                    <div class="card faq-item" style="margin-top: 1rem;">
+                        <h4><i class="fa-solid fa-cubes" style="color: #a78bfa; margin-right: 8px;"></i> What does #AQ 36 mean for my workloads?</h4>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">Algorithmic Qubits (#AQ) measure the real-world utility of a QPU. At #AQ 36, the Forte-1 is capable of executing complex computational circuits up to 36 qubits wide and over 900 entangling gates deep. This level of fidelity means the machine can consider over 68 billion simultaneous states, making it viable for advanced quantum machine learning algorithms.</p>
+                    </div>
+                    <div class="card faq-item" style="margin-top: 1rem;">
+                        <h4><i class="fa-regular fa-clock" style="color: #a78bfa; margin-right: 8px;"></i> Why does IonQ Forte-1 go offline frequently?</h4>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">If you observe the Forte-1 status dropping to OFFLINE on our dashboard, it is almost certainly undergoing a scheduled calibration cycle. The advanced AOD laser system requires meticulous environmental tuning to maintain its high gate fidelity. These maintenance windows are routine and usually brief.</p>
+                    </div>
+                </section>
+
+                <section id="links" class="tab-pane">
+                    
+                    <h3 class="section-title" style="margin-bottom: 1rem;">Official Resources</h3>
+                    <div style="display: grid; gap: 1rem; margin-bottom: 2.5rem;">
+                        <a href="https://ionq.com/quantum-systems/forte" target="_blank" class="card link-card">
+                            <div class="link-card-icon icon-ionq"><i class="fa-solid fa-microchip"></i></div>
+                            <div>
+                                <h4>IonQ Forte Official Overview</h4>
+                                <p>Hardware specifications and research papers directly from the manufacturer.</p>
+                            </div>
+                        </a>
+                        
+                        <a href="https://aws.amazon.com/braket/quantum-computers/ionq/" target="_blank" class="card link-card">
+                            <div class="link-card-icon icon-aws"><i class="fa-solid fa-cloud"></i></div>
+                            <div>
+                                <h4>AWS Braket: IonQ Provider Hub</h4>
+                                <p>Pricing, regional availability, and specific AWS routing details for Forte.</p>
+                            </div>
+                        </a>
+
+                        <a href="https://learn.microsoft.com/en-us/azure/quantum/provider-ionq" target="_blank" class="card link-card">
+                            <div class="link-card-icon icon-azure"><i class="fa-solid fa-network-wired"></i></div>
+                            <div>
+                                <h4>Azure Quantum: IonQ Target</h4>
+                                <p>Documentation on submitting jobs and managing Azure Quantum workspaces.</p>
+                            </div>
+                        </a>
+                    </div>
+
+                    <h3 class="section-title" style="margin-bottom: 1rem;">Compare Hardware</h3>
+                    <div class="internal-nav-grid">
+                        <a href="index.html" class="card link-card internal-card">
+                            <i class="fa-solid fa-layer-group" style="color: #8b5cf6;"></i>
+                            <h4>Global Dashboard</h4>
+                        </a>
+                        <a href="ionq-aria-1.html" class="card link-card internal-card">
+                            <i class="fa-solid fa-microchip" style="color: var(--muted);"></i>
+                            <h4>IonQ Aria-1</h4>
+                        </a>
+                        <a href="rigetti-aspen.html" class="card link-card internal-card">
+                            <i class="fa-solid fa-microchip" style="color: var(--muted);"></i>
+                            <h4>Rigetti Aspen-M-3</h4>
+                        </a>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-links" style="margin-bottom: 1.5rem; display: flex; justify-content: center; gap: 2rem; font-weight: 500;">
+            <a href="about.html" style="color: var(--muted); text-decoration: none; transition: color 0.2s;">About Us</a>
+            <a href="privacy.html" style="color: var(--muted); text-decoration: none; transition: color 0.2s;">Privacy Policy</a>
+            <a href="contact.html" style="color: var(--muted); text-decoration: none; transition: color 0.2s;">Contact Us</a>
+        </div>
+        <p>&copy; 2026 QPUStatus. All rights reserved.</p>
+        <p class="disclaimer">Disclaimer: This is an independent telemetry dashboard. QPUStatus is not an official project and is not affiliated with, endorsed by, or partnered with AWS, Microsoft Azure, IonQ, Rigetti, Quantinuum, or any other displayed hardware providers.</p>
+    </footer>
+
+    <script src="device-script.js"></script>
+</body>
+</html>
