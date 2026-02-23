@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | QPUStatus</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
+                <svg class="logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                <h1>QPU<span>Status</span></h1>
+            </a>
+        </div>
+        <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">
+            <span id="theme-icon">☀️</span>
+        </button>
+    </header>
+
+    <main style="max-width: 800px; margin: 0 auto;">
+        
+        <section class="card" style="margin-bottom: 2rem; padding: 2rem; text-align: center; background: linear-gradient(135deg, var(--panel), color-mix(in srgb, var(--accent) 5%, var(--panel)));">
+            <h2 style="font-size: 2rem; margin-bottom: 1rem;">The Mission</h2>
+            <p style="color: var(--muted); line-height: 1.8; font-size: 1.1rem;">
+                QPUStatus was created to bring transparency to the quantum cloud. As quantum computing moves from lab experiments to cloud-accessible hardware, researchers and developers need a centralized, real-time view of hardware availability and network latency.
+            </p>
+        </section>
+
+        <section style="display: grid; gap: 2rem; margin-bottom: 3rem;">
+            <div>
+                <h3 class="section-title"><i class="fa-solid fa-microchip" style="margin-right: 10px; color: var(--accent);"></i> Why Telemetry Matters</h3>
+                <p style="color: var(--muted); line-height: 1.6;">
+                    Quantum Processors (QPUs) aren't like standard web servers. They require constant calibration, cooling cycles, and environmental tuning. A device might be "Online" on a provider's marketing page, but "Unavailable" for job submission due to a maintenance window. We bridge that gap by polling live routing endpoints every few minutes.
+                </p>
+            </div>
+
+            <div>
+                <h3 class="section-title"><i class="fa-solid fa-code-branch" style="margin-right: 10px; color: var(--accent);"></i> How it Works</h3>
+                <p style="color: var(--muted); line-height: 1.6;">
+                    Our backend runs on a highly optimized serverless architecture. We utilize secure, signed API requests to query the health and queue depths of major quantum providers including AWS Braket and Azure Quantum. 
+                </p>
+                
+                <p style="color: var(--muted); line-height: 1.6; margin-top: 1rem;">
+                    This data is processed and stored in a globally distributed database, allowing us to provide historical uptime trends and latency charts without putting unnecessary load on the providers themselves.
+                </p>
+            </div>
+
+            <div class="card" style="border-left: 4px solid var(--offline); background: rgba(239, 68, 68, 0.05);">
+                <h3 class="section-title" style="color: var(--offline);"><i class="fa-solid fa-user-shield" style="margin-right: 10px;"></i> Unofficial & Independent</h3>
+                <p style="color: var(--muted); line-height: 1.6; font-size: 0.9rem;">
+                    <strong>QPUStatus is an independent, community-focused project.</strong> We are not employees, partners, or representatives of IonQ, Rigetti, Oxford Quantum Circuits, AWS, or Microsoft. 
+                </p>
+                <p style="color: var(--muted); line-height: 1.6; font-size: 0.9rem; margin-top: 0.5rem;">
+                    This project is maintained out of a passion for quantum computing and a desire for better developer tools. All product names, logos, and brands are property of their respective owners.
+                </p>
+            </div>
+        </section>
+
+        <div style="text-align: center; margin-bottom: 4rem;">
+            <a href="index.html" class="view-more-btn" style="padding: 0.8rem 2rem;">
+                Back to Dashboard <i class="fa-solid fa-arrow-left" style="margin-left: 10px; order: -1;"></i>
+            </a>
+        </div>
+
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 QPUStatus. All rights reserved.</p>
+        <p class="disclaimer">Independent Telemetry Dashboard.</p>
+    </footer>
+
+    <script>
+        const htmlTag = document.documentElement;
+        const themeBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        htmlTag.setAttribute('data-theme', savedTheme);
+        themeIcon.innerText = savedTheme === 'dark' ? '☀️' : '🌙';
+        
+        themeBtn.addEventListener('click', () => {
+            const newTheme = htmlTag.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            htmlTag.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            themeIcon.innerText = newTheme === 'dark' ? '☀️' : '🌙';
+        });
+    </script>
+</body>
+</html>
