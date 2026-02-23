@@ -55,12 +55,11 @@ function createCard(machine) {
         const rIcon = r === 'AWS' ? 'fa-cloud' : r === 'Azure' ? 'fa-network-wired' : 'fa-server';
         const iColor = r === 'AWS' ? '#f97316' : r === 'Azure' ? '#3b82f6' : '#a855f7';
         
-        // FLEXBOX LAYOUT (No Grid)
         return `
-        <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); gap: 12px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); gap: 15px; width: 100%;">
             
             <div style="display: flex; align-items: center; min-width: 0;">
-                <div style="width: 24px; text-align: center; flex-shrink: 0; margin-right: 6px;">
+                <div style="width: 24px; text-align: center; flex-shrink: 0; margin-right: 8px;">
                     <i class="fa-solid ${rIcon}" style="color: ${iColor}; font-size: 0.9rem;"></i>
                 </div>
                 <span style="font-size: 0.85rem; color: var(--muted); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -78,23 +77,22 @@ function createCard(machine) {
     }).join('');
 
     return `
-        <div class="card">
-            <div class="card-header">
-                <div>
-                    <p class="qpu-name">${machine.name}</p>
-                    <p class="qpu-provider">${machine.mfg}</p>
+        <div class="card" style="display: flex; flex-direction: column; height: 100%;">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem;">
+                <div style="min-width: 0; flex: 1;">
+                    <p class="qpu-name" style="margin: 0; font-weight: 700; font-size: 1.1rem; line-height: 1.2;">${machine.name}</p>
+                    <p class="qpu-provider" style="margin: 2px 0 0 0; font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;">${machine.mfg}</p>
                 </div>
-                <div class="status-badge ${badgeClass}">
+                <div class="status-badge ${badgeClass}" style="flex-shrink: 0;">
                     <div class="dot ${dotClass}"></div> ${statusText}
                 </div>
             </div>
             
-            <div class="metrics" style="background: rgba(0,0,0,0.15); padding: 0.8rem 1rem; border-radius: 8px; margin: 0.5rem 0 1rem 0;">
-                <div style="font-size: 0.7rem; font-weight: 800; color: var(--muted); margin-bottom: 0.6rem; letter-spacing: 0.5px; text-transform: uppercase; opacity: 0.7;">Routing Options</div>
+            <div class="metrics" style="background: rgba(0,0,0,0.15); padding: 0.5rem 1rem; border-radius: 8px; margin-bottom: auto; display: flex; flex-direction: column;">
                 ${routeHtml}
             </div>
             
-            <div class="time-ago" style="margin-bottom: 1rem; text-align: right; font-size: 0.75rem; color: var(--muted);">Updated ${timeSince(machine.last_updated)}</div>
+            <div class="time-ago" style="margin-top: 1rem; margin-bottom: 1rem; text-align: right; font-size: 0.75rem; color: var(--muted);">Updated ${timeSince(machine.last_updated)}</div>
             
             <a href="${slug}.html" class="view-more-btn">
                 View Hardware Metrics <i class="fa-solid fa-arrow-right"></i>
