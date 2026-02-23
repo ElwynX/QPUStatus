@@ -348,7 +348,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 else          { block.classList.add('down');   block.title=key+': Degraded / Offline'; }
             } else if (key === todayKey) {  // ADD THIS BRANCH
                 block.style.background='repeating-linear-gradient(45deg,#1e3a5f,#1e3a5f 4px,#1e293b 4px,#1e293b 8px)';
-                block.style.border='1px solid #3b82f6';
                 block.title=key+': Collecting data...';
             } else {
                 block.style.background='var(--border,#334155)'; block.title=key+': Data not collected';
