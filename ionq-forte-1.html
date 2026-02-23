@@ -82,36 +82,45 @@
                     
                     <div class="card route-card" id="card-direct" style="flex: 1 1 250px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 1.5rem; order: 1;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-                            <div class="metric-label" style="font-size: 0.85rem;"><i class="fa-solid fa-server" style="color:#a855f7; margin-right:5px; font-size: 1rem;"></i> DIRECT CLOUD</div>
+                            <div class="metric-label" style="font-size: 0.85rem;">
+                                <i class="fa-solid fa-server" style="color:#a855f7; margin-right:5px; font-size: 1rem;"></i> DIRECT CLOUD
+                                <i class="fa-regular fa-circle-question info-icon" title="Metric: Average age of all jobs currently in the queue. This is NOT the estimated wait time for a new job."></i>
+                            </div>
                             <div class="status-badge status-offline" id="direct-status"><div class="dot dot-offline"></div> LOAD</div>
                         </div>
                         <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1rem;">
                             <div class="metric-value" id="direct-queue" style="font-size: 2rem;">--</div>
-                            <span style="color: var(--muted); font-size: 0.8rem;">min (Average Queue Time)</span>
+                            <span style="color: var(--muted); font-size: 0.8rem;">Avg Job Age (min)</span>
                         </div>
                         <div id="direct-last-seen" class="provider-last-seen">Awaiting telemetry...</div>
                     </div>
-
+                    
                     <div class="card route-card" id="card-aws" style="flex: 1 1 250px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 1.5rem; order: 2;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-                            <div class="metric-label" style="font-size: 0.85rem;"><i class="fa-solid fa-cloud" style="color:#f97316; margin-right:5px; font-size: 1rem;"></i> AWS ROUTE</div>
+                            <div class="metric-label" style="font-size: 0.85rem;">
+                                <i class="fa-solid fa-cloud" style="color:#f97316; margin-right:5px; font-size: 1rem;"></i> AWS ROUTE
+                                <i class="fa-regular fa-circle-question info-icon" title="Metric: Total count of tasks/jobs currently pending execution in the AWS Braket queue."></i>
+                            </div>
                             <div class="status-badge status-offline" id="aws-status"><div class="dot dot-offline"></div> LOAD</div>
                         </div>
                         <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1rem;">
                             <div class="metric-value" id="aws-queue" style="font-size: 2rem;">--</div>
-                            <span style="color: var(--muted); font-size: 0.8rem;">Tasks</span>
+                            <span style="color: var(--muted); font-size: 0.8rem;">Pending Tasks</span>
                         </div>
                         <div id="aws-last-seen" class="provider-last-seen">Awaiting telemetry...</div>
                     </div>
-
+                    
                     <div class="card route-card" id="card-azure" style="flex: 1 1 250px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 1.5rem; order: 3;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-                            <div class="metric-label" style="font-size: 0.85rem;"><i class="fa-solid fa-network-wired" style="color:#3b82f6; margin-right:5px; font-size: 1rem;"></i> AZURE ROUTE</div>
+                            <div class="metric-label" style="font-size: 0.85rem;">
+                                <i class="fa-solid fa-network-wired" style="color:#3b82f6; margin-right:5px; font-size: 1rem;"></i> AZURE ROUTE
+                                <i class="fa-regular fa-circle-question info-icon" title="Metric: Estimated wait time for a new job, calculated by Azure Quantum based on current load."></i>
+                            </div>
                             <div class="status-badge status-offline" id="azure-status"><div class="dot dot-offline"></div> LOAD</div>
                         </div>
                         <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1rem;">
                             <div class="metric-value" id="azure-queue" style="font-size: 2rem;">--</div>
-                            <span style="color: var(--muted); font-size: 0.8rem;">min (Estimated Wait Time)</span>
+                            <span style="color: var(--muted); font-size: 0.8rem;">Est. Wait (min)</span>
                         </div>
                         <div id="azure-last-seen" class="provider-last-seen">Awaiting telemetry...</div>
                     </div>
@@ -141,26 +150,35 @@
                     <div id="charts-wrapper" style="display: flex; flex-direction: column;">
                         
                         <div class="route-chart-group" id="group-direct" style="order: 1; margin-bottom: 2rem;">
-                            <h4 style="margin: 0 0 0.5rem 0; color: var(--text);">Direct Cloud Route (Average Queue Time in Minutes)</h4>
-                            <div class="card" style="height: 250px; padding: 1rem; margin-bottom: 0.5rem;">
+                            <h4 style="margin: 0 0 0.5rem 0; color: var(--text);">Direct Cloud Route</h4>
+                            <div class="card" style="height: 280px; padding: 1rem; margin-bottom: 0.5rem;">
                                 <canvas id="directChart"></canvas>
+                                <p class="chart-caption">
+                                    *Metric: Average age of jobs currently in queue (Lower is better). This is NOT the wait time for a new job.
+                                </p>
                             </div>
                         </div>
-
+                    
                         <div class="route-chart-group" id="group-aws" style="order: 2; margin-bottom: 2rem;">
-                            <h4 style="margin: 0 0 0.5rem 0; color: var(--text);">AWS Route (Queued Tasks)</h4>
-                            <div class="card" style="height: 250px; padding: 1rem; margin-bottom: 0.5rem;">
+                            <h4 style="margin: 0 0 0.5rem 0; color: var(--text);">AWS Route</h4>
+                            <div class="card" style="height: 280px; padding: 1rem; margin-bottom: 0.5rem;">
                                 <canvas id="awsChart"></canvas>
+                                <p class="chart-caption">
+                                    *Metric: Total number of tasks pending execution (Queue Depth).
+                                </p>
                             </div>
                         </div>
-
+                    
                         <div class="route-chart-group" id="group-azure" style="order: 3; margin-bottom: 2rem;">
-                            <h4 style="margin: 0 0 0.5rem 0; color: var(--text);">Azure Route (Estimated Wait in Minutes)</h4>
-                            <div class="card" style="height: 250px; padding: 1rem; margin-bottom: 0.5rem;">
+                            <h4 style="margin: 0 0 0.5rem 0; color: var(--text);">Azure Route</h4>
+                            <div class="card" style="height: 280px; padding: 1rem; margin-bottom: 0.5rem;">
                                 <canvas id="azureChart"></canvas>
+                                <p class="chart-caption">
+                                    *Metric: Azure's estimated wait time in minutes for a newly submitted job.
+                                </p>
                             </div>
                         </div>
-
+                    
                     </div>
                 </section>
 
