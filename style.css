@@ -450,7 +450,7 @@ table tr:last-child {
     font-size: 0.75rem;
     color: var(--muted);
     text-align: center;
-    margin-top: 0.5rem;
+    margin-top: 1rem;
     font-style: italic;
 }
 .info-icon {
