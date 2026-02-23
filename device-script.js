@@ -57,51 +57,51 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ── 2. HERO STATS UPDATER ──────────────────────────
+    // ── 2. HERO STATS UPDATER ──────────────────────────
     async function updateHeroStats() {
         try {
             const res  = await fetch(`${API}/stats`);
             const data = await res.json();
             const awsLive   = data.find(q => q.id === awsId);
             const azureLive = data.find(q => q.id === azureId);
-            const primaryStatus = awsLive?.status ?? azureLive?.status ?? 'OFFLINE';
-            const heroBadge = document.getElementById('hero-status');
-            
-            if (primaryStatus === 'ONLINE') {
-                heroBadge.className = 'status-badge status-online';
-                heroBadge.innerHTML = '<div class="dot dot-online"></div> ONLINE';
-            } else {
-                heroBadge.className = 'status-badge status-offline';
-                heroBadge.innerHTML = '<div class="dot dot-offline"></div> OFFLINE';
-            }
 
-            let lastSeenEl = document.getElementById('hero-last-seen');
-            if (!lastSeenEl) {
-                lastSeenEl = document.createElement('div');
-                lastSeenEl.id = 'hero-last-seen';
-                lastSeenEl.style.cssText = 'font-size: 0.8rem; color: var(--muted); margin-top: 0.5rem; font-weight: 500; text-align: center;';
-                heroBadge.parentNode.appendChild(lastSeenEl);
-            }
-
-            const activeProvider = awsLive ? 'aws' : 'azure';
-            const events = exactEvents[activeProvider];
-            
             const fmtExactDate = (ts) => ts ? new Date(ts.replace(' ', 'T') + 'Z').toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : 'Never';
 
-            if (events) {
-                // Keep it simple and strictly useful
-                const lastImportantDate = primaryStatus === 'ONLINE' 
-                    ? `Last offline: ${fmtExactDate(events.last_offline)}` 
-                    : `Last online: ${fmtExactDate(events.last_online)}`;
-                
-                lastSeenEl.innerHTML = `${lastImportantDate}`;
-            } else {
-                lastSeenEl.innerText = 'Awaiting telemetry...';
+            function updateProviderCard(liveData, exactData, prefix) {
+                const statBadge = document.getElementById(`${prefix}-status`);
+                const queueEl   = document.getElementById(`${prefix}-queue`);
+                const lastSeenEl = document.getElementById(`${prefix}-last-seen`);
+
+                if (!liveData) {
+                    queueEl.innerHTML = 'N/A';
+                    return;
+                }
+
+                // 1. Independent Status Badge
+                if (liveData.status === 'ONLINE') {
+                    statBadge.className = 'status-badge status-online';
+                    statBadge.innerHTML = '<div class="dot dot-online"></div> ONLINE';
+                } else {
+                    statBadge.className = 'status-badge status-offline';
+                    statBadge.innerHTML = '<div class="dot dot-offline"></div> OFFLINE';
+                }
+
+                // 2. Queue Depth
+                queueEl.innerHTML = (liveData.queue_depth != null) ? liveData.queue_depth : '--';
+
+                // 3. Independent Last Seen
+                if (exactData) {
+                    const lastImportantDate = liveData.status === 'ONLINE' 
+                        ? `Last offline: ${fmtExactDate(exactData.last_offline)}` 
+                        : `Last online: ${fmtExactDate(exactData.last_online)}`;
+                    lastSeenEl.innerHTML = lastImportantDate;
+                }
             }
 
-            const fmtAws   = v => (v != null) ? v + ' <small>Tasks</small>'  : '--';
-            const fmtAzure = v => (v != null) ? v + 'm <small>Wait</small>'  : '--';
-            document.getElementById('aws-queue').innerHTML   = awsLive   ? fmtAws(awsLive.queue_depth)     : 'N/A';
-            document.getElementById('azure-queue').innerHTML = azureLive ? fmtAzure(azureLive.queue_depth) : 'N/A';
+            // Run the independent updates
+            updateProviderCard(awsLive, exactEvents.aws, 'aws');
+            updateProviderCard(azureLive, exactEvents.azure, 'azure');
+
         } catch (e) { console.error('Hero stats fetch failed:', e); }
     }
 
