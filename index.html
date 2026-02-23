@@ -37,6 +37,20 @@
         <div id="grid-simulators"></div>
     </main>
 
+    <section style="margin-top: 4rem;">
+            <h2 class="section-title" style="margin-bottom: 1.5rem;">Dashboard FAQ</h2>
+            <div class="grid" style="margin-bottom: 0;">
+                <div class="card faq-item">
+                    <h4 style="margin: 0 0 0.5rem 0; color: var(--text);"><i class="fa-regular fa-circle-question" style="color: var(--accent); margin-right: 8px;"></i> Why is Azure measured in minutes, but AWS in tasks?</h4>
+                    <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.6;">Cloud providers expose their APIs differently. AWS Braket exposes the raw integer count of pending quantum tasks currently in the queue. Azure Quantum abstracts this and provides an estimated wait time (in minutes) based on historical job processing speeds.</p>
+                </div>
+                <div class="card faq-item">
+                    <h4 style="margin: 0 0 0.5rem 0; color: var(--text);"><i class="fa-regular fa-circle-question" style="color: var(--accent); margin-right: 8px;"></i> What does it mean when a machine goes OFFLINE?</h4>
+                    <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.6;">Unlike standard web servers, quantum processors require frequent recalibration, laser tuning, and cooling cycles. An "OFFLINE" status on our dashboard typically indicates routine daily maintenance or calibration windows rather than a hardware failure.</p>
+                </div>
+            </div>
+        </section>
+
     <footer class="site-footer">
         <p>&copy; 2026 QPUStatus. All rights reserved.</p>
         <p class="disclaimer">Disclaimer: This is an independent telemetry dashboard. QPUStatus is not an official project and is not affiliated with, endorsed by, or partnered with AWS, Microsoft Azure, IonQ, Rigetti, Quantinuum, or any other displayed hardware providers.</p>
