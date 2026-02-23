@@ -51,20 +51,36 @@
             
             <div class="hero-section card">
                 <h2 style="font-size: 2.5rem; margin: 0 0 0.5rem 0;">IonQ Aria-1</h2>
-                <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 2rem;">
-                    <div class="status-badge status-online" id="hero-status"><div class="dot dot-online"></div> ONLINE</div>
-                    <span style="color: var(--muted); font-size: 0.9rem;">Trapped Ion • 25 Qubits</span>
+                <div style="margin-bottom: 2rem;">
+                    <span style="color: var(--muted); font-size: 0.9rem;">Trapped Ion • 25 Algorithmic Qubits</span>
                 </div>
                 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                    <div class="card" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border);">
-                        <div class="metric-label">AWS ROUTE QUEUE</div>
-                        <div class="metric-value" id="aws-queue">Loading...</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                    
+                    <div class="card" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                            <div class="metric-label" style="font-size: 0.85rem;"><i class="fa-brands fa-aws" style="color:#f97316; margin-right:5px; font-size: 1rem;"></i> AWS ROUTE</div>
+                            <div class="status-badge status-offline" id="aws-status"><div class="dot dot-offline"></div> LOAD</div>
+                        </div>
+                        <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1rem;">
+                            <div class="metric-value" id="aws-queue" style="font-size: 2rem;">--</div>
+                            <span style="color: var(--muted); font-size: 0.8rem;">Tasks</span>
+                        </div>
+                        <div id="aws-last-seen" class="provider-last-seen">Awaiting telemetry...</div>
                     </div>
-                    <div class="card" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border);">
-                        <div class="metric-label">AZURE ROUTE WAIT</div>
-                        <div class="metric-value" id="azure-queue">Loading...</div>
+
+                    <div class="card" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                            <div class="metric-label" style="font-size: 0.85rem;"><i class="fa-brands fa-microsoft" style="color:#3b82f6; margin-right:5px; font-size: 1rem;"></i> AZURE ROUTE</div>
+                            <div class="status-badge status-offline" id="azure-status"><div class="dot dot-offline"></div> LOAD</div>
+                        </div>
+                        <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1rem;">
+                            <div class="metric-value" id="azure-queue" style="font-size: 2rem;">--</div>
+                            <span style="color: var(--muted); font-size: 0.8rem;">Min Wait</span>
+                        </div>
+                        <div id="azure-last-seen" class="provider-last-seen">Awaiting telemetry...</div>
                     </div>
+
                 </div>
             </div>
 
