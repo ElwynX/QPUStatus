@@ -339,12 +339,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         for (var i=days-1; i>=0; i--) {
             var d=new Date(); d.setUTCDate(d.getUTCDate()-i);
             var key=d.toISOString().slice(0,10);
+            var todayKey = new Date().toISOString().slice(0,10); // ADD THIS
             var block=document.createElement('div'); block.className='uptime-block';
             if (dayMap[key]) {
                 dataDays++;
                 var pct=dayMap[key].filter(function(s){return s==='ONLINE';}).length/dayMap[key].length;
                 if (pct>=0.9) { block.classList.add('online'); block.title=key+': Online'; onlineDays++; }
                 else          { block.classList.add('down');   block.title=key+': Degraded / Offline'; }
+            } else if (key === todayKey) {  // ADD THIS BRANCH
+                block.style.background='repeating-linear-gradient(45deg,#1e3a5f,#1e3a5f 4px,#1e293b 4px,#1e293b 8px)';
+                block.style.border='1px solid #3b82f6';
+                block.title=key+': Collecting data...';
             } else {
                 block.style.background='var(--border,#334155)'; block.title=key+': Data not collected';
             }
