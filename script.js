@@ -123,7 +123,7 @@ function renderGrouped(containerId, itemsDict) {
 
         const grid = document.createElement('div');
         grid.className = 'grid';
-        grid.style.marginBottom = '1.5rem'; 
+
         
         groups[mfg].sort((a, b) => a.name.localeCompare(b.name));
         groups[mfg].forEach(machine => {
