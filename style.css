@@ -257,3 +257,132 @@ h1 span { color: var(--accent); }
     display: flex; justify-content: space-between; 
     margin-top: 0.5rem; color: var(--muted); font-size: 0.7rem;
 }
+
+/* --- INFO TAB: Table & FAQ Styling --- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+table th {
+    padding: 1rem;
+    background: color-mix(in srgb, var(--panel) 80%, black); /* Slightly darker than panel */
+    width: 35%;
+    font-weight: 600;
+    color: var(--text);
+}
+
+table td {
+    padding: 1rem;
+    color: var(--muted);
+}
+
+table tr {
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.2s ease;
+}
+
+/* Add a subtle highlight when hovering over a table row */
+table tr:hover {
+    background-color: color-mix(in srgb, var(--panel) 95%, white);
+}
+
+/* Remove border from the last row so it looks clean inside the card */
+table tr:last-child {
+    border-bottom: none;
+}
+
+.faq-item h4 {
+    margin: 0 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    color: var(--text);
+}
+
+.faq-item h4 i {
+    color: var(--accent);
+    margin-right: 8px;
+}
+
+.faq-item p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+/* --- LINKS TAB: Interactive Cards --- */
+.link-card {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1.2rem;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.link-card h4 {
+    margin: 0 0 0.3rem 0;
+    color: var(--text);
+    transition: color 0.2s ease;
+}
+
+.link-card p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+.link-card-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+/* Specific icon colors mapped to the HTML classes */
+.icon-ionq { background: rgba(255,255,255,0.05); border: 1px solid var(--border); }
+.icon-aws { background: rgba(249,115,22,0.1); color: #f97316; border: 1px solid rgba(249,115,22,0.3); }
+.icon-azure { background: rgba(59,130,246,0.1); color: #3b82f6; border: 1px solid rgba(59,130,246,0.3); }
+
+/* The Hover Animation */
+.link-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--muted);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.link-card:hover h4 {
+    color: var(--accent); /* Turn title blue on hover */
+}
+
+/* Internal Navigation Grid Alignment */
+.internal-nav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.internal-card {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.8rem;
+}
+
+.internal-card i {
+    font-size: 1.8rem;
+    transition: transform 0.2s ease;
+}
+
+.internal-card:hover i {
+    transform: scale(1.1); /* Pop the icon up slightly on hover */
+}
