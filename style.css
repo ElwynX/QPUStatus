@@ -446,6 +446,22 @@ table tr:last-child {
     transition: transform 0.2s ease;
 }
 
+.chart-caption {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+.info-icon {
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin-left: 6px;
+    cursor: help;
+    transition: color 0.2s;
+}
+.info-icon:hover { color: var(--accent); }
+
 .internal-card:hover i {
     transform: scale(1.1); /* Pop the icon up slightly on hover */
 }
