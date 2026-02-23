@@ -85,9 +85,10 @@ function createCard(machine) {
 
 function renderGrouped(containerId, itemsDict) {
     const container = document.getElementById(containerId);
+    if (!container) return;
     container.innerHTML = ''; 
     
-    // Group by Manufacturer again for the UI
+    // Group by Manufacturer for the UI sections
     const groups = {};
     Object.values(itemsDict).forEach(machine => {
         if (!groups[machine.mfg]) groups[machine.mfg] = [];
@@ -106,6 +107,7 @@ function renderGrouped(containerId, itemsDict) {
         grid.className = 'grid';
         grid.style.marginBottom = '1.5rem'; 
         
+        // Sort machines alphabetically
         groups[mfg].sort((a, b) => a.name.localeCompare(b.name));
         groups[mfg].forEach(machine => {
             grid.innerHTML += createCard(machine);
@@ -125,48 +127,60 @@ async function init() {
 
         rawData.forEach(qpu => {
             let mfg = 'Unknown';
-            let cleanName = qpu.name.replace(' (Simulator)', '');
             let route = 'Direct';
-
-            if (qpu.provider === 'aws') {
+            
+            // 1. Detect Route & Manufacturer
+            if (qpu.id.startsWith('aws_')) {
                 route = 'AWS';
-                const n = cleanName.toLowerCase();
+                const n = qpu.name.toLowerCase();
                 if (n.includes('aquila')) mfg = 'QuEra';
-                else if (n.includes('aria') || n.includes('forte')) mfg = 'IonQ';
+                else if (n.includes('aria') || n.includes('forte') || n.includes('harmony')) mfg = 'IonQ';
                 else if (n.includes('ankaa') || n.includes('aspen')) mfg = 'Rigetti';
                 else if (n.includes('garnet') || n.includes('emerald')) mfg = 'IQM';
                 else if (n.includes('ibex')) mfg = 'AQT';
                 else if (n.includes('sv1') || n.includes('dm1') || n.includes('tn1')) mfg = 'Amazon';
-            } else if (qpu.provider.startsWith('azure')) {
+            } else if (qpu.id.startsWith('azure_')) {
                 route = 'Azure';
-                mfg = qpu.provider.split('_')[1] || qpu.provider; 
-                mfg = mfg.charAt(0).toUpperCase() + mfg.slice(1);
-                if (mfg === 'Ionq') mfg = 'IonQ';
-                
-                if (cleanName.includes('.')) {
-                    cleanName = cleanName.split('.').pop();
-                    cleanName = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
-                }
+                if (qpu.provider.includes('ionq')) mfg = 'IonQ';
+                else if (qpu.provider.includes('rigetti')) mfg = 'Rigetti';
+                else if (qpu.provider.includes('quantinuum')) mfg = 'Quantinuum';
             } else if (qpu.provider === 'ionq-direct') {
                 mfg = 'IonQ';
                 route = 'Direct';
             }
 
-            // Normalize the name so Azure, AWS, and Direct all match perfectly
-            let normName = cleanName;
-            if (normName.toLowerCase().startsWith(mfg.toLowerCase())) {
-                normName = normName.substring(mfg.length).trim();
-            }
+            // 2. Heavy Cleaning of the Name to ensure merging
+            // This turns "ionq.qpu.aria-1", "IonQ Aria-1", and "Aria-1" all into just "Aria-1"
+            let cleanName = qpu.name;
             
-            const isSim = qpu.name.includes('(Simulator)');
-            const key = `${mfg}-${normName}`;
+            // Remove Simulator tag first
+            const isSim = cleanName.includes('(Simulator)') || cleanName.toLowerCase().includes('simulator');
+            cleanName = cleanName.replace(' (Simulator)', '').replace('simulator', '');
+
+            // Handle Azure's dot notation (e.g. "ionq.qpu.aria-1" -> "aria-1")
+            if (cleanName.includes('.')) {
+                cleanName = cleanName.split('.').pop();
+            }
+
+            // Remove Manufacturer prefix (case insensitive)
+            const regex = new RegExp(`^${mfg}\\s*`, 'i');
+            cleanName = cleanName.replace(regex, '').replace(/[-_]/g, ' ').trim();
+
+            // Capitalize First Letter of each word
+            cleanName = cleanName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('-');
+
+            // 3. Create the Merge Key
+            const key = `${mfg}-${cleanName}`;
             const targetDict = isSim ? sims : qpus;
 
             if (!targetDict[key]) {
-                targetDict[key] = { mfg, name: normName, routes: {}, last_updated: qpu.last_updated };
+                targetDict[key] = { mfg, name: cleanName, routes: {}, last_updated: qpu.last_updated };
             }
             
+            // Add this route to the unified card
             targetDict[key].routes[route] = qpu;
+            
+            // Keep the latest timestamp
             if (new Date(qpu.last_updated) > new Date(targetDict[key].last_updated)) {
                 targetDict[key].last_updated = qpu.last_updated;
             }
@@ -180,7 +194,9 @@ async function init() {
         renderGrouped('grid-simulators', sims);
 
     } catch (e) {
-        document.getElementById('loader').innerText = "Failed to establish connection to telemetry server.";
+        console.error(e);
+        const loader = document.getElementById('loader');
+        if(loader) loader.innerText = "Failed to establish connection to telemetry server.";
     }
 }
 
