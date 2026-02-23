@@ -170,7 +170,7 @@
                                     <td>Trapped Ion (Ytterbium ions)</td>
                                 </tr>
                                 <tr>
-                                    <th>Physical Qubits</th>
+                                    <th>Algorithmic Qubits</th>
                                     <td>25</td>
                                 </tr>
                                 <tr>
@@ -187,12 +187,12 @@
 
                     <h3 class="section-title">Frequently Asked Questions</h3>
                     <div class="card faq-item">
-                        <h4><i class="fa-regular fa-circle-question"></i> Why is the Azure queue measured in minutes, but AWS in tasks?</h4>
-                        <p>Cloud providers expose their APIs differently. AWS Braket exposes the raw integer count of pending quantum tasks currently in the queue. Azure Quantum abstracts this and provides an estimated wait time (in minutes) based on historical job processing speeds.</p>
+                        <h4><i class="fa-solid fa-microchip" style="color: #3b82f6; margin-right: 8px;"></i> What does #AQ 25 mean?</h4>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">AQ (Algorithmic Qubits) is a system-level metric introduced by IonQ to measure the real-world utility of a quantum computer, factoring in error rates and gate fidelities. An #AQ of 25 means the Aria-1 can successfully execute quantum circuits up to 25 qubits wide and over 600 entangling gate operations deep, a benchmark that far exceeds most competing systems available today.</p>
                     </div>
                     <div class="card faq-item" style="margin-top: 1rem;">
-                        <h4><i class="fa-regular fa-circle-question"></i> What does it mean when the machine goes OFFLINE?</h4>
-                        <p>Unlike standard web servers, quantum processors require frequent recalibration, laser tuning, and cooling cycles. An "OFFLINE" status on our dashboard typically indicates routine daily maintenance or calibration windows rather than a hardware failure.</p>
+                        <h4><i class="fa-solid fa-atom" style="color: #3b82f6; margin-right: 8px;"></i> Why trapped-ion over superconducting?</h4>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">Unlike superconducting qubits (used by IBM or Google) which must be physically manufactured and can have slight variations, trapped-ion qubits are identical atomic isotopes (Ytterbium in this case). This naturally leads to longer coherence times and allows for a fully connected "all-to-all" topology, meaning any qubit can interact with any other qubit directly.</p>
                     </div>
                 </section>
 
