@@ -163,4 +163,4 @@ async function init() {
 }
 
 init();
-setInterval(init, 60000);
+setInterval(init, 120000);
