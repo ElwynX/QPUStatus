@@ -1,4 +1,4 @@
-// --- THEME TOGGLE LOGIC ---
+
 const themeBtn = document.getElementById('theme-toggle');
 const themeIcon = document.getElementById('theme-icon');
 const htmlTag = document.documentElement;
@@ -16,7 +16,7 @@ themeBtn.addEventListener('click', () => {
     themeIcon.innerText = newTheme === 'dark' ? '☀️' : '🌙';
 });
 
-// --- TELEMETRY LOGIC ---
+
 function formatQueue(depth, provider, status) {
     if (status === 'OFFLINE') return '<span style="color: var(--muted)">--</span>';
     
@@ -44,11 +44,10 @@ function createCard(qpu) {
     const badgeClass = isOnline ? 'status-online' : 'status-offline';
     const dotClass = isOnline ? 'dot-online' : 'dot-offline';
 
-    // THE SLUG GENERATOR: Combines 'IonQ' and 'Aria-1' into 'ionq-aria-1'
     const slug = (qpu.mfg + '-' + qpu.cleanName)
         .toLowerCase()
-        .replace(/\s+/g, '-')       // Turns spaces into hyphens (e.g., 'Rigetti Ankaa' -> 'rigetti-ankaa')
-        .replace(/[^a-z0-9-]/g, ''); // Removes any weird symbols just in case
+        .replace(/\s+/g, '-')       
+        .replace(/[^a-z0-9-]/g, ''); 
 
     return `
         <div class="card">
@@ -76,10 +75,10 @@ function createCard(qpu) {
     `;
 }
 
-// Function to group items by manufacturer and build sub-grids
+
 function renderGrouped(containerId, items) {
     const container = document.getElementById(containerId);
-    container.innerHTML = ''; // Clear container to prevent duplicates
+    container.innerHTML = ''; 
     
     const groups = {};
     items.forEach(item => {
@@ -87,20 +86,20 @@ function renderGrouped(containerId, items) {
         groups[item.mfg].push(item);
     });
 
-    // Alphabetical sort for manufacturers
+
     const sortedMfgs = Object.keys(groups).sort();
 
     sortedMfgs.forEach(mfg => {
-        // Build the Subheading
+
         const header = document.createElement('h3');
         header.className = 'mfg-title';
         header.innerText = mfg;
         container.appendChild(header);
 
-        // Build the specific Grid for this company
+
         const grid = document.createElement('div');
         grid.className = 'grid';
-        grid.style.marginBottom = '1rem'; // tighter spacing between groups
+        grid.style.marginBottom = '1rem';
         
         groups[mfg].sort((a, b) => a.cleanName.localeCompare(b.cleanName));
         groups[mfg].forEach(qpu => {
@@ -125,7 +124,6 @@ async function init() {
             let cleanName = qpu.name.replace(' (Simulator)', '');
             let route = qpu.provider === 'aws' ? 'AWS' : 'Azure';
 
-            // Tag AWS manufacturers
             if (qpu.provider === 'aws') {
                 if (n.includes('aquila')) mfg = 'QuEra';
                 else if (n.includes('aria') || n.includes('forte')) mfg = 'IonQ';
@@ -134,11 +132,16 @@ async function init() {
                 else if (n.includes('ibex')) mfg = 'AQT';
                 else if (n.includes('sv1') || n.includes('dm1') || n.includes('tn1')) mfg = 'Amazon';
             } else {
-                // Azure manufacturers (keeps the ugly name below)
+
                 mfg = qpu.provider.charAt(0).toUpperCase() + qpu.provider.slice(1);
-                
-                // THE FIX: Force Azure's "Ionq" to match AWS's "IonQ" so they merge!
                 if (mfg === 'Ionq') mfg = 'IonQ';
+
+
+                if (cleanName.includes('.')) {
+                    cleanName = cleanName.split('.').pop();
+
+                    cleanName = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
+                }
             }
             
             const processedItem = { ...qpu, mfg, cleanName, route };
@@ -162,5 +165,19 @@ async function init() {
     }
 }
 
+
 init();
-setInterval(init, 120000);
+
+
+let pollInterval = setInterval(() => {
+    if (document.visibilityState === 'visible') {
+        init();
+    }
+}, 120000);
+
+
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        init();
+    }
+});
