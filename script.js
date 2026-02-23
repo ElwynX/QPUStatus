@@ -17,9 +17,11 @@ themeBtn.addEventListener('click', () => {
 
 // --- TELEMETRY LOGIC ---
 function formatQueue(depth, provider, status) {
-    // FIX: We now show the queue depth even if OFFLINE
+    // FIX: Show queue depth even if OFFLINE
+    // If depth is null/undefined, show '--'
     if (depth === undefined || depth === null) return '--';
     
+    // Return formatted string
     if (provider === 'aws') return `${depth} Tasks`;
     if (depth === 0) return '0 Wait';
     if (depth > 60) return `${Math.floor(depth / 60)}h Wait`;
@@ -53,37 +55,46 @@ function createCard(machine) {
         const rIcon = r === 'AWS' ? 'fa-cloud' : r === 'Azure' ? 'fa-network-wired' : 'fa-server';
         const iColor = r === 'AWS' ? '#f97316' : r === 'Azure' ? '#3b82f6' : '#a855f7';
         
+        // FLEXBOX LAYOUT (No Grid)
         return `
-        <div style="display:flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); gap: 12px;">
-            <div style="display: flex; align-items: center;">
-                <span style="display: inline-block; width: 20px; text-align: center; margin-right: 8px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); gap: 12px;">
+            
+            <div style="display: flex; align-items: center; min-width: 0;">
+                <div style="width: 24px; text-align: center; flex-shrink: 0; margin-right: 6px;">
                     <i class="fa-solid ${rIcon}" style="color: ${iColor}; font-size: 0.9rem;"></i>
+                </div>
+                <span style="font-size: 0.85rem; color: var(--muted); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    ${r}
                 </span>
-                <span style="font-size: 0.85rem; color: var(--muted); font-weight: 500;">${r}</span>
             </div>
             
-            <span style="font-size: 0.85rem; font-weight: 600; color: ${rColor}; white-space: nowrap;">
-                ${formatQueue(rData.queue_depth, rData.provider, rData.status)}
-            </span>
+            <div style="text-align: right; flex-shrink: 0;">
+                <span style="font-size: 0.85rem; font-weight: 600; color: ${rColor}; white-space: nowrap;">
+                    ${formatQueue(rData.queue_depth, rData.provider, rData.status)}
+                </span>
+            </div>
+
         </div>`;
     }).join('');
 
     return `
         <div class="card">
-            <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
-                <div style="min-width: 0; flex: 1;"> <p class="qpu-name" style="margin: 0; font-weight: 700; font-size: 1.1rem; line-height: 1.2;">${machine.name}</p>
-                    <p class="qpu-provider" style="margin: 2px 0 0 0; font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;">${machine.mfg}</p>
+            <div class="card-header">
+                <div>
+                    <p class="qpu-name">${machine.name}</p>
+                    <p class="qpu-provider">${machine.mfg}</p>
                 </div>
-                <div class="status-badge ${badgeClass}" style="flex-shrink: 0;"> <div class="dot ${dotClass}"></div> ${statusText}
+                <div class="status-badge ${badgeClass}">
+                    <div class="dot ${dotClass}"></div> ${statusText}
                 </div>
             </div>
             
-            <div class="metrics" style="background: rgba(0,0,0,0.15); padding: 0.8rem 1rem; border-radius: 8px; margin: 1rem 0;">
+            <div class="metrics" style="background: rgba(0,0,0,0.15); padding: 0.8rem 1rem; border-radius: 8px; margin: 0.5rem 0 1rem 0;">
                 <div style="font-size: 0.7rem; font-weight: 800; color: var(--muted); margin-bottom: 0.6rem; letter-spacing: 0.5px; text-transform: uppercase; opacity: 0.7;">Routing Options</div>
                 ${routeHtml}
             </div>
             
-            <div class="time-ago" style="margin-bottom: 1rem; text-align: right; font-size: 0.8rem; color: var(--muted);">Updated ${timeSince(machine.last_updated)}</div>
+            <div class="time-ago" style="margin-bottom: 1rem; text-align: right; font-size: 0.75rem; color: var(--muted);">Updated ${timeSince(machine.last_updated)}</div>
             
             <a href="${slug}.html" class="view-more-btn">
                 View Hardware Metrics <i class="fa-solid fa-arrow-right"></i>
@@ -97,7 +108,7 @@ function renderGrouped(containerId, itemsDict) {
     if (!container) return;
     container.innerHTML = ''; 
     
-    // Group by Manufacturer for the UI sections
+    // Group by Manufacturer
     const groups = {};
     Object.values(itemsDict).forEach(machine => {
         if (!groups[machine.mfg]) groups[machine.mfg] = [];
@@ -116,7 +127,6 @@ function renderGrouped(containerId, itemsDict) {
         grid.className = 'grid';
         grid.style.marginBottom = '1.5rem'; 
         
-        // Sort machines alphabetically
         groups[mfg].sort((a, b) => a.name.localeCompare(b.name));
         groups[mfg].forEach(machine => {
             grid.innerHTML += createCard(machine);
@@ -158,27 +168,19 @@ async function init() {
                 route = 'Direct';
             }
 
-            // 2. Heavy Cleaning of the Name to ensure merging
-            // This turns "ionq.qpu.aria-1", "IonQ Aria-1", and "Aria-1" all into just "Aria-1"
+            // 2. Name Cleaning & Merging Logic
             let cleanName = qpu.name;
-            
-            // Remove Simulator tag first
             const isSim = cleanName.includes('(Simulator)') || cleanName.toLowerCase().includes('simulator');
             cleanName = cleanName.replace(' (Simulator)', '').replace('simulator', '');
 
-            // Handle Azure's dot notation (e.g. "ionq.qpu.aria-1" -> "aria-1")
             if (cleanName.includes('.')) {
                 cleanName = cleanName.split('.').pop();
             }
 
-            // Remove Manufacturer prefix (case insensitive)
             const regex = new RegExp(`^${mfg}\\s*`, 'i');
             cleanName = cleanName.replace(regex, '').replace(/[-_]/g, ' ').trim();
-
-            // Capitalize First Letter of each word
             cleanName = cleanName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('-');
 
-            // 3. Create the Merge Key
             const key = `${mfg}-${cleanName}`;
             const targetDict = isSim ? sims : qpus;
 
@@ -186,10 +188,8 @@ async function init() {
                 targetDict[key] = { mfg, name: cleanName, routes: {}, last_updated: qpu.last_updated };
             }
             
-            // Add this route to the unified card
             targetDict[key].routes[route] = qpu;
             
-            // Keep the latest timestamp
             if (new Date(qpu.last_updated) > new Date(targetDict[key].last_updated)) {
                 targetDict[key].last_updated = qpu.last_updated;
             }
