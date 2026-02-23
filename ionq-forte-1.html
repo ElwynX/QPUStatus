@@ -87,7 +87,7 @@
                         </div>
                         <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1rem;">
                             <div class="metric-value" id="direct-queue" style="font-size: 2rem;">--</div>
-                            <span style="color: var(--muted); font-size: 0.8rem;">Min Wait</span>
+                            <span style="color: var(--muted); font-size: 0.8rem;">Average Queue Time</span>
                         </div>
                         <div id="direct-last-seen" class="provider-last-seen">Awaiting telemetry...</div>
                     </div>
@@ -141,7 +141,7 @@
                     <div id="charts-wrapper" style="display: flex; flex-direction: column;">
                         
                         <div class="route-chart-group" id="group-direct" style="order: 1; margin-bottom: 2rem;">
-                            <h4 style="margin: 0 0 0.5rem 0; color: var(--text);">Direct Cloud Route (Wait Minutes)</h4>
+                            <h4 style="margin: 0 0 0.5rem 0; color: var(--text);">Direct Cloud Route (Average Queue Time)</h4>
                             <div class="card" style="height: 250px; padding: 1rem; margin-bottom: 0.5rem;">
                                 <canvas id="directChart"></canvas>
                             </div>
