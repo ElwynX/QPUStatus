@@ -39,8 +39,71 @@
         <p>If you have questions regarding this policy, please reach out via our <a href="contact.html" style="color: var(--accent);">Contact Page</a>.</p>
     </main>
 
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>QPU Status | Live Quantum Hardware Telemetry</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <svg class="logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <div>
+                <h1>QPU<span>Status</span></h1>
+                <div class="subtitle">Live Global Quantum Hardware Telemetry</div>
+            </div>
+        </div>
+        <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">
+            <span id="theme-icon">☀️</span>
+        </button>
+    </header>
+
+    <main>
+        <div id="loader" style="color: var(--muted);">Establishing secure connection to quantum targets...</div>
+
+        <h2 class="section-title" id="title-qpus" style="display: none;">Physical Hardware</h2>
+        <div id="grid-qpus"></div>
+
+        <h2 class="section-title" id="title-simulators" style="display: none; margin-top:20px;">Simulators & Emulators</h2>
+        <div id="grid-simulators"></div>
+    </main>
+
+    <section style="margin-top: 4rem;">
+            <h2 class="section-title" style="margin-bottom: 1.5rem;">Dashboard FAQ</h2>
+            <div class="grid" style="margin-bottom: 0;">
+                <div class="card faq-item">
+                    <h4 style="margin: 0 0 0.5rem 0; color: var(--text);"><i class="fa-regular fa-circle-question" style="color: var(--accent); margin-right: 8px;"></i> Why is Azure measured in minutes, but AWS in tasks?</h4>
+                    <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.6;">Cloud providers expose their APIs differently. AWS Braket exposes the raw integer count of pending quantum tasks currently in the queue. Azure Quantum abstracts this and provides an estimated wait time (in minutes) based on historical job processing speeds.</p>
+                </div>
+                <div class="card faq-item">
+                    <h4 style="margin: 0 0 0.5rem 0; color: var(--text);"><i class="fa-regular fa-circle-question" style="color: var(--accent); margin-right: 8px;"></i> What does it mean when a machine goes OFFLINE?</h4>
+                    <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.6;">Unlike standard web servers, quantum processors require frequent recalibration, laser tuning, and cooling cycles. An "OFFLINE" status on our dashboard typically indicates routine daily maintenance or calibration windows rather than a hardware failure.</p>
+                </div>
+            </div>
+        </section>
+
     <footer class="site-footer">
+        <div class="footer-links" style="margin-bottom: 1.5rem; display: flex; justify-content: center; gap: 2rem; font-weight: 500;">
+            <a href="about.html" style="color: var(--muted); text-decoration: none; transition: color 0.2s;">About Us</a>
+            <a href="privacy.html" style="color: var(--muted); text-decoration: none; transition: color 0.2s;">Privacy Policy</a>
+            <a href="contact.html" style="color: var(--muted); text-decoration: none; transition: color 0.2s;">Contact Us</a>
+        </div>
         <p>&copy; 2026 QPUStatus. All rights reserved.</p>
+        <p class="disclaimer">Disclaimer: This is an independent telemetry dashboard. QPUStatus is not an official project and is not affiliated with, endorsed by, or partnered with AWS, Microsoft Azure, IonQ, Rigetti, Quantinuum, or any other displayed hardware providers.</p>
     </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
 </body>
 </html>
