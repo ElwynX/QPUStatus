@@ -196,6 +196,7 @@ h1 span { color: var(--accent); }
     line-height: 1.4;
     color: var(--muted);
     margin: 0;
+    white-space: nowrap;
 }
 /* Base Content Styling */
 .right-column { display: flex; flex-direction: column; gap: 2rem; width: 100%; min-width: 0; }
@@ -204,6 +205,15 @@ h1 span { color: var(--accent); }
 /* DESKTOP PC OVERRIDES: Transform back to the Ultimate Left Sidebar */
 @media (min-width: 768px) {
     .device-page { flex-direction: row; padding-bottom: 0; }
+
+    /* Flatten the Disclaimer so it doesn't take vertical space at the top */
+    /* We'll move it to the bottom of the mobile nav or content */
+    .nav-disclaimer {
+        margin-top: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-top: none;
+        border-left: 2px solid var(--border); /* Small visual hint instead of top-border */
+    }
     
     /* Strip the mobile floating styles */
     .side-nav { 
