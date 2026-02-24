@@ -16,7 +16,12 @@
         "@type": "Brand",
         "name": "IonQ"
       },
-      "category": "Quantum Processor"
+      "category": "Quantum Processor",
+      "additionalProperty": [{
+        "@type": "PropertyValue",
+        "name": "Algorithmic Qubits",
+        "value": "25"
+      }]
     }
     </script>
 
@@ -45,7 +50,7 @@
             <ul id="tab-menu">
                 <li class="active" data-target="history">
                     <i class="fa-solid fa-chart-line nav-icon"></i>
-                    <span class="nav-text">Latency</span>
+                    <span class="nav-text">Queue</span>
                 </li>
                 <li data-target="uptime">
                     <i class="fa-solid fa-server nav-icon"></i>
@@ -65,49 +70,59 @@
         <div class="right-column">
             
             <div class="hero-section card">
-                <h2 style="font-size: 2.5rem; margin: 0 0 0.5rem 0;">IonQ Aria-1</h2>
-                <div style="margin-bottom: 2rem;">
-                    <span style="color: var(--muted); font-size: 0.9rem;">Trapped Ion • 25 Algorithmic Qubits • Real-Time Hardware Tracker</span>
+                <div style="margin-bottom: 0.5rem;">
+                    <h2 style="font-size: 2.5rem; margin: 0 0 0.5rem 0;">IonQ Aria-1</h2>
                 </div>
-                
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
-                    
-                    <div class="card" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 1.5rem;">
+                <div style="margin-bottom: 2rem;">
+                    <span style="color: var(--muted); font-size: 0.9rem;">Trapped Ion • 25 Algorithmic Qubits • All-to-All Connectivity</span>
+                </div>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+
+                    <div class="card route-card" id="card-aws" style="flex: 1 1 250px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 1.5rem; order: 2;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-                            <div class="metric-label" style="font-size: 0.85rem;"><i class="fa-solid fa-cloud" style="color:#f97316; margin-right:5px; font-size: 1rem;"></i> AWS ROUTE</div>
+                            <div class="metric-label" style="font-size: 0.85rem;">
+                                <i class="fa-solid fa-cloud" style="color:#f97316; margin-right:5px; font-size: 1rem;"></i> AWS ROUTE
+                                <i class="fa-regular fa-circle-question info-icon" title="AWS Braket: This tracks 'Pending Tasks', the total number of quantum tasks submitted through Amazon Braket currently waiting for execution."></i>
+                            </div>
                             <div class="status-badge status-offline" id="aws-status"><div class="dot dot-offline"></div> LOAD</div>
                         </div>
                         <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1rem;">
                             <div class="metric-value" id="aws-queue" style="font-size: 2rem;">--</div>
-                            <span style="color: var(--muted); font-size: 0.8rem;">Tasks</span>
+                            <span style="color: var(--muted); font-size: 0.8rem;">Pending Tasks</span>
                         </div>
                         <div id="aws-last-seen" class="provider-last-seen">Awaiting telemetry...</div>
                     </div>
 
-                    <div class="card" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 1.5rem;">
+                    <div class="card route-card" id="card-azure" style="flex: 1 1 250px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 1.5rem; order: 3;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-                            <div class="metric-label" style="font-size: 0.85rem;"><i class="fa-solid fa-network-wired" style="color:#3b82f6; margin-right:5px; font-size: 1rem;"></i> AZURE ROUTE</div>
+                            <div class="metric-label" style="font-size: 0.85rem;">
+                                <i class="fa-solid fa-network-wired" style="color:#3b82f6; margin-right:5px; font-size: 1rem;"></i> AZURE ROUTE
+                                <i class="fa-regular fa-circle-question info-icon" title="Azure Quantum: This tracks 'Estimated Wait Time', Microsoft's calculated prediction in minutes of how long a newly submitted job will take to start."></i>
+                            </div>
                             <div class="status-badge status-offline" id="azure-status"><div class="dot dot-offline"></div> LOAD</div>
                         </div>
                         <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1rem;">
                             <div class="metric-value" id="azure-queue" style="font-size: 2rem;">--</div>
-                            <span style="color: var(--muted); font-size: 0.8rem;">Min Wait</span>
+                            <span style="color: var(--muted); font-size: 0.8rem;">Est. Wait (min)</span>
                         </div>
                         <div id="azure-last-seen" class="provider-last-seen">Awaiting telemetry...</div>
                     </div>
+
                 </div>
-                <div class="card" style="margin-bottom: 2rem; background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2);">
-                    <p id="seo-dynamic-summary" style="margin: 0; font-size: 0.95rem; line-height: 1.6; color: var(--text);">
-                        Checking real-time network load and availability for the IonQ Aria-1...
-                    </p>
-                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: 2rem; background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2);">
+                <p id="seo-dynamic-summary" style="margin: 0; font-size: 0.95rem; line-height: 1.6; color: var(--text);">
+                    Checking real-time network load and availability for the IonQ Aria-1...
+                </p>
             </div>
 
             <div class="content-area">
                 
                 <section id="history" class="tab-pane active">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h3 class="section-title" style="margin: 0;">Real-Time Queue Depth</h3>
+                        <h3 class="section-title" style="margin: 0;">Live Network Load</h3>
                         <div class="timeframe-toggle" id="queue-tf">
                             <button class="active" data-tf="1">24H</button>
                             <button data-tf="7">1W</button>
@@ -116,27 +131,43 @@
                         </div>
                     </div>
 
-                    <h4 style="margin: 1rem 0 0.5rem 0; color: var(--text);">AWS Route (Queued Tasks)</h4>
-                    <div class="card" style="height: 250px; padding: 1rem; margin-bottom: 0.5rem;">
-                        <canvas id="awsChart"></canvas>
-                    </div>
-                    <div id="aws-event-bar" style="display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 4px; margin-bottom: 1.5rem; min-height: 30px;"></div>
+                    <div id="charts-wrapper" style="display: flex; flex-direction: column;">
 
-                    <h4 style="margin: 1rem 0 0.5rem 0; color: var(--text);">Azure Route (Wait Minutes)</h4>
-                    <div class="card" style="height: 250px; padding: 1rem; margin-bottom: 0.5rem;">
-                        <canvas id="azureChart"></canvas>
-                    </div>
-                    <div id="azure-event-bar" style="display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 4px; margin-bottom: 1.5rem; min-height: 30px;"></div>
+                        <div class="route-chart-group" id="group-aws" style="order: 2; margin-bottom: 2rem;">
+                            <h4 style="margin: 0 0 0.5rem 0; color: var(--text);">AWS Route</h4>
+                            <div class="card" style="height: 280px; padding: 1rem; margin-bottom: 0.5rem;">
+                                <canvas id="awsChart"></canvas>
+                                <p class="chart-caption">
+                                    *Metric: Total number of tasks pending execution (Queue Depth).
+                                </p>
+                            </div>
+                            <div id="aws-event-bar" style="display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 4px; min-height: 30px;"></div>
+                        </div>
 
-                    <h4 style="margin: 1rem 0 0.5rem 0; color: var(--muted);">Direct API Route</h4>
-                    <div class="card disabled-card" style="height: 150px; padding: 1rem;">
-                        <div class="coming-soon-overlay">Direct API Integration Coming Soon</div>
+                        <div class="route-chart-group" id="group-azure" style="order: 3; margin-bottom: 2rem;">
+                            <h4 style="margin: 0 0 0.5rem 0; color: var(--text);">Azure Route</h4>
+                            <div class="card" style="height: 280px; padding: 1rem; margin-bottom: 0.5rem;">
+                                <canvas id="azureChart"></canvas>
+                                <p class="chart-caption">
+                                    *Metric: Azure's estimated wait time in minutes for a newly submitted job.
+                                </p>
+                            </div>
+                            <div id="azure-event-bar" style="display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 4px; min-height: 30px;"></div>
+                        </div>
+
+                        <div class="route-chart-group" style="order: 4; margin-bottom: 2rem;">
+                            <h4 style="margin: 0 0 0.5rem 0; color: var(--muted);">Direct Cloud Route</h4>
+                            <div class="card disabled-card" style="height: 150px; padding: 1rem;">
+                                <div class="coming-soon-overlay">Direct API Integration Coming Soon</div>
+                            </div>
+                        </div>
+
                     </div>
                 </section>
 
                 <section id="uptime" class="tab-pane">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h3 class="section-title" style="margin: 0;">Hardware Uptime Dashboard</h3>
+                        <h3 class="section-title" style="margin: 0;">System Availability Trends</h3>
                         <div class="timeframe-toggle" id="uptime-tf">
                             <button class="active" data-tf="30">30D</button>
                             <button data-tf="90">90D</button>
@@ -193,10 +224,10 @@
                         <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">This is an independent tracking project. QPUStatus is <strong>not</strong> affiliated with, endorsed by, or partnered with IonQ, AWS, or Microsoft Azure. Our data is gathered automatically via public API routing endpoints and may not perfectly reflect internal hardware states.</p>
                     </div>
 
-                    <h3 class="section-title">Machine Overview</h3>
+                    <h3 class="section-title">Hardware Deep Dive</h3>
                     <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 2rem;">The IonQ Aria-1 is a 25-qubit trapped-ion quantum computer. Known for its error mitigation and fully connected topology, it allows researchers to run deep and complex quantum circuits with high fidelity without the need for intensive qubit swapping logic.</p>
 
-                    <h3 class="section-title">Hardware Metadata</h3>
+                    <h3 class="section-title">Technical Specifications</h3>
                     <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 2.5rem;">
                         <table>
                             <tbody>
@@ -206,7 +237,7 @@
                                 </tr>
                                 <tr>
                                     <th>Algorithmic Qubits</th>
-                                    <td>25</td>
+                                    <td>25 (#AQ 25)</td>
                                 </tr>
                                 <tr>
                                     <th>Topology</th>
@@ -220,14 +251,14 @@
                         </table>
                     </div>
 
-                    <h3 class="section-title">Frequently Asked Questions</h3>
+                    <h3 class="section-title">Common Provider Questions</h3>
                     <div class="card faq-item">
                         <h4><i class="fa-regular fa-circle-xmark" style="color: #ef4444; margin-right: 8px;"></i> Why is the IonQ Aria-1 offline or unavailable?</h4>
                         <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">If the Aria-1 status shows as OFFLINE, it is usually due to a scheduled daily calibration window or laser tuning sequence rather than a hardware failure. Quantum processors require frequent environmental recalibration to maintain gate fidelity. Check our uptime charts above to see if this is a routine outage.</p>
                     </div>
                     <div class="card faq-item" style="margin-top: 1rem;">
-                        <h4><i class="fa-solid fa-microchip" style="color: #3b82f6; margin-right: 8px;"></i> What does #AQ 25 mean?</h4>
-                        <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">AQ (Algorithmic Qubits) is a system-level metric introduced by IonQ to measure the real-world utility of a quantum computer, factoring in error rates and gate fidelities. An #AQ of 25 means the Aria-1 can successfully execute quantum circuits up to 25 qubits wide and over 600 entangling gate operations deep, a benchmark that far exceeds most competing systems available today.</p>
+                        <h4><i class="fa-solid fa-microchip" style="color: #3b82f6; margin-right: 8px;"></i> What does #AQ 25 mean for my workloads?</h4>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">Algorithmic Qubits (#AQ) measure the real-world utility of a QPU. At #AQ 25, the Aria-1 can successfully execute quantum circuits up to 25 qubits wide and over 600 entangling gates deep — a benchmark that represents a significant amount of useful computational work for near-term algorithms.</p>
                     </div>
                     <div class="card faq-item" style="margin-top: 1rem;">
                         <h4><i class="fa-solid fa-atom" style="color: #3b82f6; margin-right: 8px;"></i> Why trapped-ion over superconducting?</h4>
@@ -242,7 +273,7 @@
                         <a href="https://ionq.com/quantum-systems/aria" target="_blank" class="card link-card">
                             <div class="link-card-icon icon-ionq"><i class="fa-solid fa-microchip"></i></div>
                             <div>
-                                <h4>IonQ Aria Official Page</h4>
+                                <h4>IonQ Aria Official Overview</h4>
                                 <p>Hardware specifications and whitepapers directly from the manufacturer.</p>
                             </div>
                         </a>
@@ -250,7 +281,7 @@
                         <a href="https://aws.amazon.com/braket/quantum-computers/ionq/" target="_blank" class="card link-card">
                             <div class="link-card-icon icon-aws"><i class="fa-solid fa-cloud"></i></div>
                             <div>
-                                <h4>AWS Braket: IonQ Devices</h4>
+                                <h4>AWS Braket: IonQ Provider Hub</h4>
                                 <p>Pricing, regional availability, and specific AWS routing details.</p>
                             </div>
                         </a>
@@ -258,21 +289,21 @@
                         <a href="https://learn.microsoft.com/en-us/azure/quantum/provider-ionq" target="_blank" class="card link-card">
                             <div class="link-card-icon icon-azure"><i class="fa-solid fa-network-wired"></i></div>
                             <div>
-                                <h4>Azure Quantum: IonQ Provider</h4>
+                                <h4>Azure Quantum: IonQ Target</h4>
                                 <p>Documentation on submitting jobs and managing Azure Quantum workspaces.</p>
                             </div>
                         </a>
                     </div>
 
-                    <h3 class="section-title" style="margin-bottom: 1rem;">Internal Navigation</h3>
+                    <h3 class="section-title" style="margin-bottom: 1rem;">Other QPUs</h3>
                     <div class="internal-nav-grid">
                         <a href="index.html" class="card link-card internal-card">
                             <i class="fa-solid fa-layer-group" style="color: #8b5cf6;"></i>
-                            <h4>Global Dashboard</h4>
+                            <h4>Homepage</h4>
                         </a>
                         <a href="ionq-forte.html" class="card link-card internal-card">
                             <i class="fa-solid fa-microchip" style="color: var(--muted);"></i>
-                            <h4>IonQ Forte</h4>
+                            <h4>IonQ Forte-1</h4>
                         </a>
                         <a href="rigetti-aspen.html" class="card link-card internal-card">
                             <i class="fa-solid fa-microchip" style="color: var(--muted);"></i>
