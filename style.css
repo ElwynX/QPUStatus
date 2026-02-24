@@ -466,3 +466,15 @@ table tr:last-child {
 .internal-card:hover i {
     transform: scale(1.1); /* Pop the icon up slightly on hover */
 }
+
+.content-area {
+    /* This creates an invisible cushion when scrolling to this element */
+    scroll-margin-top: 20px; 
+}
+
+/* On mobile, give it a bit more space so it doesn't feel cramped */
+@media (max-width: 768px) {
+    .content-area {
+        scroll-margin-top: 60px; /* Adjust this if you have a sticky top nav */
+    }
+}
