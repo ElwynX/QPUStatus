@@ -122,7 +122,7 @@ function renderGrouped(containerId, itemsDict) {
         container.appendChild(header);
 
         const grid = document.createElement('div');
-        grid.className = 'grid';
+        grid.className = 'grid home-layout';
 
         
         groups[mfg].sort((a, b) => a.name.localeCompare(b.name));
