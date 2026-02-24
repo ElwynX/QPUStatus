@@ -180,27 +180,6 @@ h1 span { color: var(--accent); }
     border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); 
 }
 
-.nav-disclaimer {
-    margin-top: auto;
-    padding: 2rem 1rem 1rem 1rem;
-    opacity: 0.4;
-    transition: opacity 0.3s;
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-}
-
-.nav-disclaimer:hover {
-    opacity: 1; /* Reveals clearly on hover if they look for it */
-}
-
-.nav-disclaimer p {
-    font-size: 0.65rem;
-    line-height: 1.4;
-    color: var(--muted);
-    margin: 0;
-    white-space: nowrap;
-}
 /* Base Content Styling */
 .right-column { display: flex; flex-direction: column; gap: 2rem; width: 100%; min-width: 0; }
 .hero-section { background: var(--panel); padding: 2rem; border-radius: 0.5rem; border: 1px solid var(--border); }
