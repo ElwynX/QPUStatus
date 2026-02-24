@@ -503,8 +503,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }}}
                 },
                 scales: {
-                    x: { ticks: { maxTicksLimit: 7, color: '#94a3b8' }, grid: { color: '#334155' } },
-                    y: { min: -0.05, max: 1.15,
+                    x: { ticks: { maxTicksLimit: 7, color: '#94a3b8' }, grid: { color: '#334155' },
+                         title: { display: true, text: 'Date / Time', color: '#64748b', font: { size: 11 } } },
+                    y: { min: -0.15, max: 1.2,
+                         // Force exactly two ticks — OFFLINE at 0, ONLINE at 1.
+                         // Without this, Chart.js sometimes skips the 0 tick when
+                         // all data is ONLINE, making OFFLINE disappear from the axis.
+                         afterBuildTicks: function(axis) { axis.ticks = [{ value: 0 }, { value: 1 }]; },
                          ticks: { stepSize: 1, color: '#94a3b8', callback: function(v) {
                              return v === 1 ? 'ONLINE' : v === 0 ? 'OFFLINE' : '';
                          }},
