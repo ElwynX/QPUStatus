@@ -16,14 +16,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         Object.values(CHART_INSTANCES).forEach(c => c.update()); 
     });
 
+    // ... theme logic above ...
+
     const tabs = document.querySelectorAll('#tab-menu li');
     const panes = document.querySelectorAll('.tab-pane');
+    
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
+            // 1. Deactivate old tabs
             tabs.forEach(t => t.classList.remove('active'));
             panes.forEach(p => p.classList.remove('active'));
+            
+            // 2. Activate new tab
             tab.classList.add('active');
-            document.getElementById(tab.getAttribute('data-target')).classList.add('active');
+            const targetId = tab.getAttribute('data-target');
+            document.getElementById(targetId).classList.add('active');
+
+            // 3. THE BUMP DOWN LOGIC
+            // This finds the content area and smooth-scrolls to it
+            const contentArea = document.querySelector('.content-area');
+            
+            // Only scroll if we are currently looking at the Hero (top of page)
+            // This prevents annoying jumping if the user is already reading the content
+            const heroHeight = document.querySelector('.hero-section').offsetHeight;
+            
+            if (window.scrollY < heroHeight) {
+                contentArea.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' // Aligns top of content to top of screen
+                });
+            }
         });
     });
 
