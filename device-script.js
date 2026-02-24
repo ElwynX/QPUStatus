@@ -384,6 +384,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ── 8. UPTIME GRIDS ──────────────────────────────────────
     function buildUptimeGrid(gridId, pctId, history, days) {
         var grid = document.getElementById(gridId); if (!grid) return;
+        grid.className = 'uptime-grid tf-' + days;
         grid.innerHTML = '';
         var dayMap = {};
         history.forEach(function(h) {
