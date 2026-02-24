@@ -43,7 +43,7 @@
         </button>
     </header>
 
-    <main class="device-page" data-aws-id="aws_Aria-1" data-azure-id="azure_ionq.qpu.aria-1">
+    <main class="device-page" data-aws-id="aws_Aria-1" data-azure-id="azure_ionq.qpu.aria-1" data-dir>
         
         <nav class="side-nav">
             <h3 class="nav-title">Aria-1 Menu</h3>
@@ -78,6 +78,21 @@
                 </div>
 
                 <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+                    
+                    <div class="card route-card" id="card-direct" style="flex: 1 1 250px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 1.5rem; order: 1;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                            <div class="metric-label" style="font-size: 0.85rem;">
+                                <i class="fa-solid fa-server" style="color:#a855f7; margin-right:5px; font-size: 1rem;"></i> DIRECT CLOUD
+                                <i class="fa-regular fa-circle-question info-icon" title="IonQ Direct: This metric tracks the 'Average Job Age', how long current jobs have been sitting in the queue. It indicates the actual backlog speed of IonQ's native cloud service."></i>
+                            </div>
+                            <div class="status-badge status-offline" id="direct-status"><div class="dot dot-offline"></div> LOAD</div>
+                        </div>
+                        <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1rem;">
+                            <div class="metric-value" id="direct-queue" style="font-size: 2rem;">--</div>
+                            <span style="color: var(--muted); font-size: 0.8rem;">Avg Job Age (min)</span>
+                        </div>
+                        <div id="direct-last-seen" class="provider-last-seen">Awaiting telemetry...</div>
+                    </div>
 
                     <div class="card route-card" id="card-aws" style="flex: 1 1 250px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 1.5rem; order: 2;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
