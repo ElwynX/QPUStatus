@@ -210,9 +210,12 @@ h1 span { color: var(--accent); }
     /* We'll move it to the bottom of the mobile nav or content */
     .nav-disclaimer {
         margin-top: 0.5rem;
-        padding: 0.5rem 1rem;
+        padding: 0 0 0 0;
         border-top: none;
         border-left: 2px solid var(--border); /* Small visual hint instead of top-border */
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
     }
     
     /* Strip the mobile floating styles */
