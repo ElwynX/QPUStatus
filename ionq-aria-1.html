@@ -43,7 +43,7 @@
         </button>
     </header>
 
-    <main class="device-page" data-aws-id="aws_Aria-1" data-azure-id="azure_ionq.qpu.aria-1" data-dir>
+    <main class="device-page" data-aws-id="aws_Aria-1" data-azure-id="azure_ionq.qpu.aria-1" data-direct-id="ionq_qpu.aria-1">
         
         <nav class="side-nav">
             <h3 class="nav-title">Aria-1 Menu</h3>
@@ -147,6 +147,16 @@
                     </div>
 
                     <div id="charts-wrapper" style="display: flex; flex-direction: column;">
+                        
+                        <div class="route-chart-group" id="group-direct" style="order: 1; margin-bottom: 2rem;">
+                            <h4 style="margin: 0 0 0.5rem 0; color: var(--text);">Direct Cloud Route</h4>
+                            <div class="card" style="height: 280px; padding: 1rem; margin-bottom: 0.5rem;">
+                                <canvas id="directChart"></canvas>
+                                <p class="chart-caption">
+                                    *Metric: Average age of jobs currently in queue (Lower is better). This is NOT the wait time for a new job.
+                                </p>
+                            </div>
+                        </div>
 
                         <div class="route-chart-group" id="group-aws" style="order: 2; margin-bottom: 2rem;">
                             <h4 style="margin: 0 0 0.5rem 0; color: var(--text);">AWS Route</h4>
