@@ -41,6 +41,11 @@ h1 span { color: var(--accent); }
     display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;
     margin-bottom: 4rem;
 }
+
+.grid.home-layout {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    margin-bottom: 4rem; row-gap: 4rem; column-gap: 1rem;
+}
 .section-title { font-size: 1.25rem; margin-bottom: 1rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em;}
 
 .mfg-title {
