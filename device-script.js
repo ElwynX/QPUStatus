@@ -308,7 +308,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ── 7. CHART DRAWING ─────────────────────────────────────
-    function renderQueueChart(canvasId, eventBarId, windowData, firstSeenRecord, days, color, label) {
+    // yLabel: unit-specific description shown on the Y axis per provider type
+    function renderQueueChart(canvasId, eventBarId, windowData, firstSeenRecord, days, color, label, yLabel) {
         if (CHART_INSTANCES[canvasId]) { CHART_INSTANCES[canvasId].destroy(); delete CHART_INSTANCES[canvasId]; }
         
         var events = detectStatusEvents(windowData, firstSeenRecord, days);
@@ -328,6 +329,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         var maxVal = dataValues.length ? Math.max.apply(null,dataValues) : 0;
         var sugMax = maxVal < 5 ? 5 : Math.ceil(maxVal*1.2);
 
+        var axisStyle = { color: '#64748b', font: { size: 11 } };
+
         var cfg = {
             type: 'line',
             _statusEvents: events,
@@ -339,9 +342,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 interaction:{mode:'index',intersect:false},
                 plugins:{legend:{display:false}},
                 scales:{
-                    x:{grid:{color:'#334155'},ticks:{maxTicksLimit:8,color:'#94a3b8'}},
-                    y:{beginAtZero:true,suggestedMax:sugMax,grid:{color:'#334155'},
-                       ticks:{color:'#94a3b8',precision:0,stepSize:1}}
+                    x:{
+                        grid:{color:'#334155'},
+                        ticks:{maxTicksLimit:8,color:'#94a3b8'},
+                        title:{ display:true, text:'Date / Time', ...axisStyle }
+                    },
+                    y:{
+                        beginAtZero:true, suggestedMax:sugMax,
+                        grid:{color:'#334155'},
+                        ticks:{color:'#94a3b8',precision:0,stepSize:1},
+                        title:{ display:true, text: yLabel || label, ...axisStyle }
+                    }
                 }
             }
         };
@@ -355,9 +366,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         showNoData('azureChart',  'Loading...');
         
         var h = await fetchHistory(days);
-        renderQueueChart('directChart', 'direct-event-bar', h.direct, firstSeenDirect, days, '#a855f7', 'Direct Queue (Wait Mins)');
-        renderQueueChart('awsChart',    'aws-event-bar',    h.aws,    firstSeenAws,    days, '#f97316', 'AWS Queue (Tasks)');
-        renderQueueChart('azureChart',  'azure-event-bar',  h.azure,  firstSeenAzure,  days, '#3b82f6', 'Azure Queue (Wait Mins)');
+        // Third argument after color is the Y axis label — unit-specific per provider
+        renderQueueChart('directChart', 'direct-event-bar', h.direct, firstSeenDirect, days, '#a855f7', 'Direct Queue (Wait Mins)', 'Avg Queue Age (min)');
+        renderQueueChart('awsChart',    'aws-event-bar',    h.aws,    firstSeenAws,    days, '#f97316', 'AWS Queue (Tasks)',        'Jobs Pending');
+        renderQueueChart('azureChart',  'azure-event-bar',  h.azure,  firstSeenAzure,  days, '#3b82f6', 'Azure Queue (Wait Mins)',  'Est. Wait (min)');
     }
 
     document.querySelectorAll('#queue-tf button').forEach(function(btn) {
