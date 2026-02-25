@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuEra Aquila Queue Time, Live Status & Wait Monitor | QPUStatus</title>
+    <meta name="description" content="Track the live status, AWS wait times, and real-time queue depth for the QuEra Aquila. Explore uptime history and 256-qubit neutral atom hardware specifications.">
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": "QuEra Aquila",
+      "description": "Live status, real-time queue depth, and AWS wait times for the QuEra Aquila neutral atom quantum computer.",
+      "brand": {
+        "@type": "Brand",
+        "name": "QuEra"
+      },
+      "category": "Quantum Processor",
+      "additionalProperty": [{
+        "@type": "PropertyValue",
+        "name": "Physical Qubits",
+        "value": "256"
+      }]
+    }
+    </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
+                <svg class="logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                <h1>QPU<span>Status</span></h1>
+            </a>
+        </div>
+        <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">
+            <span id="theme-icon">☀️</span>
+        </button>
+    </header>
+
+    <main class="device-page" data-aws-id="aws_Aquila">
+        
+        <nav class="side-nav">
+            <h3 class="nav-title">Aquila Menu</h3>
+            <ul id="tab-menu">
+                <li class="active" data-target="history">
+                    <i class="fa-solid fa-chart-line nav-icon"></i>
+                    <span class="nav-text">Queue</span>
+                </li>
+                <li data-target="uptime">
+                    <i class="fa-solid fa-server nav-icon"></i>
+                    <span class="nav-text">Uptime</span>
+                </li>
+                <li data-target="info">
+                    <i class="fa-solid fa-circle-info nav-icon"></i>
+                    <span class="nav-text">Info</span>
+                </li>
+                <li data-target="links">
+                    <i class="fa-solid fa-link nav-icon"></i>
+                    <span class="nav-text">Links</span>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="right-column">
+            
+            <div class="hero-section card" style="border-top: 4px solid #14b8a6;">
+                <div style="margin-bottom: 0.5rem;">
+                    <h2 style="font-size: 2.5rem; margin: 0 0 0.5rem 0;">QuEra Aquila</h2>
+                </div>
+                <div style="margin-bottom: 2rem;">
+                    <span style="color: var(--muted); font-size: 0.9rem;">Neutral Atom (Rydberg) • 256 Physical Qubits • Analog & Digital Modes</span>
+                </div>
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+
+                    <!-- AWS Route — live -->
+                    <div class="card route-card" id="card-aws" style="flex: 1 1 250px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 1.5rem; order: 1;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                            <div class="metric-label" style="font-size: 0.85rem;">
+                                <i class="fa-solid fa-cloud" style="color:#f97316; margin-right:5px; font-size: 1rem;"></i> AWS ROUTE
+                                <i class="fa-regular fa-circle-question info-icon" title="AWS Braket: This tracks 'Pending Tasks', the total number of quantum tasks submitted through Amazon Braket currently waiting for execution."></i>
+                            </div>
+                            <div class="status-badge status-offline" id="aws-status"><div class="dot dot-offline"></div> LOAD</div>
+                        </div>
+                        <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1rem;">
+                            <div class="metric-value" id="aws-queue" style="font-size: 2rem;">--</div>
+                            <span style="color: var(--muted); font-size: 0.8rem;">Pending Tasks</span>
+                        </div>
+                        <div id="aws-last-seen" class="provider-last-seen">Awaiting telemetry...</div>
+                    </div>
+
+                    <!-- Direct Cloud — coming soon -->
+                    <div class="card route-card" id="card-direct" style="flex: 1 1 250px; background: rgba(0,0,0,0.15); border: 1px solid var(--border); padding: 1.5rem; order: 2; opacity: 0.6; position: relative; overflow: hidden;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                            <div class="metric-label" style="font-size: 0.85rem;">
+                                <i class="fa-solid fa-server" style="color:#a855f7; margin-right:5px; font-size: 1rem;"></i> DIRECT CLOUD
+                            </div>
+                            <div class="status-badge status-offline"><div class="dot dot-offline"></div> N/A</div>
+                        </div>
+                        <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1rem;">
+                            <div class="metric-value" style="font-size: 2rem; color: var(--muted);">--</div>
+                            <span style="color: var(--muted); font-size: 0.8rem;">Not Available</span>
+                        </div>
+                        <div class="provider-last-seen" style="color: var(--muted);">QuEra Aquila is accessed exclusively via AWS Braket. No direct cloud API is available at this time.</div>
+                    </div>
+
+                    <!-- Azure — coming soon -->
+                    <div class="card route-card" id="card-azure" style="flex: 1 1 250px; background: rgba(0,0,0,0.15); border: 1px solid var(--border); padding: 1.5rem; order: 3; opacity: 0.6; position: relative; overflow: hidden;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                            <div class="metric-label" style="font-size: 0.85rem;">
+                                <i class="fa-solid fa-network-wired" style="color:#3b82f6; margin-right:5px; font-size: 1rem;"></i> AZURE ROUTE
+                            </div>
+                            <div class="status-badge status-offline"><div class="dot dot-offline"></div> N/A</div>
+                        </div>
+                        <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1rem;">
+                            <div class="metric-value" style="font-size: 2rem; color: var(--muted);">--</div>
+                            <span style="color: var(--muted); font-size: 0.8rem;">Not Available</span>
+                        </div>
+                        <div class="provider-last-seen" style="color: var(--muted);">Aquila is not listed as an Azure Quantum target. No Azure integration is expected at this time.</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: 2rem; background: rgba(20, 184, 166, 0.05); border: 1px solid rgba(20, 184, 166, 0.2);">
+                <p id="seo-dynamic-summary" style="margin: 0; font-size: 0.95rem; line-height: 1.6; color: var(--text);">
+                    Checking real-time network load and availability for the QuEra Aquila...
+                </p>
+            </div>
+
+            <div class="content-area">
+                
+                <section id="history" class="tab-pane active">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 class="section-title" style="margin: 0;">Live Network Load</h3>
+                        <div class="timeframe-toggle" id="queue-tf">
+                            <button class="active" data-tf="1">24H</button>
+                            <button data-tf="7">1W</button>
+                            <button data-tf="30">1M</button>
+                            <button data-tf="365">1Y</button>
+                        </div>
+                    </div>
+
+                    <div id="charts-wrapper" style="display: flex; flex-direction: column;">
+                        
+                        <!-- AWS — live chart -->
+                        <div class="route-chart-group" id="group-aws" style="order: 1; margin-bottom: 2rem;">
+                            <h4 style="margin: 0 0 0.5rem 0; color: var(--text);">AWS Route</h4>
+                            <div class="card" style="height: 280px; padding: 1rem; margin-bottom: 0.5rem;">
+                                <canvas id="awsChart"></canvas>
+                                <p class="chart-caption">
+                                    *Metric: Total number of tasks pending execution (Queue Depth).
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Direct Cloud — coming soon -->
+                        <div class="route-chart-group" style="order: 2; margin-bottom: 2rem;">
+                            <h4 style="margin: 0 0 0.5rem 0; color: var(--muted);">Direct Cloud Route</h4>
+                            <div class="card disabled-card" style="height: 150px; padding: 1rem; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                                <div class="coming-soon-overlay" style="text-align: center; color: var(--muted); font-size: 0.9rem; pointer-events: none;">
+                                    <i class="fa-solid fa-ban" style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem; opacity: 0.4;"></i>
+                                    Direct API Integration Not Available for Aquila
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Azure — coming soon -->
+                        <div class="route-chart-group" style="order: 3; margin-bottom: 2rem;">
+                            <h4 style="margin: 0 0 0.5rem 0; color: var(--muted);">Azure Route</h4>
+                            <div class="card disabled-card" style="height: 150px; padding: 1rem; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                                <div class="coming-soon-overlay" style="text-align: center; color: var(--muted); font-size: 0.9rem; pointer-events: none;">
+                                    <i class="fa-solid fa-ban" style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem; opacity: 0.4;"></i>
+                                    Azure Route Not Available for Aquila
+                                </div>
+                            </div>
+                        </div>
+                    
+                    </div>
+                </section>
+
+                <section id="uptime" class="tab-pane">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 class="section-title" style="margin: 0;">System Availability Trends</h3>
+                        <div class="timeframe-toggle" id="uptime-tf">
+                            <button class="active" data-tf="30">30D</button>
+                            <button data-tf="90">90D</button>
+                            <button data-tf="180">180D</button>
+                            <button data-tf="365">1Y</button>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 600;">AWS Route Availability</span>
+                            <span style="color: var(--online);" id="aws-uptime-pct">100%</span>
+                        </div>
+                        <div class="uptime-grid" id="aws-uptime-grid"></div>
+                        <div class="uptime-labels">
+                            <span id="uptime-start-label">30 days ago</span>
+                            <span>Today</span>
+                        </div>
+                    </div>
+
+                    <h4 style="margin: 2rem 0 0.5rem 0; color: var(--text);">Detailed Connectivity (Last 7 Days)</h4>
+                    <div class="card" style="height: 200px; padding: 1rem; margin-bottom: 1.5rem;">
+                        <canvas id="detailedStatusChart"></canvas>
+                    </div>
+
+                </section>
+
+                <section id="info" class="tab-pane">
+                    
+                    <div class="card" style="margin-bottom: 2rem; border-left: 4px solid #ef4444; background: rgba(239, 68, 68, 0.05);">
+                        <h4 style="margin: 0 0 0.5rem 0; color: #ef4444;"><i class="fa-solid fa-triangle-exclamation" style="margin-right: 8px;"></i> Unofficial Telemetry Dashboard</h4>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">This is an independent tracking project. QPUStatus is <strong>not</strong> affiliated with, endorsed by, or partnered with QuEra or AWS. Our data is gathered automatically via public API routing endpoints and may not perfectly reflect internal hardware states.</p>
+                    </div>
+
+                    <h3 class="section-title">Hardware Deep Dive</h3>
+                    <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 2rem;">QuEra's Aquila is a neutral atom quantum computer based on Rydberg atom physics. Unlike gate-based QPUs that manipulate qubits with microwave pulses or laser gates, Aquila operates in a programmable analog mode, atoms are individually trapped and arranged in custom 2D spatial arrays, then driven into strongly interacting Rydberg states to perform quantum computations. With <strong>256 physical qubits</strong>, it is one of the largest publicly accessible quantum processors available today.</p>
+
+                    <h3 class="section-title">Technical Specifications</h3>
+                    <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 2.5rem;">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <th>Architecture</th>
+                                    <td>Neutral Atom (Rubidium-87)</td>
+                                </tr>
+                                <tr>
+                                    <th>Physical Qubits</th>
+                                    <td>256</td>
+                                </tr>
+                                <tr>
+                                    <th>Computation Mode</th>
+                                    <td>Analog (AHS — Adiabatic / Hamiltonian Simulation)</td>
+                                </tr>
+                                <tr>
+                                    <th>Qubit Arrangement</th>
+                                    <td>Programmable 2D spatial arrays (optical tweezers)</td>
+                                </tr>
+                                <tr>
+                                    <th>Interaction Mechanism</th>
+                                    <td>Rydberg blockade (van der Waals interactions)</td>
+                                </tr>
+                                <tr>
+                                    <th>Max Rabi Frequency</th>
+                                    <td>4 MHz</td>
+                                </tr>
+                                <tr>
+                                    <th>Max Detuning Range</th>
+                                    <td>±125 rad/µs</td>
+                                </tr>
+                                <tr>
+                                    <th>Cloud Access</th>
+                                    <td>AWS Braket only <a href="https://aws.amazon.com/braket/quantum-computers/quera/" target="_blank" style="font-size: 0.7rem; color: var(--accent); text-decoration: none; margin-left: 5px;"><i class="fa-solid fa-up-right-from-square"></i> Source</a></td>
+                                </tr>
+                                <tr>
+                                    <th>Topology</th>
+                                    <td>Reconfigurable (user-defined atom placement)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 class="section-title">Common Provider Questions</h3>
+                    <div class="card faq-item">
+                        <h4><i class="fa-solid fa-atom" style="color: #14b8a6; margin-right: 8px;"></i> What kind of problems is Aquila suited for?</h4>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">Aquila excels at <strong>combinatorial optimization</strong> and <strong>quantum many-body simulation</strong> problems that map naturally to Ising-like Hamiltonians. Because each atom can be placed at a custom (x, y) coordinate, the geometry of the qubit graph itself is a programmable degree of freedom, making it uniquely suited for graph problems such as Maximum Independent Set (MIS), where the interaction graph matches the physical atom array.</p>
+                    </div>
+                    <div class="card faq-item" style="margin-top: 1rem;">
+                        <h4><i class="fa-solid fa-code-branch" style="color: #14b8a6; margin-right: 8px;"></i> How is analog mode different from gate-based computing?</h4>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">Gate-based QPUs (like IonQ or Rigetti) execute discrete sequences of single- and two-qubit gates. Aquila instead runs <strong>Analog Hamiltonian Simulation (AHS)</strong>: you define a time-varying Rabi frequency and detuning schedule that globally drives all atoms simultaneously, and the system evolves according to the Schrödinger equation. There are no discrete gates, no circuit depth concept, and no CNOT operations, the computation is the natural evolution of the quantum system.</p>
+                    </div>
+                    <div class="card faq-item" style="margin-top: 1rem;">
+                        <h4><i class="fa-solid fa-satellite-dish" style="color: #14b8a6; margin-right: 8px;"></i> Why is Aquila only available on AWS?</h4>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">QuEra partnered with Amazon Braket as the exclusive cloud provider for Aquila's public cloud access. Unlike IonQ or Rigetti, which also publish through Azure Quantum, QuEra has not yet listed Aquila on any alternative marketplace (aside from direct premium access). Users wishing to access Aquila must go through an AWS account with Braket enabled in the <strong>us-east-1 (N. Virginia)</strong> region.</p>
+                    </div>
+                </section>
+
+                <section id="links" class="tab-pane">
+                    
+                    <h3 class="section-title" style="margin-bottom: 1rem;">Official Resources</h3>
+                    <div style="display: grid; gap: 1rem; margin-bottom: 2.5rem;">
+                        <a href="https://www.quera.com/aquila" target="_blank" class="card link-card">
+                            <div class="link-card-icon" style="background: rgba(20,184,166,0.15); color: #14b8a6;"><i class="fa-solid fa-atom"></i></div>
+                            <div>
+                                <h4>QuEra Aquila Official Overview</h4>
+                                <p>Hardware specifications, whitepapers, and research publications from QuEra.</p>
+                            </div>
+                        </a>
+                        
+                        <a href="https://aws.amazon.com/braket/quantum-computers/quera/" target="_blank" class="card link-card">
+                            <div class="link-card-icon icon-aws"><i class="fa-solid fa-cloud"></i></div>
+                            <div>
+                                <h4>AWS Braket: QuEra Provider Hub</h4>
+                                <p>Pricing, regional availability (us-east-1), and Braket SDK documentation for Aquila.</p>
+                            </div>
+                        </a>
+
+                        <a href="https://amazon-braket-default-bucket-a9cf45f1-5d09-47c5-8ad1-a9f7-92398a6c8b8e.s3.amazonaws.com/amazon-braket-quera-aquila-device-spec.json" target="_blank" class="card link-card">
+                            <div class="link-card-icon" style="background: rgba(249,115,22,0.15); color: #f97316;"><i class="fa-solid fa-file-code"></i></div>
+                            <div>
+                                <h4>Aquila Device Specification (JSON)</h4>
+                                <p>Full machine parameters and constraint definitions directly from the Braket device spec endpoint.</p>
+                            </div>
+                        </a>
+
+                        <a href="https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html" target="_blank" class="card link-card">
+                            <div class="link-card-icon icon-aws"><i class="fa-solid fa-book"></i></div>
+                            <div>
+                                <h4>AWS Braket Developer Guide</h4>
+                                <p>Submitting AHS programs, the Braket SDK, and QuEra-specific programming examples.</p>
+                            </div>
+                        </a>
+                    </div>
+
+                    <h3 class="section-title" style="margin-bottom: 1rem;">Other QPUs</h3>
+                    <div class="internal-nav-grid">
+                        <a href="index.html" class="card link-card internal-card">
+                            <i class="fa-solid fa-layer-group" style="color: #8b5cf6;"></i>
+                            <h4>Homepage</h4>
+                        </a>
+                        <a href="ionq-forte-1.html" class="card link-card internal-card">
+                            <i class="fa-solid fa-microchip" style="color: var(--muted);"></i>
+                            <h4>IonQ Forte-1</h4>
+                        </a>
+                        <a href="ionq-aria-1.html" class="card link-card internal-card">
+                            <i class="fa-solid fa-microchip" style="color: var(--muted);"></i>
+                            <h4>IonQ Aria-1</h4>
+                        </a>
+                        <a href="rigetti-ankaa-3.html" class="card link-card internal-card">
+                            <i class="fa-solid fa-microchip" style="color: var(--muted);"></i>
+                            <h4>Rigetti Ankaa-3</h4>
+                        </a>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-links" style="margin-bottom: 1.5rem; display: flex; justify-content: center; gap: 2rem; font-weight: 500;">
+            <a href="about.html" style="color: var(--muted); text-decoration: none; transition: color 0.2s;">About Us</a>
+            <a href="privacy.html" style="color: var(--muted); text-decoration: none; transition: color 0.2s;">Privacy Policy</a>
+            <a href="contact.html" style="color: var(--muted); text-decoration: none; transition: color 0.2s;">Contact Us</a>
+        </div>
+        <p>&copy; 2026 QPUStatus. All rights reserved.</p>
+        <p class="disclaimer">Disclaimer: This is an independent telemetry dashboard. QPUStatus is not an official project and is not affiliated with, endorsed by, or partnered with AWS, Microsoft Azure, IonQ, QuEra, Rigetti, Quantinuum, or any other displayed hardware providers.</p>
+    </footer>
+
+    <script src="device-script.js"></script>
+</body>
+</html>
