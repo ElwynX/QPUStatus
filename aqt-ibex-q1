@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AQT IBEX Q1 Queue Time, Live Status & Wait Monitor | QPUStatus</title>
+    <meta name="description" content="Live status and AWS queue depth for the AQT IBEX Q1 trapped-ion QPU. 12 qubits, QV 128, eu-north-1 region.">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": "AQT IBEX Q1",
+      "description": "Live status and real-time queue depth for the AQT IBEX Q1 trapped-ion quantum computer on AWS Braket.",
+      "brand": {
+        "@type": "Brand",
+        "name": "Alpine Quantum Technologies"
+      },
+      "category": "Quantum Processor",
+      "additionalProperty": [
+        { "@type": "PropertyValue", "name": "Physical Qubits", "value": "12" },
+        { "@type": "PropertyValue", "name": "Quantum Volume", "value": "128" }
+      ]
+    }
+    </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
+                <svg class="logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                <h1>QPU<span>Status</span></h1>
+            </a>
+        </div>
+        <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">
+            <span id="theme-icon">☀️</span>
+        </button>
+    </header>
+
+    <main class="device-page" data-aws-id="aws_Ibex-Q1">
+
+        <nav class="side-nav">
+            <h3 class="nav-title">IBEX Q1 Menu</h3>
+            <ul id="tab-menu">
+                <li class="active" data-target="history">
+                    <i class="fa-solid fa-chart-line nav-icon"></i>
+                    <span class="nav-text">Queue</span>
+                </li>
+                <li data-target="uptime">
+                    <i class="fa-solid fa-server nav-icon"></i>
+                    <span class="nav-text">Uptime</span>
+                </li>
+                <li data-target="info">
+                    <i class="fa-solid fa-circle-info nav-icon"></i>
+                    <span class="nav-text">Info</span>
+                </li>
+                <li data-target="links">
+                    <i class="fa-solid fa-link nav-icon"></i>
+                    <span class="nav-text">Links</span>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="right-column">
+
+            <div class="hero-section card" style="border-top: 4px solid #f59e0b;">
+                <div style="margin-bottom: 0.5rem;">
+                    <h2 style="font-size: 2.5rem; margin: 0 0 0.5rem 0;">AQT IBEX Q1</h2>
+                </div>
+                <div style="margin-bottom: 2rem;">
+                    <span style="color: var(--muted); font-size: 0.9rem;">Trapped Ion (Ca-40) • 12 Fully Connected Qubits • Quantum Volume 128 • EU-Hosted (Innsbruck)</span>
+                </div>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+
+                    <!-- AWS Route — live -->
+                    <div class="card route-card" id="card-aws" style="flex: 1 1 250px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 1.5rem; order: 1;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                            <div class="metric-label" style="font-size: 0.85rem;">
+                                <i class="fa-solid fa-cloud" style="color:#f97316; margin-right:5px; font-size: 1rem;"></i> AWS ROUTE
+                                <i class="fa-regular fa-circle-question info-icon" title="AWS Braket (eu-north-1): This tracks 'Pending Tasks', the total number of quantum tasks currently waiting for execution. Note: IBEX Q1 is only available Tuesdays and Wednesdays 09:00-16:00 UTC."></i>
+                            </div>
+                            <div class="status-badge status-offline" id="aws-status"><div class="dot dot-offline"></div> LOAD</div>
+                        </div>
+                        <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1rem;">
+                            <div class="metric-value" id="aws-queue" style="font-size: 2rem;">--</div>
+                            <span style="color: var(--muted); font-size: 0.8rem;">Pending Tasks</span>
+                        </div>
+                        <div id="aws-last-seen" class="provider-last-seen">Awaiting telemetry...</div>
+                    </div>
+
+                    <!-- Direct Cloud — coming soon -->
+                    <div class="card route-card" id="card-direct" style="flex: 1 1 250px; background: rgba(0,0,0,0.15); border: 1px solid var(--border); padding: 1.5rem; order: 2; opacity: 0.6; position: relative; overflow: hidden;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                            <div class="metric-label" style="font-size: 0.85rem;">
+                                <i class="fa-solid fa-server" style="color:#a855f7; margin-right:5px; font-size: 1rem;"></i> DIRECT CLOUD
+                            </div>
+                            <div class="status-badge status-offline"><div class="dot dot-offline"></div> SOON</div>
+                        </div>
+                        <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1rem;">
+                            <div class="metric-value" style="font-size: 2rem; color: var(--muted);">--</div>
+                            <span style="color: var(--muted); font-size: 0.8rem;">Not Yet Tracked</span>
+                        </div>
+                        <div class="provider-last-seen" style="color: var(--muted);">AQT operates its own cloud portal at aqt.eu. Direct API telemetry integration is coming soon.</div>
+                    </div>
+
+                    <!-- Azure — N/A -->
+                    <div class="card route-card" id="card-azure" style="flex: 1 1 250px; background: rgba(0,0,0,0.15); border: 1px solid var(--border); padding: 1.5rem; order: 3; opacity: 0.6; position: relative; overflow: hidden;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                            <div class="metric-label" style="font-size: 0.85rem;">
+                                <i class="fa-solid fa-network-wired" style="color:#3b82f6; margin-right:5px; font-size: 1rem;"></i> AZURE ROUTE
+                            </div>
+                            <div class="status-badge status-offline"><div class="dot dot-offline"></div> N/A</div>
+                        </div>
+                        <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1rem;">
+                            <div class="metric-value" style="font-size: 2rem; color: var(--muted);">--</div>
+                            <span style="color: var(--muted); font-size: 0.8rem;">Not Available</span>
+                        </div>
+                        <div class="provider-last-seen" style="color: var(--muted);">IBEX Q1 is not listed as an Azure Quantum target. No Azure integration is available at this time.</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: 2rem; background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.2);">
+                <p id="seo-dynamic-summary" style="margin: 0; font-size: 0.95rem; line-height: 1.6; color: var(--text);">
+                    Checking real-time network load and availability for the AQT IBEX Q1...
+                </p>
+            </div>
+
+            <div class="content-area">
+
+                <section id="history" class="tab-pane active">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 class="section-title" style="margin: 0;">Live Network Load</h3>
+                        <div class="timeframe-toggle" id="queue-tf">
+                            <button class="active" data-tf="1">24H</button>
+                            <button data-tf="7">1W</button>
+                            <button data-tf="30">1M</button>
+                            <button data-tf="365">1Y</button>
+                        </div>
+                    </div>
+
+                    <div id="charts-wrapper" style="display: flex; flex-direction: column;">
+
+                        <!-- AWS — live chart -->
+                        <div class="route-chart-group" id="group-aws" style="order: 1; margin-bottom: 2rem;">
+                            <h4 style="margin: 0 0 0.5rem 0; color: var(--text);">AWS Route</h4>
+                            <div class="card" style="height: 280px; padding: 1rem; margin-bottom: 0.5rem;">
+                                <canvas id="awsChart"></canvas>
+                                <p class="chart-caption">
+                                    *Metric: Total number of tasks pending execution (Queue Depth). Device is only online Tuesdays and Wednesdays 09:00-16:00 UTC.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Direct Cloud — coming soon -->
+                        <div class="route-chart-group" style="order: 2; margin-bottom: 2rem;">
+                            <h4 style="margin: 0 0 0.5rem 0; color: var(--muted);">Direct Cloud Route</h4>
+                            <div class="card disabled-card" style="height: 150px; padding: 1rem; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                                <div class="coming-soon-overlay" style="text-align: center; color: var(--muted); font-size: 0.9rem; pointer-events: none;">
+                                    <i class="fa-solid fa-clock" style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem; opacity: 0.4;"></i>
+                                    Direct API Integration Coming Soon
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Azure — N/A -->
+                        <div class="route-chart-group" style="order: 3; margin-bottom: 2rem;">
+                            <h4 style="margin: 0 0 0.5rem 0; color: var(--muted);">Azure Route</h4>
+                            <div class="card disabled-card" style="height: 150px; padding: 1rem; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                                <div class="coming-soon-overlay" style="text-align: center; color: var(--muted); font-size: 0.9rem; pointer-events: none;">
+                                    <i class="fa-solid fa-ban" style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem; opacity: 0.4;"></i>
+                                    Azure Route Not Available for IBEX Q1
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <section id="uptime" class="tab-pane">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 class="section-title" style="margin: 0;">System Availability Trends</h3>
+                        <div class="timeframe-toggle" id="uptime-tf">
+                            <button class="active" data-tf="30">30D</button>
+                            <button data-tf="90">90D</button>
+                            <button data-tf="180">180D</button>
+                            <button data-tf="365">1Y</button>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-bottom: 1rem; background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.2);">
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">
+                            <i class="fa-solid fa-triangle-exclamation" style="color: #f59e0b; margin-right: 6px;"></i>
+                            <strong>Scheduled availability window:</strong> IBEX Q1 operates on AWS Braket only on <strong>Tuesdays and Wednesdays, 09:00-16:00 UTC</strong>. Offline readings outside this window are expected and do not indicate an outage.
+                        </p>
+                    </div>
+
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 600;">AWS Route Availability</span>
+                            <span style="color: var(--online);" id="aws-uptime-pct">100%</span>
+                        </div>
+                        <div class="uptime-grid" id="aws-uptime-grid"></div>
+                        <div class="uptime-labels">
+                            <span id="uptime-start-label">30 days ago</span>
+                            <span>Today</span>
+                        </div>
+                    </div>
+
+                    <h4 style="margin: 2rem 0 0.5rem 0; color: var(--text);">Detailed Connectivity (Last 7 Days)</h4>
+                    <div class="card" style="height: 200px; padding: 1rem; margin-bottom: 1.5rem;">
+                        <canvas id="detailedStatusChart"></canvas>
+                    </div>
+
+                    <div class="official-status-card">
+                        <div class="official-status-text">
+                            <h4><i class="fa-solid fa-tower-broadcast" style="margin-right: 5px;"></i> Official Provider Status</h4>
+                            <p>Because we're still gathering historical data, our telemetry might not show the full picture yet. For official incident reports, past outages, and scheduled maintenance windows, please check the manufacturer's official page.</p>
+                            <p class="official-warning"><i class="fa-solid fa-triangle-exclamation"></i> Note: QPUStatus is an unofficial project and is not affiliated with AQT or AWS.</p>
+                        </div>
+                        <a href="https://www.aqt.eu" target="_blank" rel="noopener" class="official-status-btn">
+                            aqt.eu <i class="fa-solid fa-arrow-up-right-from-square" style="margin-left: 5px;"></i>
+                        </a>
+                    </div>
+                </section>
+
+                <section id="info" class="tab-pane">
+
+                    <div class="card" style="margin-bottom: 2rem; border-left: 4px solid #ef4444; background: rgba(239, 68, 68, 0.05);">
+                        <h4 style="margin: 0 0 0.5rem 0; color: #ef4444;"><i class="fa-solid fa-triangle-exclamation" style="margin-right: 8px;"></i> Unofficial Telemetry Dashboard</h4>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">This is an independent tracking project. QPUStatus is <strong>not</strong> affiliated with, endorsed by, or partnered with Alpine Quantum Technologies, Scaleway, or AWS. Our data is gathered automatically via public API routing endpoints and may not perfectly reflect internal hardware states.</p>
+                    </div>
+
+                    <h3 class="section-title">Hardware Deep Dive</h3>
+                    <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 2rem;">The AQT IBEX Q1 is a trapped-ion quantum computer built by Alpine Quantum Technologies, headquartered in Innsbruck, Austria. It encodes qubits in the electronic spin states of calcium-40 ions held in an ultra-high vacuum radio frequency trap. Entangling operations are mediated by the collective motional modes of the ion chain via the Coulomb interaction, giving the system all-to-all qubit connectivity without any routing overhead. Uniquely for a quantum computer, the entire system is rack-mounted and operates at room temperature, consuming under 2 kW of power.</p>
+
+                    <h3 class="section-title">Technical Specifications</h3>
+                    <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 2.5rem;">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <th>Architecture</th>
+                                    <td>Trapped Ion (Calcium-40)</td>
+                                </tr>
+                                <tr>
+                                    <th>Physical Qubits</th>
+                                    <td>12 (fully connected) <a href="https://www.aqt.eu/products/ibex-q1/" target="_blank" style="font-size: 0.7rem; color: var(--accent); text-decoration: none; margin-left: 5px;"><i class="fa-solid fa-up-right-from-square"></i> Source</a></td>
+                                </tr>
+                                <tr>
+                                    <th>Quantum Volume</th>
+                                    <td>128 (2<sup>7</sup>) <a href="https://www.aqt.eu/products/ibex-q1/" target="_blank" style="font-size: 0.7rem; color: var(--accent); text-decoration: none; margin-left: 5px;"><i class="fa-solid fa-up-right-from-square"></i> Source</a></td>
+                                </tr>
+                                <tr>
+                                    <th>1-Qubit Gate Fidelity</th>
+                                    <td>99.97% (+/- 0.01%) <a href="https://www.aqt.eu/products/ibex-q1/" target="_blank" style="font-size: 0.7rem; color: var(--accent); text-decoration: none; margin-left: 5px;"><i class="fa-solid fa-up-right-from-square"></i> Source</a></td>
+                                </tr>
+                                <tr>
+                                    <th>2-Qubit Gate Fidelity</th>
+                                    <td>
+                                        98.7% (+/- 0.3%) avg. over all pairs <a href="https://www.aqt.eu/products/ibex-q1/" target="_blank" style="font-size: 0.7rem; color: var(--accent); text-decoration: none; margin-left: 5px;"><i class="fa-solid fa-up-right-from-square"></i> AQT spec</a>
+                                        <br><span style="font-size: 0.78rem; color: var(--muted); line-height: 1.8;">Note: AWS launch blog reported 97.7% "at time of launch" (Nov 2025). Figures may differ due to calibration snapshots. <a href="https://aws.amazon.com/blogs/quantum-computing/amazon-braket-launches-trapped-ion-quantum-computer-from-alpine-quantum-technologies/" target="_blank" style="font-size: 0.7rem; color: var(--accent); text-decoration: none;"><i class="fa-solid fa-up-right-from-square"></i> AWS source</a></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>2-Qubit Gate Error Range</th>
+                                    <td>0.9% min / 1.8% max (over all pairs) <a href="https://www.aqt.eu/products/ibex-q1/" target="_blank" style="font-size: 0.7rem; color: var(--accent); text-decoration: none; margin-left: 5px;"><i class="fa-solid fa-up-right-from-square"></i> Source</a></td>
+                                </tr>
+                                <tr>
+                                    <th>Native Gates</th>
+                                    <td>RZ, R, RXX <a href="https://aws.amazon.com/blogs/quantum-computing/amazon-braket-launches-trapped-ion-quantum-computer-from-alpine-quantum-technologies/" target="_blank" style="font-size: 0.7rem; color: var(--accent); text-decoration: none; margin-left: 5px;"><i class="fa-solid fa-up-right-from-square"></i> Source</a></td>
+                                </tr>
+                                <tr>
+                                    <th>Topology</th>
+                                    <td>All-to-All (Fully connected)</td>
+                                </tr>
+                                <tr>
+                                    <th>Max Circuit Size</th>
+                                    <td>1,000 gates, 12 qubits <a href="https://www.aqt.eu/products/ibex-q1/" target="_blank" style="font-size: 0.7rem; color: var(--accent); text-decoration: none; margin-left: 5px;"><i class="fa-solid fa-up-right-from-square"></i> Source</a></td>
+                                </tr>
+                                <tr>
+                                    <th>Throughput</th>
+                                    <td>>20,000 circuits/hour (circuit-depth dependent) <a href="https://www.aqt.eu/products/ibex-q1/" target="_blank" style="font-size: 0.7rem; color: var(--accent); text-decoration: none; margin-left: 5px;"><i class="fa-solid fa-up-right-from-square"></i> Source</a></td>
+                                </tr>
+                                <tr>
+                                    <th>Operating Temperature</th>
+                                    <td>Room temperature</td>
+                                </tr>
+                                <tr>
+                                    <th>Power Consumption</th>
+                                    <td>&lt;2 kW <a href="https://thequantuminsider.com/2025/11/19/aqt-ibex-q1-amazon-braket/" target="_blank" style="font-size: 0.7rem; color: var(--accent); text-decoration: none; margin-left: 5px;"><i class="fa-solid fa-up-right-from-square"></i> Source</a></td>
+                                </tr>
+                                <tr>
+                                    <th>Physical Location</th>
+                                    <td>Innsbruck, Austria (EU data residency)</td>
+                                </tr>
+                                <tr>
+                                    <th>AWS Region</th>
+                                    <td>eu-north-1 (Stockholm)</td>
+                                </tr>
+                                <tr>
+                                    <th>AWS Availability Window</th>
+                                    <td>Tues and Wed, 09:00-16:00 UTC <a href="https://aws.amazon.com/blogs/quantum-computing/amazon-braket-launches-trapped-ion-quantum-computer-from-alpine-quantum-technologies/" target="_blank" style="font-size: 0.7rem; color: var(--accent); text-decoration: none; margin-left: 5px;"><i class="fa-solid fa-up-right-from-square"></i> Source</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 class="section-title">Common Provider Questions</h3>
+                    <div class="card faq-item">
+                        <h4><i class="fa-solid fa-atom" style="color: #f59e0b; margin-right: 8px;"></i> Why is IBEX Q1 only online two days a week?</h4>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">AQT currently schedules IBEX Q1 on AWS Braket for <strong>Tuesdays and Wednesdays, 09:00-16:00 UTC</strong>. This window is designed around European working hours. Outside of this window the device reports as offline -- that is expected behaviour, not a fault. If you need dedicated access at other times, AQT offers hourly reservations through <strong>Braket Direct</strong>.</p>
+                    </div>
+                    <div class="card faq-item" style="margin-top: 1rem;">
+                        <h4><i class="fa-regular fa-clock" style="color: #f59e0b; margin-right: 8px;"></i> Why does IBEX Q1 go offline for calibration?</h4>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">AQT states that IBEX Q1 <strong>automatically calibrates on a regular basis</strong> to maintain gate quality. Trapped-ion systems are sensitive to laser frequency drift, ambient magnetic field fluctuations, and trap heating rates, all of which can degrade gate fidelity over time without correction. Brief offline periods during or between availability windows are a normal part of keeping the 98.7% two-qubit fidelity benchmark valid.</p>
+                    </div>
+                    <div class="card faq-item" style="margin-top: 1rem;">
+                        <h4><i class="fa-solid fa-server" style="color: #f59e0b; margin-right: 8px;"></i> Can I access IBEX Q1 outside of AWS?</h4>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">Yes. AQT runs its own cloud portal at <a href="https://www.aqt.eu/products/#cloud-access" target="_blank" style="color: var(--accent);">aqt.eu</a>, and as of February 2026, IBEX Q1 is also accessible via <strong>Scaleway's QaaS platform</strong> (an European sovereign cloud). Additionally, <strong>qBraid Lab</strong> has integrated IBEX Q1 access. QPUStatus currently only tracks the AWS Braket route; direct and Scaleway telemetry is planned for future integration.</p>
+                    </div>
+                </section>
+
+                <section id="links" class="tab-pane">
+
+                    <h3 class="section-title" style="margin-bottom: 1rem;">Official Resources</h3>
+                    <div style="display: grid; gap: 1rem; margin-bottom: 2.5rem;">
+                        <a href="https://www.aqt.eu/products/ibex-q1/" target="_blank" class="card link-card">
+                            <div class="link-card-icon" style="background: rgba(245,158,11,0.15); color: #f59e0b;"><i class="fa-solid fa-microchip"></i></div>
+                            <div>
+                                <h4>AQT IBEX Q1 Official Specs</h4>
+                                <p>Full hardware specifications, benchmarking data, and fidelity figures directly from Alpine Quantum Technologies.</p>
+                            </div>
+                        </a>
+
+                        <a href="https://aws.amazon.com/braket/quantum-computers/aqt/" target="_blank" class="card link-card">
+                            <div class="link-card-icon icon-aws"><i class="fa-solid fa-cloud"></i></div>
+                            <div>
+                                <h4>AWS Braket: AQT Provider Hub</h4>
+                                <p>Pricing, eu-north-1 availability, on-demand and reservation access (Braket Direct) details.</p>
+                            </div>
+                        </a>
+
+                        <a href="https://aws.amazon.com/blogs/quantum-computing/amazon-braket-launches-trapped-ion-quantum-computer-from-alpine-quantum-technologies/" target="_blank" class="card link-card">
+                            <div class="link-card-icon icon-aws"><i class="fa-solid fa-newspaper"></i></div>
+                            <div>
+                                <h4>AWS Launch Announcement (Nov 2025)</h4>
+                                <p>Full technical writeup from the AWS Quantum Technologies Blog on IBEX Q1's Braket integration, including the ARN, gate set, and initial characterisation data.</p>
+                            </div>
+                        </a>
+
+                        <a href="https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html" target="_blank" class="card link-card">
+                            <div class="link-card-icon icon-aws"><i class="fa-solid fa-book"></i></div>
+                            <div>
+                                <h4>AWS Braket Developer Guide</h4>
+                                <p>SDK usage, submitting circuits to IBEX Q1, and on-demand vs reservation access documentation.</p>
+                            </div>
+                        </a>
+                    </div>
+
+                    <h3 class="section-title" style="margin-bottom: 1rem;">Other QPUs</h3>
+                    <div class="internal-nav-grid">
+                        <a href="index.html" class="card link-card internal-card">
+                            <i class="fa-solid fa-layer-group" style="color: #8b5cf6;"></i>
+                            <h4>Homepage</h4>
+                        </a>
+                        <a href="ionq-forte-1.html" class="card link-card internal-card">
+                            <i class="fa-solid fa-microchip" style="color: var(--muted);"></i>
+                            <h4>IonQ Forte-1</h4>
+                        </a>
+                        <a href="quera-aquila.html" class="card link-card internal-card">
+                            <i class="fa-solid fa-atom" style="color: var(--muted);"></i>
+                            <h4>QuEra Aquila</h4>
+                        </a>
+                        <a href="rigetti-ankaa-3.html" class="card link-card internal-card">
+                            <i class="fa-solid fa-microchip" style="color: var(--muted);"></i>
+                            <h4>Rigetti Ankaa-3</h4>
+                        </a>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-links" style="margin-bottom: 1.5rem; display: flex; justify-content: center; gap: 2rem; font-weight: 500;">
+            <a href="about.html" style="color: var(--muted); text-decoration: none; transition: color 0.2s;">About Us</a>
+            <a href="privacy.html" style="color: var(--muted); text-decoration: none; transition: color 0.2s;">Privacy Policy</a>
+            <a href="contact.html" style="color: var(--muted); text-decoration: none; transition: color 0.2s;">Contact Us</a>
+        </div>
+        <p>&copy; 2026 QPUStatus. All rights reserved.</p>
+        <p class="disclaimer">Disclaimer: This is an independent telemetry dashboard. QPUStatus is not an official project and is not affiliated with, endorsed by, or partnered with AWS, Microsoft Azure, Alpine Quantum Technologies, IonQ, QuEra, Rigetti, Quantinuum, or any other displayed hardware providers.</p>
+    </footer>
+
+    <script src="device-script.js"></script>
+</body>
+</html>
