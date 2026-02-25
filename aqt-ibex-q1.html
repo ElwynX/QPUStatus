@@ -195,12 +195,6 @@
                         </div>
                     </div>
 
-                    <div class="card" style="margin-bottom: 1rem; background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.2);">
-                        <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">
-                            <i class="fa-solid fa-triangle-exclamation" style="color: #f59e0b; margin-right: 6px;"></i>
-                            <strong>Scheduled availability window:</strong> IBEX Q1 operates on AWS Braket only on <strong>Tuesdays and Wednesdays, 09:00-16:00 UTC</strong>. Offline readings outside this window are expected and do not indicate an outage.
-                        </p>
-                    </div>
 
                     <div class="card" style="margin-bottom: 1.5rem;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
@@ -217,17 +211,6 @@
                     <h4 style="margin: 2rem 0 0.5rem 0; color: var(--text);">Detailed Connectivity (Last 7 Days)</h4>
                     <div class="card" style="height: 200px; padding: 1rem; margin-bottom: 1.5rem;">
                         <canvas id="detailedStatusChart"></canvas>
-                    </div>
-
-                    <div class="official-status-card">
-                        <div class="official-status-text">
-                            <h4><i class="fa-solid fa-tower-broadcast" style="margin-right: 5px;"></i> Official Provider Status</h4>
-                            <p>Because we're still gathering historical data, our telemetry might not show the full picture yet. For official incident reports, past outages, and scheduled maintenance windows, please check the manufacturer's official page.</p>
-                            <p class="official-warning"><i class="fa-solid fa-triangle-exclamation"></i> Note: QPUStatus is an unofficial project and is not affiliated with AQT or AWS.</p>
-                        </div>
-                        <a href="https://www.aqt.eu" target="_blank" rel="noopener" class="official-status-btn">
-                            aqt.eu <i class="fa-solid fa-arrow-up-right-from-square" style="margin-left: 5px;"></i>
-                        </a>
                     </div>
                 </section>
 
@@ -304,19 +287,13 @@
                                     <th>AWS Region</th>
                                     <td>eu-north-1 (Stockholm)</td>
                                 </tr>
-                                <tr>
-                                    <th>AWS Availability Window</th>
-                                    <td>Tues and Wed, 09:00-16:00 UTC <a href="https://aws.amazon.com/blogs/quantum-computing/amazon-braket-launches-trapped-ion-quantum-computer-from-alpine-quantum-technologies/" target="_blank" style="font-size: 0.7rem; color: var(--accent); text-decoration: none; margin-left: 5px;"><i class="fa-solid fa-up-right-from-square"></i> Source</a></td>
-                                </tr>
+
                             </tbody>
                         </table>
                     </div>
 
                     <h3 class="section-title">Common Provider Questions</h3>
-                    <div class="card faq-item">
-                        <h4><i class="fa-solid fa-atom" style="color: #f59e0b; margin-right: 8px;"></i> Why is IBEX Q1 only online two days a week?</h4>
-                        <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">AQT currently schedules IBEX Q1 on AWS Braket for <strong>Tuesdays and Wednesdays, 09:00-16:00 UTC</strong>. This window is designed around European working hours. Outside of this window the device reports as offline -- that is expected behaviour, not a fault. If you need dedicated access at other times, AQT offers hourly reservations through <strong>Braket Direct</strong>.</p>
-                    </div>
+
                     <div class="card faq-item" style="margin-top: 1rem;">
                         <h4><i class="fa-regular fa-clock" style="color: #f59e0b; margin-right: 8px;"></i> Why does IBEX Q1 go offline for calibration?</h4>
                         <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">AQT states that IBEX Q1 <strong>automatically calibrates on a regular basis</strong> to maintain gate quality. Trapped-ion systems are sensitive to laser frequency drift, ambient magnetic field fluctuations, and trap heating rates, all of which can degrade gate fidelity over time without correction. Brief offline periods during or between availability windows are a normal part of keeping the 98.7% two-qubit fidelity benchmark valid.</p>
