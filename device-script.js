@@ -451,7 +451,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 totalOnlineM  += s.online_minutes;
                 totalTrackedM += s.total_minutes;
 
-                if (pct >= 0.9) {
+                if (pct >= 0.5) {
                     block.classList.add('online');
                     block.title = key + ': ' + (pct * 100).toFixed(1) + '% online — '
                         + onH + 'h online, ' + offH + 'h offline';
