@@ -16,36 +16,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         Object.values(CHART_INSTANCES).forEach(c => c.update()); 
     });
 
-    // ... theme logic above ...
-
     const tabs = document.querySelectorAll('#tab-menu li');
     const panes = document.querySelectorAll('.tab-pane');
-    
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
-            // 1. Deactivate old tabs
             tabs.forEach(t => t.classList.remove('active'));
             panes.forEach(p => p.classList.remove('active'));
-            
-            // 2. Activate new tab
             tab.classList.add('active');
-            const targetId = tab.getAttribute('data-target');
-            document.getElementById(targetId).classList.add('active');
-
-            // 3. THE BUMP DOWN LOGIC
-            // This finds the content area and smooth-scrolls to it
-            const contentArea = document.querySelector('.content-area');
-            
-            // Only scroll if we are currently looking at the Hero (top of page)
-            // This prevents annoying jumping if the user is already reading the content
-            const heroHeight = document.querySelector('.hero-section').offsetHeight;
-            
-            if (window.scrollY < heroHeight) {
-                contentArea.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' // Aligns top of content to top of screen
-                });
-            }
+            document.getElementById(tab.getAttribute('data-target')).classList.add('active');
         });
     });
 
@@ -154,6 +132,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // ── 4. HISTORY CACHE & FETCHING ──────────────────────────
     const historyCache = {};
+    const uptimeCache  = {};
+
+    async function fetchUptime(days) {
+        if (uptimeCache[days]) return uptimeCache[days];
+        try {
+            const safeUptimeFetch = (id) => id
+                ? fetch(`${API}/uptime?id=${id}&days=${days}`)
+                : Promise.resolve({ json: () => [] });
+            const [awsRes, azRes, dirRes] = await Promise.all([
+                safeUptimeFetch(awsId),
+                safeUptimeFetch(azureId),
+                safeUptimeFetch(directId)
+            ]);
+            const result = {
+                aws:    await awsRes.json(),
+                azure:  await azRes.json(),
+                direct: await dirRes.json()
+            };
+            uptimeCache[days] = result;
+            return result;
+        } catch(e) {
+            console.error('Uptime fetch failed days=' + days, e);
+            return { aws: [], azure: [], direct: [] };
+        }
+    }
 
     async function fetchHistory(days) {
         if (historyCache[days]) return historyCache[days];
@@ -211,6 +214,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     function detectStatusEvents(windowData, firstSeenRecord, days) {
         var events = [];
         var windowStartMs = Date.now() - days * 86400000;
+        // For 1W / 1M / 1Y, data is aggregated into hourly/daily majority-vote buckets.
+        // A bucket flip (ONLINE→OFFLINE) reflects statistical noise in the bucket, not a
+        // real transition event. Only first_seen is meaningful at these resolutions.
+        var suppressTransitions = days > 1;
 
         if (firstSeenRecord) {
             var firstMs = new Date(firstSeenRecord.timestamp.replace(' ','T')+'Z').getTime();
@@ -222,10 +229,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 timestamp: firstSeenRecord.timestamp, isFirst: true, inWindow: inWindow });
         }
 
-        for (var i = 1; i < windowData.length; i++) {
-            if (windowData[i].status !== windowData[i-1].status) {
-                events.push({ index: i+1, status: windowData[i].status,
-                    timestamp: windowData[i].timestamp, isFirst: false, inWindow: true });
+        if (!suppressTransitions) {
+            for (var i = 1; i < windowData.length; i++) {
+                if (windowData[i].status !== windowData[i-1].status) {
+                    events.push({ index: i+1, status: windowData[i].status,
+                        timestamp: windowData[i].timestamp, isFirst: false, inWindow: true });
+                }
             }
         }
         return events;
@@ -285,6 +294,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderEventBar(barId, events, days) {
         var bar = document.getElementById(barId); if (!bar) return;
         bar.innerHTML = '';
+        // For aggregated views, explain that full event log is on 24H
+        if (days > 1) {
+            var note = document.createElement('span');
+            note.style.cssText = 'color:var(--muted,#64748b);font-size:0.78rem;font-style:italic;';
+            note.innerText = 'Status transition events shown on 24H view — aggregated data at this resolution may contain bucket noise.';
+            // Still show first_seen chip if present
+            var firstEv = events.find(function(e){ return e.isFirst; });
+            if (firstEv) {
+                bar.appendChild(note);
+                bar.innerHTML += ' ';
+                events = [firstEv]; // only render first_seen chip below
+            } else {
+                bar.appendChild(note);
+                return;
+            }
+        }
         if (!events.length) { bar.innerHTML='<span style="color:var(--muted,#64748b);font-size:0.78rem;">No events recorded</span>'; return; }
         events.forEach(function(ev) {
             var isOnline = ev.status==='ONLINE', outOfWin = ev.isFirst && !ev.inWindow;
@@ -382,45 +407,83 @@ document.addEventListener('DOMContentLoaded', async () => {
     await renderAllQueueCharts(1);
 
     // ── 8. UPTIME GRIDS ──────────────────────────────────────
-    function buildUptimeGrid(gridId, pctId, history, days) {
+    // buildUptimeGrid uses minute-level data from /uptime (qpu_daily_stats).
+    // dailyStats: array of { date, online_minutes, offline_minutes, total_minutes }
+    // Today's block always shows as "collecting data" (striped) and is EXCLUDED from the %.
+    // % = sum(online_minutes) / sum(total_minutes) for completed days only.
+    function buildUptimeGrid(gridId, pctId, dailyStats, days) {
         var grid = document.getElementById(gridId); if (!grid) return;
         grid.innerHTML = '';
-        var dayMap = {};
-        history.forEach(function(h) {
-            var key = new Date(h.timestamp.replace(' ','T')+'Z').toISOString().slice(0,10);
-            if (!dayMap[key]) dayMap[key]=[];
-            dayMap[key].push(h.status);
-        });
-        var onlineDays=0, dataDays=0;
-        var todayKey = new Date().toISOString().slice(0,10);
-        for (var i=days-1; i>=0; i--) {
-            var d=new Date(); d.setUTCDate(d.getUTCDate()-i);
-            var key=d.toISOString().slice(0,10);
-            var block=document.createElement('div'); block.className='uptime-block';
-            if (dayMap[key]) {
-                dataDays++;
-                var pct=dayMap[key].filter(function(s){return s==='ONLINE';}).length/dayMap[key].length;
-                if (pct>=0.9) { block.classList.add('online'); block.title=key+': Online'; onlineDays++; }
-                else          { block.classList.add('down');   block.title=key+': Degraded / Offline'; }
-            } else if (key === todayKey) {
-                block.style.background='repeating-linear-gradient(45deg,#1e3a5f,#1e3a5f 4px,#1e293b 4px,#1e293b 8px)';
-                block.title=key+': Collecting data...';
+
+        // Build fast lookup by date string
+        var statsMap = {};
+        dailyStats.forEach(function(s) { statsMap[s.date] = s; });
+
+        var todayKey     = new Date().toISOString().slice(0, 10);
+        var totalOnlineM = 0, totalTrackedM = 0;
+
+        for (var i = days - 1; i >= 0; i--) {
+            var d = new Date(); d.setUTCDate(d.getUTCDate() - i);
+            var key   = d.toISOString().slice(0, 10);
+            var block = document.createElement('div');
+            block.className = 'uptime-block';
+
+            if (key === todayKey) {
+                // Present day — always striped "collecting data", partial stats in tooltip
+                block.style.background = 'repeating-linear-gradient(45deg,#1e3a5f,#1e3a5f 4px,#1e293b 4px,#1e293b 8px)';
+                var ts = statsMap[key];
+                if (ts && ts.total_minutes > 0) {
+                    var pctToday = (ts.online_minutes / ts.total_minutes * 100).toFixed(1);
+                    var onH  = (ts.online_minutes  / 60).toFixed(1);
+                    var offH = (ts.offline_minutes / 60).toFixed(1);
+                    block.title = key + ': Collecting data… ' + pctToday + '% online so far ('
+                        + onH + 'h online, ' + offH + 'h offline tracked today)';
+                } else {
+                    block.title = key + ': Collecting data…';
+                }
+                // Today intentionally excluded from overall % calculation
+
+            } else if (statsMap[key]) {
+                var s    = statsMap[key];
+                var pct  = s.total_minutes > 0 ? s.online_minutes / s.total_minutes : 0;
+                var onH  = (s.online_minutes  / 60).toFixed(1);
+                var offH = (s.offline_minutes / 60).toFixed(1);
+                totalOnlineM  += s.online_minutes;
+                totalTrackedM += s.total_minutes;
+
+                if (pct >= 0.9) {
+                    block.classList.add('online');
+                    block.title = key + ': ' + (pct * 100).toFixed(1) + '% online — '
+                        + onH + 'h online, ' + offH + 'h offline';
+                } else {
+                    block.classList.add('down');
+                    block.title = key + ': ' + (pct * 100).toFixed(1) + '% — Degraded/Offline — '
+                        + onH + 'h online, ' + offH + 'h offline';
+                }
             } else {
-                block.style.background='var(--border,#334155)'; block.title=key+': Data not collected';
+                block.style.background = 'var(--border,#334155)';
+                block.title = key + ': No data collected';
             }
             grid.appendChild(block);
         }
-        var pctEl=document.getElementById(pctId);
-        if (pctEl) pctEl.innerText = dataDays>0 ? ((onlineDays/dataDays)*100).toFixed(2)+'%' : 'No Data';
+
+        var pctEl = document.getElementById(pctId);
+        if (pctEl) {
+            pctEl.innerText = totalTrackedM > 0
+                ? ((totalOnlineM / totalTrackedM) * 100).toFixed(2) + '%'
+                : 'No Data';
+        }
     }
 
     async function renderUptime(days) {
-        var sl=document.getElementById('uptime-start-label');
-        if (sl) sl.innerText = days>=365?'1 year ago':days+' days ago';
-        var h = await fetchHistory(days);
-        buildUptimeGrid('direct-uptime-grid', 'direct-uptime-pct', h.direct, days);
-        buildUptimeGrid('aws-uptime-grid',    'aws-uptime-pct',    h.aws,    days);
-        buildUptimeGrid('azure-uptime-grid',  'azure-uptime-pct',  h.azure,  days);
+        var sl = document.getElementById('uptime-start-label');
+        if (sl) sl.innerText = days >= 365 ? '1 year ago' : days + ' days ago';
+        // Use /uptime for minute-level accuracy (qpu_daily_stats).
+        // Falls back to empty arrays if table not yet migrated.
+        var u = await fetchUptime(days);
+        buildUptimeGrid('direct-uptime-grid', 'direct-uptime-pct', u.direct, days);
+        buildUptimeGrid('aws-uptime-grid',    'aws-uptime-pct',    u.aws,    days);
+        buildUptimeGrid('azure-uptime-grid',  'azure-uptime-pct',  u.azure,  days);
     }
 
     document.querySelectorAll('#uptime-tf button').forEach(function(btn) {
