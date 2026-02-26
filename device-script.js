@@ -24,6 +24,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             panes.forEach(p => p.classList.remove('active'));
             tab.classList.add('active');
             document.getElementById(tab.getAttribute('data-target')).classList.add('active');
+
+            const contentArea = document.querySelector('.content-area');
+            const heroHeight = document.querySelector('.hero-section').offsetHeight;
+            if (window.scrollY < heroHeight) {
+                contentArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         });
     });
 
