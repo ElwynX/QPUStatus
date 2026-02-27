@@ -82,7 +82,7 @@ class SEOTextInjector {
             <div style="background: rgba(150, 150, 150, 0.05); border: 1px solid var(--border); border-radius: 8px; padding: 15px; margin-top: 20px;">
                 <p style="margin: 0; font-size: 0.82em; color: var(--muted); line-height: 1.5; opacity: 0.9;">
                     <strong>Data Accuracy Notice:</strong> QPUStatus is an independent monitoring project. 
-                    Real-time data is aggregated from public provider APIs (AWS Braket, Azure Quantum, IonQ) and may vary from internal proprietary hardware states. 
+                    Real-time data is aggregated from public provider APIs (AWS Braket, Azure Quantum, ${brandName}) and may vary from internal proprietary hardware states. 
                     The 24-hour availability chart is updated every 3 minutes. Long-term historical rollups (Weekly/Monthly) occur daily at 00:00 UTC. 
                     ${machineName} is a trademark of ${brandName}. We are not officially affiliated with or endorsed by any listed hardware manufacturer.
                 </p>
