@@ -37,19 +37,73 @@
         <div id="grid-simulators"></div>
     </main>
 
-    <section style="margin-top: 4rem;">
-            <h2 class="section-title" style="margin-bottom: 1.5rem;">Dashboard FAQ</h2>
-            <div class="grid" style="margin-bottom: 0;">
-                <div class="card faq-item">
-                    <h4 style="margin: 0 0 0.5rem 0; color: var(--text);"><i class="fa-regular fa-circle-question" style="color: var(--accent); margin-right: 8px;"></i> Why is Azure measured in minutes, but AWS in tasks?</h4>
-                    <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.6;">Cloud providers expose their APIs differently. AWS Braket exposes the raw integer count of pending quantum tasks currently in the queue. Azure Quantum abstracts this and provides an estimated wait time (in minutes) based on historical job processing speeds.</p>
-                </div>
-                <div class="card faq-item">
-                    <h4 style="margin: 0 0 0.5rem 0; color: var(--text);"><i class="fa-regular fa-circle-question" style="color: var(--accent); margin-right: 8px;"></i> What does it mean when a machine goes OFFLINE?</h4>
-                    <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.6;">Unlike standard web servers, quantum processors require frequent recalibration, laser tuning, and cooling cycles. An "OFFLINE" status on our dashboard typically indicates routine daily maintenance or calibration windows rather than a hardware failure.</p>
-                </div>
+    <section style="margin-top: 5rem; border-top: 1px solid var(--border); padding-top: 3rem;">
+        <h2 class="section-title" style="margin-bottom: 2rem;">Dashboard Intelligence & FAQ</h2>
+        
+        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem; margin-bottom: 0;">
+            
+            <div class="card faq-item">
+                <h4 style="margin: 0 0 0.8rem 0; color: var(--text);">
+                    <i class="fa-solid fa-lock" style="color: var(--accent); margin-right: 8px;"></i> 
+                    Why are major QPUs like IBM, Google, or Quantinuum missing?
+                </h4>
+                <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.6;">
+                    Tracking a QPU requires either a public API endpoint or an authenticated account with that provider. IBM Quantum and Google require approved research accounts with no open public endpoint. Quantinuum hardware sits behind a paid tier starting at $125,000/month. Access to these systems is genuinely restricted and not something we can work around without provider cooperation.
+                </p>
             </div>
-        </section>
+    
+            <div class="card faq-item">
+                <h4 style="margin: 0 0 0.8rem 0; color: var(--text);">
+                    <i class="fa-solid fa-bolt" style="color: var(--accent); margin-right: 8px;"></i> 
+                    Why does IonQ have a Direct route when others don't?
+                </h4>
+                <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.6;">
+                    IonQ publishes a completely open, unauthenticated public API at api.ionq.co/v0.3/backends that returns live queue and status data for all their systems. There is no API key, no account, and no cost. This is genuinely unusual in the quantum industry and lets us poll it directly every 3 minutes. Most other providers require authenticated API keys or restrict programmatic access entirely.
+                </p>
+            </div>
+    
+            <div class="card faq-item">
+                <h4 style="margin: 0 0 0.8rem 0; color: var(--text);">
+                    <i class="fa-solid fa-gauge-high" style="color: var(--accent); margin-right: 8px;"></i> 
+                    What is the difference between AWS tasks and Azure wait minutes?
+                </h4>
+                <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.6;">
+                    AWS Braket reports queue depth as a raw task count which is the number of jobs sitting in line ahead of yours. Azure Quantum instead exposes an estimated wait time in minutes based on historical job throughput. Neither metric is directly comparable to the other. A device with 10 AWS tasks could mean 10 minutes or 2 hours depending on how long each circuit takes to run.
+                </p>
+            </div>
+    
+            <div class="card faq-item">
+                <h4 style="margin: 0 0 0.8rem 0; color: var(--text);">
+                    <i class="fa-solid fa-microscope" style="color: var(--accent); margin-right: 8px;"></i> 
+                    Why does a QPU show OFFLINE even though I can submit jobs?
+                </h4>
+                <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.6;">
+                    Our OFFLINE status reflects what the provider API reports at the moment of polling. Some providers mark a device as unavailable during calibration windows while still allowing jobs to be queued for execution once calibration completes. There can also be a lag of up to 3 minutes between a device coming back online and our dashboard reflecting it.
+                </p>
+            </div>
+    
+            <div class="card faq-item">
+                <h4 style="margin: 0 0 0.8rem 0; color: var(--text);">
+                    <i class="fa-solid fa-rotate" style="color: var(--accent); margin-right: 8px;"></i> 
+                    How often does the data update?
+                </h4>
+                <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.6;">
+                    Live status and queue depth poll every 3 minutes. The 24H chart reflects this raw data in near real-time. The 1W, 1M, and 1Y charts are rolled up once per day at 00:00 UTC. This is a deliberate tradeoff to stay within the free tier of our database infrastructure. For research or time-sensitive decisions, always cross-reference with the official provider status page.
+                </p>
+            </div>
+    
+            <div class="card faq-item">
+                <h4 style="margin: 0 0 0.8rem 0; color: var(--text);">
+                    <i class="fa-solid fa-shield-halved" style="color: var(--accent); margin-right: 8px;"></i> 
+                    Is QPUStatus affiliated with any hardware provider?
+                </h4>
+                <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.6;">
+                    No. QPUStatus is a fully independent project with no commercial relationship with any provider listed on this site. We do not receive funding, API keys, or preferential access from AWS, Microsoft Azure, or any other company. All data is sourced from publicly accessible API endpoints. Hardware names and trademarks remain the property of their respective owners.
+                </p>
+            </div>
+    
+        </div>
+    </section>
 
     <footer class="site-footer">
         <div class="footer-links" style="margin-bottom: 1.5rem; display: flex; justify-content: center; gap: 2rem; font-weight: 500;">
