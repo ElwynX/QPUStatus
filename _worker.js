@@ -86,7 +86,7 @@ export default {
         if (!contentType || !contentType.includes("text/html")) return response;
 
         try {
-            const apiResponse = await fetch('https://api.qpustatus.com/stats');const apiResponse = await fetch('https://api.qpustatus.com/stats', {headers: { 'X-Internal-Key': env.INTERNAL_API_SECRET }});
+            const apiResponse = await fetch('https://api.qpustatus.com/stats', {headers: { 'X-Internal-Key': env.INTERNAL_API_SECRET }});
             const apiData = await apiResponse.json();
             return new HTMLRewriter()
                 .on('div#seo-dynamic-summary', new SEOTextInjector(apiData, request.url))
