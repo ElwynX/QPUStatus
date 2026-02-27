@@ -89,7 +89,7 @@ export default {
             const apiResponse = await fetch('https://api.qpustatus.com/stats');
             const apiData = await apiResponse.json();
             return new HTMLRewriter()
-                .on('p#seo-dynamic-summary', new SEOTextInjector(apiData, request.url))
+                .on('div#seo-dynamic-summary', new SEOTextInjector(apiData, request.url))
                 .transform(response);
         } catch (e) {
             return response;
