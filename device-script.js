@@ -120,15 +120,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateProviderCard(awsLive, exactEvents.aws, 'aws');
             updateProviderCard(azureLive, exactEvents.azure, 'azure');
 
-            const seoEl = document.getElementById('seo-dynamic-summary');
-            if (seoEl && (awsLive || azureLive || directLive)) {
-                const machineName = document.querySelector('h2') ? document.querySelector('h2').innerText : 'Quantum Machine';
-                let routesText = [];
-                if (directLive) routesText.push(`Direct API (${directLive.status}, ${directLive.queue_depth}m wait)`);
-                if (awsLive) routesText.push(`AWS (${awsLive.status}, ${awsLive.queue_depth} tasks)`);
-                if (azureLive) routesText.push(`Azure (${azureLive.status}, ${azureLive.queue_depth}m wait)`);
-                seoEl.innerHTML = `<strong>Live Status Update:</strong> As of right now, the ${machineName} is accessible via ${routesText.join(', ')}. Track historical uptime and network latency below.`;
-            }
         } catch (e) { console.error('Hero stats fetch failed:', e); }
     }
 
