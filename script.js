@@ -94,9 +94,14 @@ function createCard(machine) {
             
             <div class="time-ago" style="margin-top: 1rem; margin-bottom: 1rem; text-align: right; font-size: 0.75rem; color: var(--muted);">Updated ${timeSince(machine.last_updated)}</div>
             
-            <a href="${slug}.html" class="view-more-btn">
-                View Hardware Metrics <i class="fa-solid fa-arrow-right"></i>
-            </a>
+            ${machine.isSim
+              ? `<div class="view-more-btn" style="opacity:0.3; cursor:default; pointer-events:none;">
+                   Simulator — No Hardware Metrics
+                 </div>`
+              : `<a href="${slug}.html" class="view-more-btn">
+                   View Hardware Metrics <i class="fa-solid fa-arrow-right"></i>
+                 </a>`
+            }
         </div>
     `;
 }
@@ -183,7 +188,7 @@ async function init() {
             const targetDict = isSim ? sims : qpus;
 
             if (!targetDict[key]) {
-                targetDict[key] = { mfg, name: cleanName, routes: {}, last_updated: qpu.last_updated };
+                targetDict[key] = { mfg, name: cleanName, isSim, routes: {}, last_updated: qpu.last_updated };
             }
             
             targetDict[key].routes[route] = qpu;
