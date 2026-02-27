@@ -9,6 +9,7 @@ class SEOTextInjector {
         let brandName = '';
         let ids = { aws: '', azure: '', direct: '' };
 
+        // ... [Your existing machine detection logic remains the same] ...
         if (this.url.includes('ionq-aria-1')) {
             machineName = 'IonQ Aria-1'; brandName = 'IonQ, Inc.';
             ids.aws = 'aws_Aria-1'; ids.azure = 'azure_ionq.qpu.aria-1'; ids.direct = 'ionq_qpu.aria-1';
@@ -37,35 +38,55 @@ class SEOTextInjector {
             return;
         }
 
-        const getStatus = (sourceName, id) => {
+        const getStatusDetailed = (sourceName, id) => {
             if (!id) return null;
             const data = this.apiData.find(q => q.id === id);
             if (!data) return null;
-            if (data.status !== 'ONLINE') return `currently <strong>offline</strong> via ${sourceName}`;
-            const metric = data.queue_depth !== undefined ? ` (${data.queue_depth} tasks in queue)` : '';
-            return `<strong>online</strong> via ${sourceName}${metric}`;
+
+            if (data.status !== 'ONLINE') {
+                return `${sourceName} reports the device is currently <strong>Offline</strong>`;
+            }
+
+            // Wordy metric logic
+            let metricText = '';
+            if (data.queue_depth !== undefined) {
+                if (sourceName === 'AWS') {
+                    metricText = ` with a workload of <strong>${data.queue_depth} tasks</strong> in the execution queue`;
+                } else if (sourceName === 'Azure' || sourceName === 'Direct API') {
+                    metricText = ` with an estimated wait time of <strong>${data.queue_depth} minutes</strong>`;
+                }
+            }
+
+            return `is <strong>Online</strong> via ${sourceName}${metricText}`;
         };
 
         const statusList = [
-            getStatus('Direct API', ids.direct),
-            getStatus('AWS', ids.aws),
-            getStatus('Azure', ids.azure)
+            getStatusDetailed('Direct API', ids.direct),
+            getStatusDetailed('AWS', ids.aws),
+            getStatusDetailed('Azure', ids.azure)
         ].filter(Boolean);
 
-        let statusHtml = '';
-        if (statusList.length === 0) {
-            statusHtml = `<strong>Status Update:</strong> Live data for ${machineName} is currently unavailable. Please check back later.`;
-        } else {
-            const joinedStatus = statusList.join(', and is ');
-            statusHtml = `<strong>Live Status:</strong> The ${machineName} is ${joinedStatus}.`;
-        }
+        // --- 1. WORDY LIVE STATUS ---
+        let statusHtml = `
+            <div style="margin-bottom: 25px;">
+                <h3 style="font-size: 1.1em; color: var(--text); margin-bottom: 8px;">Is the ${machineName} online right now?</h3>
+                <p style="font-size: 1em; line-height: 1.6; color: var(--text);">
+                    According to our latest telemetry data, the <strong>${machineName}</strong> quantum computer ${statusList.length > 0 ? statusList.join(', ') : 'is currently seeing no live reporting across major providers'}. 
+                    Uptime tracking for ${brandName} hardware is updated in real-time to help researchers and developers monitor availability for quantum circuit execution.
+                </p>
+            </div>
+        `;
 
+        // --- 2. SEPARATE DISCLAIMER BOX ---
         const noticeHtml = `
-            <span style="display: block; margin-top: 10px; font-size: 0.78em; color: var(--muted); line-height: 1.6; opacity: 0.85;">
-                QPUStatus is an independent project. Data is sourced from publicly available provider APIs and may not always reflect the true internal hardware state.
-                The 24H chart updates every 3 minutes. Weekly, monthly, and yearly charts roll up once daily at 00:00 UTC due to the resource constraints of running this as a free project.
-                ${machineName} and associated trademarks are the property of ${brandName}. We are not affiliated with or endorsed by any hardware provider listed on this site.
-            </span>
+            <div style="background: rgba(150, 150, 150, 0.05); border: 1px solid var(--border); border-radius: 8px; padding: 15px; margin-top: 20px;">
+                <p style="margin: 0; font-size: 0.82em; color: var(--muted); line-height: 1.5; opacity: 0.9;">
+                    <strong>Data Accuracy Notice:</strong> QPUStatus is an independent monitoring project. 
+                    Real-time data is aggregated from public provider APIs (AWS Braket, Azure Quantum, IonQ) and may vary from internal proprietary hardware states. 
+                    The 24-hour availability chart is updated every 3 minutes. Long-term historical rollups (Weekly/Monthly) occur daily at 00:00 UTC. 
+                    ${machineName} is a trademark of ${brandName}. We are not officially affiliated with or endorsed by any listed hardware manufacturer.
+                </p>
+            </div>
         `;
 
         element.setInnerContent(statusHtml + noticeHtml, { html: true });
