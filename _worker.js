@@ -63,10 +63,10 @@ class SEOTextInjector {
 
         // COMPACT UNIFIED BLOCK
         const html = `
-            <div style="border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 10px 0; font-size: 0.88em; line-height: 1.5;">
+            <div style="font-size: 0.88em; line-height: 1.5;">
                 <p style="margin: 0 0 8px 0; color: var(--text);">
                     <span style="font-weight: 700; color: var(--accent); margin-right: 5px;">Live Status:</span>
-                    Currently, the <strong>${machineName}</strong> ${joinedStatus}. 
+                    Currently, the <strong>${machineName}</strong> is ${joinedStatus}. 
                     <span style="color: var(--muted); font-size: 0.95em;">Updated real-time for ${brandName} circuit monitoring.</span>
                 </p>
                 <p style="margin: 0; font-size: 0.8em; color: var(--muted); opacity: 0.8; font-style: italic; border-left: 2px solid var(--border); padding-left: 10px;">
