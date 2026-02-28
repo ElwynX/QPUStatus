@@ -74,7 +74,7 @@
                     <h2 style="font-size: 2.5rem; margin: 0 0 0.5rem 0;">QuEra Aquila</h2>
                 </div>
                 <div style="margin-bottom: 2rem;">
-                    <span style="color: var(--muted); font-size: 0.9rem;">Neutral Atom (Rydberg) • 256 Physical Qubits • Analog & Digital Modes</span>
+                    <span style="color: var(--muted); font-size: 0.9rem;">Neutral Atom (Rydberg) • 256 Physical Qubits • Analog Hamiltonian Simulation (AHS)</span>
                 </div>
                 
                 <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
@@ -223,7 +223,7 @@
                     </div>
 
                     <h3 class="section-title">Hardware Deep Dive</h3>
-                    <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 2rem;">QuEra's Aquila is a neutral atom quantum computer based on Rydberg atom physics. Unlike gate-based QPUs that manipulate qubits with microwave pulses or laser gates, Aquila operates in a programmable analog mode, atoms are individually trapped and arranged in custom 2D spatial arrays, then driven into strongly interacting Rydberg states to perform quantum computations. With <strong>256 physical qubits</strong>, it is one of the largest publicly accessible quantum processors available today.</p>
+                    <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 2rem;">QuEra's Aquila is a neutral atom quantum computer based on Rydberg atom physics. Unlike gate-based QPUs that manipulate qubits with microwave pulses or laser gates, Aquila operates in a programmable analog mode. Atoms are individually trapped and arranged in custom 2D spatial arrays, then driven into strongly interacting Rydberg states to perform quantum computations. With <strong>256 physical qubits</strong>, it is one of the largest publicly accessible quantum processors available today.</p>
 
                     <h3 class="section-title">Technical Specifications</h3>
                     <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 2.5rem;">
@@ -272,7 +272,7 @@
                     </div>
                     <div class="card faq-item" style="margin-top: 1rem;">
                         <h4><i class="fa-solid fa-code-branch" style="color: #14b8a6; margin-right: 8px;"></i> How is analog mode different from gate-based computing?</h4>
-                        <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">Gate-based QPUs (like IonQ or Rigetti) execute discrete sequences of single- and two-qubit gates. Aquila instead runs <strong>Analog Hamiltonian Simulation (AHS)</strong>: you define a time-varying Rabi frequency and detuning schedule that globally drives all atoms simultaneously, and the system evolves according to the Schrödinger equation. There are no discrete gates, no circuit depth concept, and no CNOT operations, the computation is the natural evolution of the quantum system.</p>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">Gate-based QPUs (like IonQ or Rigetti) execute discrete sequences of single- and two-qubit gates. Aquila instead runs <strong>Analog Hamiltonian Simulation (AHS)</strong>: you define a time-varying Rabi frequency and detuning schedule that globally drives all atoms simultaneously, and the system evolves according to the Schrödinger equation. There are no discrete gates, no circuit depth concept, and no CNOT operations. The computation is the natural evolution of the quantum system.</p>
                     </div>
                     <div class="card faq-item" style="margin-top: 1rem;">
                         <h4><i class="fa-solid fa-satellite-dish" style="color: #14b8a6; margin-right: 8px;"></i> Why is Aquila only available on AWS?</h4>
