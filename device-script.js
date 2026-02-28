@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 scales:{
                     x:{
                         grid:{color:'#334155'},
-                        ticks:{maxTicksLimit:8,color:'#94a3b8'},
+                        ticks:{maxTicksLimit: window.innerWidth < 768 ? 4 : 8, color:'#94a3b8'},
                         title:{ display:true, text:'Date / Time', ...axisStyle }
                     },
                     y:{
