@@ -151,10 +151,12 @@
                         <!-- AWS — live chart -->
                         <div class="route-chart-group" id="group-aws" style="order: 1; margin-bottom: 2rem;">
                             <h4 style="margin: 0 0 0.5rem 0; color: var(--text);">AWS Route</h4>
-                            <div class="card" style="height: 280px; padding: 1rem; margin-bottom: 0.5rem;">
-                                <canvas id="awsChart"></canvas>
+                            <div class="card chart-card">
+                                <div class="canvas-container">
+                                    <canvas id="awsChart"></canvas>
+                                </div>
                                 <p class="chart-caption">
-                                    *Metric: Total number of tasks pending execution (Queue Depth). Device is only online Tuesdays and Wednesdays 09:00-16:00 UTC.
+                                    *Metric: Total number of tasks pending execution (Queue Depth).
                                 </p>
                             </div>
                         </div>
