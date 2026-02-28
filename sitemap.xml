@@ -55,18 +55,19 @@
 <url>
   <loc>https://qpustatus.com/about</loc>
   <lastmod>2026-02-28T14:57:47+00:00</lastmod>
-  <priority>0.80</priority>
+  <priority>0.50</priority>
 </url>
 <url>
   <loc>https://qpustatus.com/privacy</loc>
   <lastmod>2026-02-28T14:57:47+00:00</lastmod>
-  <priority>0.80</priority>
+  <priority>0.50</priority>
 </url>
 <url>
   <loc>https://qpustatus.com/contact</loc>
   <lastmod>2026-02-28T14:57:47+00:00</lastmod>
-  <priority>0.80</priority>
+  <priority>0.50</priority>
 </url>
+
 
 
 </urlset>
