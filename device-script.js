@@ -563,7 +563,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }}}
                 },
                 scales: {
-                    x: { ticks: { maxTicksLimit: 7, color: '#94a3b8' }, grid: { color: '#334155' },
+                    x: { 
+                         ticks: { maxTicksLimit: window.innerWidth < 768 ? 4 : 7, color: '#94a3b8' }, 
+                         grid: { color: '#334155' },
                          title: { display: true, text: 'Date / Time', color: '#64748b', font: { size: 11 } } },
                     y: { min: -0.15, max: 1.2,
                          // Force exactly two ticks — OFFLINE at 0, ONLINE at 1.
