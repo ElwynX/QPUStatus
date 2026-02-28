@@ -150,28 +150,34 @@
                         
                         <div class="route-chart-group" id="group-direct" style="order: 1; margin-bottom: 2rem;">
                             <h4 style="margin: 0 0 0.5rem 0; color: var(--text);">Direct Cloud Route</h4>
-                            <div class="card" style="height: 280px; padding: 1rem; margin-bottom: 0.5rem;">
-                                <canvas id="directChart"></canvas>
+                            <div class="chart-card">
+                                <div class="canvas-container">
+                                    <canvas id="directChart"></canvas>
+                                </div>
                                 <p class="chart-caption">
                                     *Metric: Average age of jobs currently in queue. This is NOT the wait time for a new job.
                                 </p>
                             </div>
                         </div>
-                    
+                        
                         <div class="route-chart-group" id="group-aws" style="order: 2; margin-bottom: 2rem;">
                             <h4 style="margin: 0 0 0.5rem 0; color: var(--text);">AWS Route</h4>
-                            <div class="card" style="height: 280px; padding: 1rem; margin-bottom: 0.5rem;">
-                                <canvas id="awsChart"></canvas>
+                            <div class="chart-card">
+                                <div class="canvas-container">
+                                    <canvas id="awsChart"></canvas>
+                                </div>
                                 <p class="chart-caption">
                                     *Metric: Total number of tasks pending execution (Queue Depth).
                                 </p>
                             </div>
                         </div>
-                    
+                        
                         <div class="route-chart-group" id="group-azure" style="order: 3; margin-bottom: 2rem;">
                             <h4 style="margin: 0 0 0.5rem 0; color: var(--text);">Azure Route</h4>
-                            <div class="card" style="height: 280px; padding: 1rem; margin-bottom: 0.5rem;">
-                                <canvas id="azureChart"></canvas>
+                            <div class="chart-card">
+                                <div class="canvas-container">
+                                    <canvas id="azureChart"></canvas>
+                                </div>
                                 <p class="chart-caption">
                                     *Metric: Azure's estimated wait time in minutes for a newly submitted job.
                                 </p>
