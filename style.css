@@ -518,3 +518,61 @@ table tr:last-child {
         scroll-margin-top: 60px; /* Adjust this if you have a sticky top nav */
     }
 }
+
+/* --- RESPONSIVE FIXES --- */
+
+/* 1. Fix the overlapping chart captions */
+.chart-card {
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    height: auto; /* Lets the card expand if text wraps */
+    display: flex;
+    flex-direction: column;
+}
+.canvas-container {
+    position: relative;
+    height: 240px; /* Locks the chart height safely */
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+/* 2. Fix the cut-off timeframe buttons */
+.section-header {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 1rem;
+    flex-wrap: wrap; /* Allows buttons to drop below title on tiny screens */
+    gap: 1rem;
+}
+.timeframe-toggle button {
+    white-space: nowrap; /* Stops text inside buttons from wrapping/disappearing */
+    flex-shrink: 0;
+}
+
+/* 3. Mobile-Specific Adjustments */
+@media (max-width: 768px) {
+    /* Give the bottom nav more room and slightly shrink the text/padding */
+    .side-nav {
+        width: 95%;
+        max-width: none;
+        padding: 0.3rem;
+    }
+    .side-nav li {
+        padding: 0.4rem 0.1rem;
+    }
+    .nav-text {
+        font-size: 0.6rem;
+    }
+    
+    /* Shrink the timeframe buttons slightly so they fit better */
+    .timeframe-toggle button {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.7rem;
+    }
+    
+    /* Make the hero title scale down so it doesn't break lines awkwardly */
+    .hero-section h2 {
+        font-size: 2rem !important;
+    }
+}
