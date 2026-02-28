@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404: QPU State Not Found | QPUStatus</title>
+    <meta name="robots" content="noindex">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg: #0f172a;
+            --panel: #1e293b;
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --accent: #3b82f6;
+            --error: #ef4444;
+            --border: #334155;
+        }
+
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .error-container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .error-code {
+            font-size: 8rem;
+            font-weight: 800;
+            margin: 0;
+            line-height: 1;
+            background: linear-gradient(135deg, var(--accent), var(--error));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family: monospace;
+        }
+
+        h1 { font-size: 1.5rem; margin-top: 1rem; }
+        p { color: var(--muted); line-height: 1.6; margin-bottom: 2rem; }
+
+        .glitch-text {
+            display: inline-block;
+            position: relative;
+            color: var(--error);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Nav Grid for redirection */
+        .nav-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .nav-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            padding: 1.5rem 1rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .nav-card i { font-size: 1.5rem; color: var(--accent); }
+        .nav-card span { font-size: 0.85rem; font-weight: 600; }
+
+        .nav-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        @media (max-width: 480px) {
+            .error-code { font-size: 6rem; }
+            .nav-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="error-container">
+        <div class="error-code">404</div>
+        <div class="glitch-text">Decoherence Detected</div>
+        
+        <h1>Quantum State Lost</h1>
+        <p>The page you are looking for has collapsed into a state of non-existence. It may have moved, or the link you followed is broken.</p>
+
+        <div class="nav-grid">
+            <a href="index.html" class="nav-card">
+                <i class="fa-solid fa-house"></i>
+                <span>Return Home</span>
+            </a>
+            <a href="iqm-emerald.html" class="nav-card">
+                <i class="fa-solid fa-microchip"></i>
+                <span>Emerald Status</span>
+            </a>
+            <a href="rigetti-ankaa-3.html" class="nav-card">
+                <i class="fa-solid fa-bolt"></i>
+                <span>Ankaa-3 Status</span>
+            </a>
+            <a href="about.html" class="nav-card">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>About Project</span>
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>
