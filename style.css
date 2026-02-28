@@ -1,10 +1,11 @@
-/* Base Variables (Dark Mode Default) */
+/* ==========================================================================
+   1. BASE VARIABLES & THEME
+   ========================================================================== */
 :root {
     --bg: #0f172a; --panel: #1e293b; --text: #f8fafc; --muted: #94a3b8;
     --online: #10b981; --offline: #ef4444; --border: #334155; --accent: #3b82f6;
 }
 
-/* Light Mode Overrides */
 [data-theme="light"] {
     --bg: #f8fafc; --panel: #ffffff; --text: #0f172a; --muted: #64748b;
     --border: #e2e8f0; --accent: #2563eb;
@@ -17,7 +18,9 @@ body {
     transition: background-color 0.3s, color 0.3s;
 }
 
-/* Header & Logo */
+/* ==========================================================================
+   2. HEADER, LOGO & BUTTONS
+   ========================================================================== */
 header { 
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; 
@@ -28,7 +31,6 @@ h1 { margin: 0; font-size: 2rem; display: flex; align-items: center; gap: 0.5rem
 h1 span { color: var(--accent); }
 .subtitle { color: var(--muted); margin-top: 0.2rem; font-size: 0.9rem;}
 
-/* Theme Button */
 .theme-btn {
     background: var(--panel); border: 1px solid var(--border); color: var(--text);
     padding: 0.5rem 0.8rem; border-radius: 0.5rem; cursor: pointer;
@@ -36,260 +38,38 @@ h1 span { color: var(--accent); }
 }
 .theme-btn:hover { background: var(--border); }
 
-/* Layout & Cards */
+.view-more-btn {
+    display: inline-flex; align-items: center; justify-content: space-between;
+    margin-top: 1rem; padding: 0.5rem 0.8rem;
+    background: color-mix(in srgb, var(--accent) 15%, transparent);
+    color: var(--accent); text-decoration: none; border-radius: 0.3rem;
+    font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; border: 1px solid transparent; transition: all 0.2s;
+}
+.view-more-btn:hover { background: var(--accent); color: var(--bg); border: 1px solid var(--accent); }
+
+/* ==========================================================================
+   3. LAYOUT & CARDS
+   ========================================================================== */
 .grid {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;
     margin-bottom: 4rem;
 }
-
-.grid.home-layout {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    margin-bottom: 4rem; row-gap: 4rem; column-gap: 1rem;
-}
-.section-title { font-size: 1.25rem; margin-bottom: 1rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em;}
-
-.mfg-title {
-    font-size: 1.1rem; color: var(--text); 
-    border-bottom: 1px solid var(--border); 
-    padding-bottom: 0.5rem; margin-top: 1rem; margin-bottom: 1rem;
-}
+.grid.home-layout { row-gap: 4rem; column-gap: 1rem; }
 
 .card {
     background: var(--panel); border: 1px solid var(--border); border-radius: 0.5rem;
     padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;
     transition: background-color 0.3s, border-color 0.3s;
 }
+.disabled-card { border-style: dashed !important; opacity: 0.6; position: relative; }
+
+.section-title { font-size: 1.25rem; margin-bottom: 1rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em;}
+.mfg-title { font-size: 1.1rem; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin: 1rem 0; }
 .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
 .qpu-name { font-weight: 600; font-size: 1.1rem; margin: 0; }
 .qpu-provider { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
-/* Provider Card Last Seen Text */
-.provider-last-seen {
-    font-size: 0.75rem; 
-    color: var(--muted); 
-    padding-top: 1rem; 
-    border-top: 1px dashed var(--border);
-    font-weight: 500;
-}
-/* Badges */
-.status-badge {
-    font-size: 0.75rem; font-weight: bold; padding: 0.25rem 0.5rem; border-radius: 999px;
-    text-transform: uppercase; display: flex; align-items: center; gap: 0.3rem;
-}
-.status-online { background: rgba(16, 185, 129, 0.1); color: var(--online); border: 1px solid rgba(16, 185, 129, 0.2); }
-.status-offline { background: rgba(239, 68, 68, 0.1); color: var(--offline); border: 1px solid rgba(239, 68, 68, 0.2); }
-.dot { height: 6px; width: 6px; border-radius: 50%; }
-.dot-online { background-color: var(--online); box-shadow: 0 0 5px var(--online); }
-.dot-offline { background-color: var(--offline); }
-
-.metrics { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 1rem; border-top: 1px dashed var(--border); }
-.metric-label { font-size: 0.75rem; color: var(--muted); }
-.metric-value { font-size: 1.25rem; font-weight: 700; font-family: monospace; }
-.time-ago { font-size: 0.7rem; color: var(--muted); text-align: right; }
-
-/* Footer */
-.site-footer {
-    margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border);
-    text-align: center; color: var(--muted); font-size: 0.85rem;
-}
-.disclaimer { font-size: 0.75rem; max-width: 600px; margin: 0.5rem auto 0; opacity: 0.8; }
-
-/* Footer Fix - Prevents mobile nav from blocking text */
-.site-footer {
-    margin-top: 4rem; 
-    padding-top: 2rem; 
-    padding-bottom: 6rem; /* Extends the scrollable area at the bottom of the page */
-    border-top: 1px solid var(--border);
-    text-align: center; color: var(--muted); font-size: 0.85rem;
-}
-
-/* Homepage "View More" Button */
-.view-more-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 1rem;
-    padding: 0.5rem 0.8rem;
-    background: color-mix(in srgb, var(--accent) 15%, transparent);
-    color: var(--accent);
-    text-decoration: none;
-    border-radius: 0.3rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    border: 1px solid transparent;
-    transition: all 0.2s;
-}
-
-.view-more-btn:hover {
-    background: var(--accent);
-    color: var(--bg);
-    border: 1px solid var(--accent);
-}
-
-
-/* --- DEVICE PAGE LAYOUT (ULTIMATE SIDEBAR / MOBILE BOTTOM BAR) --- */
-.device-page { 
-    max-width: 1200px; 
-    margin: 0 auto; 
-    display: flex; 
-    flex-direction: column; 
-    gap: 2rem; 
-    align-items: flex-start;
-    padding-bottom: 6rem; /* Prevents mobile footer from hiding behind the floating bar */
-}
-
-/* MOBILE DEFAULT: Centered, Blurred Bottom Bar */
-.side-nav { 
-    position: fixed;
-    bottom: 1.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    max-width: 400px;
-    z-index: 1000;
-    
-    /* The Glassmorphism Blur Effect (Works in Light & Dark Mode) */
-    background: color-mix(in srgb, var(--panel) 85%, transparent);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    
-    border: 1px solid var(--border);
-    border-radius: 1rem;
-    padding: 0.5rem;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-}
-
-.nav-title { display: none; } /* Hide title on mobile to save space */
-
-.side-nav ul { 
-    list-style: none; padding: 0; margin: 0; 
-    display: flex; flex-direction: row; justify-content: space-around; gap: 0.2rem; 
-}
-
-.side-nav li { 
-    padding: 0.5rem; cursor: pointer; border-radius: 0.5rem; 
-    color: var(--muted); transition: all 0.2s; border: 1px solid transparent; 
-    display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
-    flex: 1; text-align: center;
-}
-
-.nav-icon { font-size: 1.2rem; }
-.nav-text { font-size: 0.65rem; font-weight: 500; } /* Tiny app-style text */
-
-.side-nav li:hover { color: var(--text); background: rgba(150, 150, 150, 0.1); }
-.side-nav li.active { 
-    color: var(--accent); 
-    background: color-mix(in srgb, var(--accent) 15%, transparent); 
-    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); 
-}
-
-/* Base Content Styling */
-.right-column { display: flex; flex-direction: column; gap: 2rem; width: 100%; min-width: 0; }
-.hero-section { background: var(--panel); padding: 2rem; border-radius: 0.5rem; border: 1px solid var(--border); }
-
-/* DESKTOP PC OVERRIDES: Transform back to the Ultimate Left Sidebar */
-@media (min-width: 768px) {
-    .device-page { flex-direction: row; padding-bottom: 0; }
-
-    
-    /* Strip the mobile floating styles */
-    .side-nav { 
-        position: sticky; top: 2rem; bottom: auto; left: auto; transform: none;
-        width: 250px; background: transparent; backdrop-filter: none; 
-        border: none; box-shadow: none; padding: 0;
-    }
-    
-    .nav-title { display: block; margin-top: 0; margin-bottom: 1rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; }
-    
-    .side-nav ul { flex-direction: column; justify-content: flex-start; }
-    
-    .side-nav li { 
-        flex-direction: row; text-align: left; padding: 0.8rem 1rem; 
-        justify-content: flex-start; gap: 0.8rem;
-    }
-    
-    .nav-icon { width: 24px; text-align: center; }
-    .nav-text { font-size: 0.95rem; }
-
-    .side-nav li.active { background: var(--panel); border: 1px solid var(--border); }
-    .right-column { width: calc(100% - 250px - 2rem); } 
-}
-
-/* Tabs & Uptime Engine */
-.content-area { width: 100%; min-width: 0; }
-.tab-pane { display: none; animation: fadeIn 0.3s ease; }
-.tab-pane.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-/* Container: Forces a single perfect row */
-.uptime-grid {
-    display: flex;
-    flex-direction: row; /* Single row only */
-    align-items: stretch;
-    width: 100%;
-    height: 35px;
-    
-    /* Reduced gap to 1px. 
-       Why? With 365 days, a 2px gap takes up 730px of space alone! 
-       1px ensures 365 days can actually fit on a screen. */
-    gap: 1px; 
-}
-
-/* Bars: The "flex: 1 1 0px" is the secret sauce */
-.uptime-block {
-    /* This forces every block to share the space equally.
-       - If 30 items: They get huge.
-       - If 365 items: They become hairline thin. */
-    flex: 1 1 0px; 
-    
-    border-radius: 2px;
-    background: var(--online);
-    opacity: 0.8;
-    transition: all 0.2s ease;
-    
-    /* REMOVED max-width. Now 30 days will stretch to fill the box! */
-}
-
-/* Hover Effects */
-.uptime-block:hover {
-    opacity: 1;
-    transform: scaleY(1.25);
-    z-index: 2;
-    box-shadow: 0 0 8px rgba(0,0,0,0.5);
-}
-
-/* Colors */
-.uptime-block.down { background: var(--offline); }
-.uptime-block.warn { background: #eab308; }
-
-/* --- UI COMPONENTS: Timeframes & Overlays --- */
-.timeframe-toggle {
-    display: flex;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 0.5rem;
-    overflow: hidden;
-}
-.timeframe-toggle button {
-    background: transparent;
-    color: var(--muted);
-    border: none;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.timeframe-toggle button:hover { background: rgba(255,255,255,0.05); color: var(--text); }
-.timeframe-toggle button.active { background: var(--panel); color: var(--accent); }
-
-.disabled-card {
-    position: relative;
-    border-style: dashed !important;
-    opacity: 0.6;
-}
 .coming-soon-overlay {
     position: absolute;
     inset: 0;
@@ -302,277 +82,179 @@ h1 span { color: var(--accent); }
     text-transform: uppercase;
 }
 
-.uptime-labels {
-    display: flex; justify-content: space-between; 
-    margin-top: 0.5rem; color: var(--muted); font-size: 0.7rem;
+/* ==========================================================================
+   4. METRICS & BADGES
+   ========================================================================== */
+.metrics { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 1rem; border-top: 1px dashed var(--border); }
+.metric-label { font-size: 0.75rem; color: var(--muted); }
+.metric-value { font-size: 1.25rem; font-weight: 700; font-family: monospace; }
+.time-ago { font-size: 0.7rem; color: var(--muted); text-align: right; }
+.provider-last-seen { font-size: 0.75rem; color: var(--muted); padding-top: 1rem; border-top: 1px dashed var(--border); font-weight: 500; }
+
+.status-badge {
+    font-size: 0.75rem; font-weight: bold; padding: 0.25rem 0.5rem; border-radius: 999px;
+    text-transform: uppercase; display: flex; align-items: center; gap: 0.3rem;
+}
+.status-online { background: rgba(16, 185, 129, 0.1); color: var(--online); border: 1px solid rgba(16, 185, 129, 0.2); }
+.status-offline { background: rgba(239, 68, 68, 0.1); color: var(--offline); border: 1px solid rgba(239, 68, 68, 0.2); }
+.dot { height: 6px; width: 6px; border-radius: 50%; }
+.dot-online { background-color: var(--online); box-shadow: 0 0 5px var(--online); }
+.dot-offline { background-color: var(--offline); }
+
+.info-icon { color: var(--muted); font-size: 0.8rem; margin-left: 6px; cursor: help; transition: color 0.2s; }
+.info-icon:hover { color: var(--accent); }
+
+/* ==========================================================================
+   5. DEVICE PAGE & SIDEBAR (MOBILE FIRST)
+   ========================================================================== */
+.device-page { 
+    max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; 
+    gap: 2rem; align-items: flex-start; padding-bottom: 6rem;
 }
 
-/* --- INFO TAB: Table & FAQ Styling --- */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-    font-size: 0.9rem;
+.side-nav { 
+    position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+    width: 90%; max-width: 400px; z-index: 1000;
+    background: color-mix(in srgb, var(--panel) 85%, transparent);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border); border-radius: 1rem; padding: 0.5rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
 }
-
-table th {
-    padding: 1rem;
-    background: color-mix(in srgb, var(--panel) 80%, black); /* Slightly darker than panel */
-    width: 35%;
-    font-weight: 600;
-    color: var(--text);
+.nav-title { display: none; }
+.side-nav ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: row; justify-content: space-around; gap: 0.2rem; }
+.side-nav li { 
+    padding: 0.5rem; cursor: pointer; border-radius: 0.5rem; color: var(--muted); 
+    transition: all 0.2s; border: 1px solid transparent; display: flex; 
+    flex-direction: column; align-items: center; gap: 0.3rem; flex: 1; text-align: center;
 }
+.nav-icon { font-size: 1.2rem; }
+.nav-text { font-size: 0.65rem; font-weight: 500; }
+.side-nav li:hover { color: var(--text); background: rgba(150, 150, 150, 0.1); }
+.side-nav li.active { color: var(--accent); background: color-mix(in srgb, var(--accent) 15%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
 
-table td {
-    padding: 1rem;
-    color: var(--muted);
+.right-column { display: flex; flex-direction: column; gap: 2rem; width: 100%; min-width: 0; }
+.hero-section { background: var(--panel); padding: 2rem; border-radius: 0.5rem; border: 1px solid var(--border); }
+
+/* ==========================================================================
+   6. TABS, UPTIME GRID & TIMEFRAME TOGGLES
+   ========================================================================== */
+.content-area { width: 100%; min-width: 0; scroll-margin-top: 20px; }
+.tab-pane { display: none; animation: fadeIn 0.3s ease; }
+.tab-pane.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Shared header class to fix flexbox breaking on mobile */
+.tab-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 1rem; }
+
+.timeframe-toggle { display: flex; background: var(--bg); border: 1px solid var(--border); border-radius: 0.5rem; overflow: hidden; }
+.timeframe-toggle button {
+    background: transparent; color: var(--muted); border: none; padding: 0.4rem 0.8rem;
+    font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+    white-space: nowrap; flex-shrink: 0;
 }
+.timeframe-toggle button:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+.timeframe-toggle button.active { background: var(--panel); color: var(--accent); }
 
-table tr {
-    border-bottom: 1px solid var(--border);
-    transition: background-color 0.2s ease;
-}
+.uptime-grid { display: flex; flex-direction: row; align-items: stretch; width: 100%; height: 35px; gap: 1px; }
+.uptime-block { flex: 1 1 0px; border-radius: 2px; background: var(--online); opacity: 0.8; transition: all 0.2s ease; }
+.uptime-block:hover { opacity: 1; transform: scaleY(1.25); z-index: 2; box-shadow: 0 0 8px rgba(0,0,0,0.5); }
+.uptime-block.down { background: var(--offline); }
+.uptime-block.warn { background: #eab308; }
+.uptime-labels { display: flex; justify-content: space-between; margin-top: 0.5rem; color: var(--muted); font-size: 0.7rem; }
 
-/* Add a subtle highlight when hovering over a table row */
-table tr:hover {
-    background-color: color-mix(in srgb, var(--panel) 95%, white);
-}
+/* ==========================================================================
+   7. CHARTS & CANVAS
+   ========================================================================== */
+.chart-card { padding: 1rem; margin-bottom: 0.5rem; display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--border); border-radius: 0.5rem;}
+.canvas-container { position: relative; height: 250px; width: 100%; margin-bottom: 0.5rem; }
+.chart-caption { font-size: 0.75rem; color: var(--muted); text-align: center; margin-top: 1rem; font-style: italic; }
 
-/* Remove border from the last row so it looks clean inside the card */
-table tr:last-child {
-    border-bottom: none;
-}
+/* ==========================================================================
+   8. INFO, LINKS & OFFICIAL STATUS
+   ========================================================================== */
+table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+table th { padding: 1rem; background: color-mix(in srgb, var(--panel) 80%, black); width: 35%; font-weight: 600; color: var(--text); }
+table td { padding: 1rem; color: var(--muted); }
+table tr { border-bottom: 1px solid var(--border); transition: background-color 0.2s ease; }
+table tr:hover { background-color: color-mix(in srgb, var(--panel) 95%, white); }
+table tr:last-child { border-bottom: none; }
 
-.faq-item h4 {
-    margin: 0 0 0.5rem 0;
-    display: flex;
-    align-items: center;
-    color: var(--text);
-}
+.faq-item h4 { margin: 0 0 0.5rem 0; display: flex; align-items: center; color: var(--text); }
+.faq-item h4 i { color: var(--accent); margin-right: 8px; }
+.faq-item p { margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
 
-.faq-item h4 i {
-    color: var(--accent);
-    margin-right: 8px;
-}
-
-.faq-item p {
-    margin: 0;
-    font-size: 0.85rem;
-    color: var(--muted);
-    line-height: 1.6;
-}
-
-/* --- LINKS TAB: Interactive Cards --- */
-/* Add high specificity (.card.link-card) to override the default column layout */
 .card.link-card {
-    text-decoration: none;
-    color: inherit;
-    display: flex;
-    flex-direction: row;      /* Forces icon and text side-by-side */
-    align-items: center;
-    text-align: left;         /* Forces text to align left */
-    gap: 1.2rem;
-    padding: 1.2rem;
+    text-decoration: none; color: inherit; display: flex; flex-direction: row; 
+    align-items: center; text-align: left; gap: 1.2rem; padding: 1.2rem;
     transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
+.card.link-card h4 { margin: 0 0 0.3rem 0; color: var(--text); transition: color 0.2s ease; }
+.card.link-card p { margin: 0; font-size: 0.85rem; color: var(--muted); }
+.card.link-card:hover { transform: translateY(-2px); border-color: var(--muted); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+.card.link-card:hover h4 { color: var(--accent); }
 
-.card.link-card h4 {
-    margin: 0 0 0.3rem 0;
-    color: var(--text);
-    transition: color 0.2s ease;
-}
-
-.card.link-card p {
-    margin: 0;
-    font-size: 0.85rem;
-    color: var(--muted);
-}
-
-.link-card-icon {
-    width: 45px;
-    height: 45px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.4rem;
-    flex-shrink: 0;
-}
-
+.link-card-icon { width: 45px; height: 45px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
 .icon-ionq { background: rgba(255,255,255,0.05); border: 1px solid var(--border); }
 .icon-aws { background: rgba(249,115,22,0.1); color: #f97316; border: 1px solid rgba(249,115,22,0.3); }
 .icon-azure { background: rgba(59,130,246,0.1); color: #3b82f6; border: 1px solid rgba(59,130,246,0.3); }
 
-.card.link-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--muted);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
+.internal-nav-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+.card.link-card.internal-card { flex-direction: column; text-align: center; justify-content: center; gap: 0.8rem; padding: 1.5rem 1rem; }
+.card.link-card.internal-card i { font-size: 1.8rem; transition: transform 0.2s ease; }
+.card.link-card.internal-card:hover i { transform: scale(1.1); }
 
-.card.link-card:hover h4 {
-    color: var(--accent); 
-}
-
-/* Override back to column specifically for the internal nav grid */
-.internal-nav-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-}
-
-.card.link-card.internal-card {
-    flex-direction: column;
-    text-align: center;
-    justify-content: center;
-    gap: 0.8rem;
-    padding: 1.5rem 1rem;
-}
-
-.card.link-card.internal-card i {
-    font-size: 1.8rem;
-    transition: transform 0.2s ease;
-}
-
-.card.link-card.internal-card:hover i {
-    transform: scale(1.1); 
-}
-
-/* --- OFFICIAL STATUS CARD (UPTIME TAB) --- */
-.official-status-card {
-    background: color-mix(in srgb, var(--accent) 5%, var(--panel));
-    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
-    border-radius: 0.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    padding: 1.5rem;
-}
-
-@media (min-width: 768px) {
-    .official-status-card {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-    }
-}
-
+.official-status-card { background: color-mix(in srgb, var(--accent) 5%, var(--panel)); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); border-radius: 0.5rem; display: flex; flex-direction: column; gap: 1.5rem; padding: 1.5rem; }
 .official-status-text h4 { margin: 0 0 0.5rem 0; color: var(--accent); }
 .official-status-text p { margin: 0 0 0.5rem 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
 .official-warning { font-size: 0.75rem !important; color: var(--offline) !important; opacity: 0.9; font-weight: 600; margin-bottom: 0 !important; }
-
-.official-status-btn {
-    text-decoration: none; padding: 0.6rem 1.2rem; border-radius: 6px;
-    background: var(--accent); color: #fff; font-weight: bold; font-size: 0.85rem;
-    white-space: nowrap; text-align: center; transition: opacity 0.2s;
-}
+.official-status-btn { text-decoration: none; padding: 0.6rem 1.2rem; border-radius: 6px; background: var(--accent); color: #fff; font-weight: bold; font-size: 0.85rem; white-space: nowrap; text-align: center; transition: opacity 0.2s; }
 .official-status-btn:hover { opacity: 0.9; }
 
-/* Internal Navigation Grid Alignment */
-.internal-nav-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
+/* ==========================================================================
+   9. FOOTER
+   ========================================================================== */
+.site-footer {
+    margin-top: 4rem; padding-top: 2rem; padding-bottom: 6rem;
+    border-top: 1px solid var(--border); text-align: center; color: var(--muted); font-size: 0.85rem;
+}
+.disclaimer { font-size: 0.75rem; max-width: 600px; margin: 0.5rem auto 0; opacity: 0.8; }
+
+/* ==========================================================================
+   10. DESKTOP & MOBILE OVERRIDES
+   ========================================================================== */
+
+/* DESKTOP (Sidebar overrides) */
+@media (min-width: 768px) {
+    .device-page { flex-direction: row; padding-bottom: 0; }
+    .side-nav { position: sticky; top: 2rem; bottom: auto; left: auto; transform: none; width: 250px; background: transparent; backdrop-filter: none; border: none; box-shadow: none; padding: 0; }
+    .nav-title { display: block; margin-top: 0; margin-bottom: 1rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; }
+    .side-nav ul { flex-direction: column; justify-content: flex-start; }
+    .side-nav li { flex-direction: row; text-align: left; padding: 0.8rem 1rem; justify-content: flex-start; gap: 0.8rem; }
+    .nav-icon { width: 24px; text-align: center; }
+    .nav-text { font-size: 0.95rem; }
+    .side-nav li.active { background: var(--panel); border: 1px solid var(--border); }
+    .right-column { width: calc(100% - 250px - 2rem); } 
+    .official-status-card { flex-direction: row; justify-content: space-between; align-items: center; }
 }
 
-.internal-card {
-    text-align: center;
-    padding: 1.5rem 1rem;
-    flex-direction: column;
-    justify-content: center;
-    gap: 0.8rem;
-}
-
-.internal-card i {
-    font-size: 1.8rem;
-    transition: transform 0.2s ease;
-}
-
-.chart-caption {
-    font-size: 0.75rem;
-    color: var(--muted);
-    text-align: center;
-    margin-top: 1rem;
-    font-style: italic;
-}
-.info-icon {
-    color: var(--muted);
-    font-size: 0.8rem;
-    margin-left: 6px;
-    cursor: help;
-    transition: color 0.2s;
-}
-.info-icon:hover { color: var(--accent); }
-
-.internal-card:hover i {
-    transform: scale(1.1); /* Pop the icon up slightly on hover */
-}
-
-.content-area {
-    /* This creates an invisible cushion when scrolling to this element */
-    scroll-margin-top: 20px; 
-}
-
-/* On mobile, give it a bit more space so it doesn't feel cramped */
+/* MOBILE FIXES */
 @media (max-width: 768px) {
-    .content-area {
-        scroll-margin-top: 60px; /* Adjust this if you have a sticky top nav */
-    }
-}
-
-/* --- RESPONSIVE FIXES --- */
-
-/* 1. Fix the overlapping chart captions */
-.chart-card {
-    padding: 1rem;
-    margin-bottom: 0.5rem;
-    height: auto; /* Lets the card expand if text wraps */
-    display: flex;
-    flex-direction: column;
-}
-.canvas-container {
-    position: relative;
-    height: 240px; /* Locks the chart height safely */
-    width: 100%;
-    margin-bottom: 0.5rem;
-}
-
-/* 2. Fix the cut-off timeframe buttons */
-.section-header {
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    margin-bottom: 1rem;
-    flex-wrap: wrap; /* Allows buttons to drop below title on tiny screens */
-    gap: 1rem;
-}
-.timeframe-toggle button {
-    white-space: nowrap; /* Stops text inside buttons from wrapping/disappearing */
-    flex-shrink: 0;
-}
-
-/* 3. Mobile-Specific Adjustments */
-@media (max-width: 768px) {
-    /* Give the bottom nav more room and slightly shrink the text/padding */
-    .side-nav {
-        width: 95%;
-        max-width: none;
-        padding: 0.3rem;
-    }
-    .side-nav li {
-        padding: 0.4rem 0.1rem;
-    }
-    .nav-text {
-        font-size: 0.6rem;
-    }
+    /* Compress Nav */
+    .side-nav { width: 95%; max-width: none; padding: 0.3rem; }
+    .side-nav li { padding: 0.4rem 0.1rem; }
+    .nav-text { font-size: 0.6rem; }
     
-    /* Shrink the timeframe buttons slightly so they fit better */
-    .timeframe-toggle button {
-        padding: 0.3rem 0.6rem;
-        font-size: 0.7rem;
-    }
+    /* Ensure Hero Titles fit */
+    .hero-section h2 { font-size: 2rem !important; }
+    .content-area { scroll-margin-top: 60px; }
+
+    /* FIX: Force flex headers to stack so timeframes don't squish */
+    .tab-header { flex-direction: column !important; align-items: flex-start !important; gap: 0.8rem; }
     
-    /* Make the hero title scale down so it doesn't break lines awkwardly */
-    .hero-section h2 {
-        font-size: 2rem !important;
-    }
+    /* FIX: Make timeframe buttons stretch evenly across mobile width */
+    .timeframe-toggle { width: 100%; display: flex; }
+    .timeframe-toggle button { flex: 1; padding: 0.5rem 0.2rem; font-size: 0.75rem; text-align: center; }
+
+    /* Tighten cards slightly to prevent X-axis cutoff on charts */
+    .card { padding: 1rem 0.75rem; }
 }
